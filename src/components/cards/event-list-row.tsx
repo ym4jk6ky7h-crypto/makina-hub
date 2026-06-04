@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Calendar, MapPin } from "lucide-react";
 import { EventActions } from "@/components/events/event-actions";
 import { EventTimingBadge } from "@/components/events/event-timing-badge";
-import { MakinaPlaceholder } from "@/components/ui/makina-placeholder";
+import { eventPosterUrl } from "@/lib/events/event-poster";
 import type { Event } from "@/types/database";
 import { formatDate } from "@/lib/utils";
 
@@ -13,6 +13,8 @@ type EventListRowProps = {
 };
 
 export function EventListRow({ event, showDateColumn = true }: EventListRowProps) {
+  const poster = eventPosterUrl(event.title, event.image_url);
+
   return (
     <div className="glass-card-hover grid gap-4 rounded-2xl p-4 sm:grid-cols-[180px_1fr] lg:grid-cols-[220px_1fr]">
       {showDateColumn && (
@@ -26,17 +28,13 @@ export function EventListRow({ event, showDateColumn = true }: EventListRowProps
           className="group flex flex-col gap-4 sm:flex-row sm:items-stretch"
         >
           <div className="relative aspect-[3/4] w-full shrink-0 overflow-hidden rounded-xl bg-secondary sm:aspect-[4/5] sm:w-44 lg:w-52">
-            {event.image_url ? (
-              <Image
-                src={event.image_url}
-                alt={`Cartel: ${event.title}`}
-                fill
-                className="object-cover transition-transform group-hover:scale-105"
-                sizes="208px"
-              />
-            ) : (
-              <MakinaPlaceholder aspect="poster" fill className="rounded-xl" />
-            )}
+            <Image
+              src={poster}
+              alt={`Cartel: ${event.title}`}
+              fill
+              className="object-cover transition-transform group-hover:scale-105"
+              sizes="208px"
+            />
           </div>
           <div className="flex min-w-0 flex-1 flex-col justify-center py-1">
             <EventTimingBadge eventDate={event.event_date} />

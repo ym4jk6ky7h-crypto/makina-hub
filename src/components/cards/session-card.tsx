@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Clock, Youtube } from "lucide-react";
+import { getArtistImageUrl } from "@/lib/artists/artist-image";
 import { MakinaPlaceholder } from "@/components/ui/makina-placeholder";
 import { PlayThumbnailOverlay } from "@/components/ui/play-youtube-button";
 import { PlayYoutubeButton } from "@/components/ui/play-youtube-button";
@@ -16,7 +17,11 @@ type SessionCardProps = {
 };
 
 export function SessionCard({ session }: SessionCardProps) {
-  const thumb = youtubeThumbnail(session.youtube_url);
+  const thumb =
+    youtubeThumbnail(session.youtube_url) ??
+    (session.artist
+      ? getArtistImageUrl(session.artist.name, session.artist.image_url)
+      : null);
   const videoId = youtubeVideoId(session.youtube_url);
   const external = isDirectYoutubeWatch(session.youtube_url);
   const href = external && session.youtube_url
@@ -33,6 +38,7 @@ export function SessionCard({ session }: SessionCardProps) {
             fill
             className="object-cover transition-transform group-hover:scale-105"
             sizes="(max-width: 640px) 100vw, 320px"
+            unoptimized={!videoId}
           />
         ) : (
           <MakinaPlaceholder aspect="video" fill className="rounded-t-xl" />

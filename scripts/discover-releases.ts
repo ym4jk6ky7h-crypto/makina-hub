@@ -5,6 +5,7 @@
  * Requiere migración 003_new_releases.sql en Supabase
  */
 import { getMergedReleases } from "../data/merge-releases";
+import { normalizePurchaseUrl } from "../src/lib/normalize-purchase-url";
 import { createAdminClient, loadEnv } from "./lib/supabase-admin";
 
 loadEnv();
@@ -38,7 +39,7 @@ async function main() {
       artist_id,
       label_id,
       release_date: r.releaseDate,
-      purchase_url: r.purchaseUrl,
+      purchase_url: normalizePurchaseUrl(r.purchaseUrl),
       store_name: r.storeName,
       cover_url: r.coverUrl ?? null,
       description: r.description ?? null,

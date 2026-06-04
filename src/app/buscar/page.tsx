@@ -4,7 +4,6 @@ import { ArtistCard } from "@/components/cards/artist-card";
 import { EventCard } from "@/components/cards/event-card";
 import { TrackCard } from "@/components/cards/track-card";
 import { SessionCard } from "@/components/cards/session-card";
-import { VinylCard } from "@/components/cards/vinyl-card";
 import { LabelCard } from "@/components/cards/label-card";
 import { SearchBar } from "@/components/search/search-bar";
 import { SearchExamples } from "@/components/search/search-examples";
@@ -16,7 +15,7 @@ import { globalSearch } from "@/services/search.service";
 export const metadata = buildMetadata({
   title: "Buscar",
   description:
-    "Búsqueda global en artistas, temas, eventos, sesiones, vinilos y sellos.",
+    "Búsqueda global en artistas, temas, eventos, sesiones y sellos.",
   path: "/buscar",
 });
 
@@ -54,7 +53,6 @@ async function SearchResults({
     { key: "eventos", count: results.events.length },
     { key: "musica", count: results.tracks.length },
     { key: "sesiones", count: results.sessions.length },
-    { key: "vinilos", count: results.vinyls.length },
     { key: "sellos", count: results.labels.length },
   ];
   const total = sections.reduce((n, s) => n + s.count, 0);
@@ -122,18 +120,6 @@ async function SearchResults({
           </div>
         </section>
       )}
-      {show("vinilos") && results.vinyls.length > 0 && (
-        <section>
-          <h2 className="mb-4 text-lg font-semibold">
-            Vinilos ({results.vinyls.length})
-          </h2>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {results.vinyls.map((v) => (
-              <VinylCard key={v.id} vinyl={v} />
-            ))}
-          </div>
-        </section>
-      )}
       {show("sellos") && results.labels.length > 0 && (
         <section>
           <h2 className="mb-4 text-lg font-semibold">
@@ -159,7 +145,7 @@ export default async function BuscarPage({ searchParams }: PageProps) {
     <div className="px-4 py-8 lg:px-8">
       <h1 className="text-3xl font-bold tracking-tight">Buscar</h1>
       <p className="mt-2 text-muted-foreground">
-        Artistas, canciones, eventos, sesiones, vinilos y sellos
+        Artistas, canciones, eventos, sesiones y sellos
       </p>
       <div className="mt-6 max-w-xl">
         <SearchBar

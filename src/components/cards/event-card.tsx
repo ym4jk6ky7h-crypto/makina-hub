@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Calendar, MapPin } from "lucide-react";
-import { MakinaPlaceholder } from "@/components/ui/makina-placeholder";
+import { eventPosterUrl } from "@/lib/events/event-poster";
 import type { Event } from "@/types/database";
 import { formatDate } from "@/lib/utils";
 
@@ -11,6 +11,8 @@ type EventCardProps = {
 };
 
 export function EventCard({ event, variant = "grid" }: EventCardProps) {
+  const poster = eventPosterUrl(event.title, event.image_url);
+
   if (variant === "row") {
     return (
       <Link
@@ -18,17 +20,13 @@ export function EventCard({ event, variant = "grid" }: EventCardProps) {
         className="group flex flex-col gap-4 sm:flex-row sm:items-stretch"
       >
         <div className="relative aspect-[3/4] w-full shrink-0 overflow-hidden rounded-xl bg-secondary sm:aspect-[4/5] sm:w-44 lg:w-52">
-          {event.image_url ? (
-            <Image
-              src={event.image_url}
-              alt={`Cartel: ${event.title}`}
-              fill
-              className="object-cover transition-transform group-hover:scale-105"
-              sizes="208px"
-            />
-          ) : (
-            <MakinaPlaceholder aspect="poster" fill className="rounded-xl" />
-          )}
+          <Image
+            src={poster}
+            alt={`Cartel: ${event.title}`}
+            fill
+            className="object-cover transition-transform group-hover:scale-105"
+            sizes="208px"
+          />
         </div>
         <div className="flex min-w-0 flex-1 flex-col justify-center py-1">
           <p className="text-sm font-medium text-makina-cyan sm:hidden">
@@ -61,17 +59,13 @@ export function EventCard({ event, variant = "grid" }: EventCardProps) {
       className="group glass-card overflow-hidden transition-transform hover:scale-[1.02]"
     >
       <div className="relative aspect-[3/4] overflow-hidden bg-secondary">
-        {event.image_url ? (
-          <Image
-            src={event.image_url}
-            alt={`Cartel: ${event.title}`}
-            fill
-            className="object-cover transition-transform group-hover:scale-105"
-            sizes="(max-width: 768px) 50vw, 25vw"
-          />
-        ) : (
-          <MakinaPlaceholder aspect="poster" fill />
-        )}
+        <Image
+          src={poster}
+          alt={`Cartel: ${event.title}`}
+          fill
+          className="object-cover transition-transform group-hover:scale-105"
+          sizes="(max-width: 768px) 50vw, 25vw"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <h3 className="line-clamp-2 font-semibold leading-tight text-white">

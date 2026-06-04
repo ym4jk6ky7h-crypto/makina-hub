@@ -4,7 +4,7 @@
  */
 import { MAKINA_ARTISTS } from "../data/makina-artists";
 import { createAdminClient, loadEnv } from "./lib/supabase-admin";
-import { fetchYouTubeForTrack } from "./lib/youtube";
+import { fetchYouTubeForArtist } from "./lib/youtube";
 
 loadEnv();
 
@@ -42,11 +42,8 @@ async function main() {
 
     const title = `${seed.name} — Sesión mákina`;
     const slug = `${seed.slug}-sesion-makina`;
-    const youtube_url = await fetchYouTubeForTrack(
-      seed.name,
-      "sesion makina remember DJ set",
-      youtubeKey
-    );
+    const yt = await fetchYouTubeForArtist(seed.name, youtubeKey);
+    const youtube_url = yt.videoUrl ?? yt.searchUrl;
 
     const row = {
       slug,

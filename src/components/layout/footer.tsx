@@ -28,7 +28,7 @@ export function Footer() {
             <MakinaLogo size="md" />
             <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">
               {SITE_TAGLINE}. Artistas, eventos remember, sesiones históricas,
-              sellos discográficos y vinilos de la cultura mákina en Catalunya.
+              sellos discográficos y la cultura mákina en Catalunya.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               {["Remember", "Mákina", "Hardcore", "Revival"].map((tag) => (

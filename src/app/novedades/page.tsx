@@ -28,16 +28,18 @@ export default async function NovedadesPage() {
 
   try {
     const releases = await listNewReleases();
+    const curated = releases.filter((r) => !r.slug.startsWith("auto-discogs-"));
+    const discogs = releases.filter((r) => r.slug.startsWith("auto-discogs-"));
 
     return (
       <>
         <PageHero
           title="Nuevas producciones"
-          subtitle="Lanzamientos recientes de la escena mákina catalana. Cada ficha incluye enlace directo a la tienda de compra."
+          subtitle="Lanzamientos curados con enlace a Beatport, Juno o Bandcamp. Abajo, detecciones recientes en Discogs (vinilos y digitales de la escena)."
           image={SITE_IMAGES.heroNovedades}
-          badge="Comprar"
+          badge={curated.length > 0 ? `${curated.length} curadas` : "Comprar"}
         />
-        <div className="mx-auto max-w-7xl px-4 py-10 lg:px-8">
+        <div className="mx-auto max-w-7xl space-y-12 px-4 py-10 lg:px-8">
           {releases.length === 0 ? (
             <EmptyState
               icon={ShoppingBag}
@@ -46,18 +48,41 @@ export default async function NovedadesPage() {
               hint={
                 <span className="block space-y-1 text-xs">
                   <span className="block">1. SQL: 003_new_releases.sql</span>
-                  <span className="block">
-                    2. Terminal: npm run db:discover-releases
-                  </span>
+                  <span className="block">2. Terminal: npm run db:discover-releases</span>
                 </span>
               }
             />
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2">
-              {releases.map((release) => (
-                <ReleaseCard key={release.id} release={release} />
-              ))}
-            </div>
+            <>
+              {curated.length > 0 && (
+                <section>
+                  <h2 className="mb-2 text-xl font-bold">Lanzamientos curados</h2>
+                  <p className="mb-6 text-sm text-muted-foreground">
+                    Producciones mákina con enlace directo a tienda digital.
+                  </p>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {curated.map((release) => (
+                      <ReleaseCard key={release.id} release={release} />
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {discogs.length > 0 && (
+                <section>
+                  <h2 className="mb-2 text-xl font-bold">Detectado en Discogs</h2>
+                  <p className="mb-6 text-sm text-muted-foreground">
+                    Publicaciones recientes del artista en Discogs (pueden ser EPs,
+                    compilaciones o reediciones — no siempre son «último single»).
+                  </p>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {discogs.slice(0, 24).map((release) => (
+                      <ReleaseCard key={release.id} release={release} />
+                    ))}
+                  </div>
+                </section>
+              )}
+            </>
           )}
         </div>
       </>

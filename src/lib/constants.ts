@@ -1,7 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Calendar,
-  Disc3,
   Headphones,
   Home,
   Mic2,
@@ -15,7 +14,7 @@ import {
 export const SITE_NAME = "Makina Hub";
 export const SITE_TAGLINE = "La enciclopedia de la mákina catalana";
 export const SITE_DESCRIPTION =
-  "La plataforma de referencia de la música mákina, remember y makina revival en Catalunya. Artistas, eventos, sesiones, sellos y vinilos.";
+  "La plataforma de referencia de la música mákina, remember y makina revival en Catalunya. Artistas, eventos, sesiones y sellos.";
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://makina-hub.vercel.app";
 
@@ -61,7 +60,6 @@ export const NAV_ITEMS: NavItem[] = [
   },
   { href: "/sesiones", label: "Sesiones", icon: Headphones, group: "catalogo" },
   { href: "/sellos", label: "Sellos", icon: Tag, group: "catalogo" },
-  { href: "/vinilos", label: "Vinilos", icon: Disc3, group: "catalogo" },
   {
     href: "/ask",
     label: "Ask Makina AI",
@@ -87,8 +85,7 @@ export type SearchTab =
   | "eventos"
   | "musica"
   | "sesiones"
-  | "sellos"
-  | "vinilos";
+  | "sellos";
 
 export const SEARCH_TABS: { id: SearchTab; label: string }[] = [
   { id: "todos", label: "Todo" },
@@ -97,7 +94,6 @@ export const SEARCH_TABS: { id: SearchTab; label: string }[] = [
   { id: "musica", label: "Música" },
   { id: "sesiones", label: "Sesiones" },
   { id: "sellos", label: "Sellos" },
-  { id: "vinilos", label: "Vinilos" },
 ];
 
 export const NAV_GROUPS = {

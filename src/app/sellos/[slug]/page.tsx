@@ -2,10 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TrackCard } from "@/components/cards/track-card";
 import { ArtistCard } from "@/components/cards/artist-card";
-import { VinylCard } from "@/components/cards/vinyl-card";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { getLabelBySlug } from "@/services/labels.service";
-import type { TrackWithRelations, VinylWithRelations } from "@/types/database";
+import type { TrackWithRelations } from "@/types/database";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -26,7 +25,6 @@ export default async function SelloDetailPage({ params }: PageProps) {
   if (!label) notFound();
 
   const tracks = (label.tracks ?? []) as TrackWithRelations[];
-  const vinyls = (label.vinyls ?? []) as VinylWithRelations[];
 
   return (
     <article className="px-4 py-8 lg:px-8">
@@ -47,17 +45,6 @@ export default async function SelloDetailPage({ params }: PageProps) {
             <div className="grid gap-3 sm:grid-cols-2">
               {tracks.map((track) => (
                 <TrackCard key={track.id} track={track} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {vinyls.length > 0 && (
-          <section className="mt-12">
-            <h2 className="mb-6 text-xl font-bold">Vinilos</h2>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-              {vinyls.map((vinyl) => (
-                <VinylCard key={vinyl.id} vinyl={vinyl} />
               ))}
             </div>
           </section>

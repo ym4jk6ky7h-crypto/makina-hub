@@ -1,5 +1,22 @@
 import { createClient } from "@/lib/supabase/server";
+import { normalizePurchaseUrl } from "@/lib/normalize-purchase-url";
 import type { Artist, Label, NewRelease, NewReleaseWithRelations } from "@/types/database";
+
+function sortReleases(items: NewReleaseWithRelations[]): NewReleaseWithRelations[] {
+  return [...items].sort((a, b) => {
+    const aCurated = !a.slug.startsWith("auto-discogs-");
+    const bCurated = !b.slug.startsWith("auto-discogs-");
+    if (aCurated !== bCurated) return aCurated ? -1 : 1;
+    return b.release_date.localeCompare(a.release_date);
+  });
+}
+
+function mapRelease(row: NewReleaseWithRelations): NewReleaseWithRelations {
+  return {
+    ...row,
+    purchase_url: normalizePurchaseUrl(row.purchase_url),
+  };
+}
 
 const releaseSelect = `
   *,
@@ -25,7 +42,8 @@ export async function listNewReleases(options?: {
   const { data, error } = await query;
   if (error) throw new Error(`new_releases: ${error.message}`);
 
-  return (data ?? []) as NewReleaseWithRelations[];
+  const rows = (data ?? []) as NewReleaseWithRelations[];
+  return sortReleases(rows.map(mapRelease));
 }
 
 export async function getNewReleaseBySlug(
@@ -41,7 +59,7 @@ export async function getNewReleaseBySlug(
   if (error) throw new Error(`new_releases: ${error.message}`);
   if (!data) return null;
 
-  return data as NewReleaseWithRelations;
+  return mapRelease(data as NewReleaseWithRelations);
 }
 
 export type { Artist, Label, NewRelease };

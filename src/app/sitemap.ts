@@ -11,7 +11,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/novedades",
     "/sesiones",
     "/sellos",
-    "/vinilos",
     "/ask",
     "/buscar",
   ].map((path) => ({
@@ -23,13 +22,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   try {
     const supabase = await createClient();
-    const [artists, tracks, events, sessions, vinyls, labels, releases] =
+    const [artists, tracks, events, sessions, labels, releases] =
       await Promise.all([
         supabase.from("artists").select("slug"),
         supabase.from("tracks").select("slug"),
         supabase.from("events").select("slug"),
         supabase.from("sessions").select("slug"),
-        supabase.from("vinyls").select("slug"),
         supabase.from("labels").select("slug"),
         supabase.from("new_releases").select("slug"),
       ]);
@@ -50,10 +48,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ...(sessions.data ?? []).map((s) => ({
         url: `${SITE_URL}/sesiones/${s.slug}`,
         pathEn: `/session/${s.slug}`,
-      })),
-      ...(vinyls.data ?? []).map((v) => ({
-        url: `${SITE_URL}/vinilos/${v.slug}`,
-        pathEn: `/vinyl/${v.slug}`,
       })),
       ...(labels.data ?? []).map((l) => ({
         url: `${SITE_URL}/sellos/${l.slug}`,

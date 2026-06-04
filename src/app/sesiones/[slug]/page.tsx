@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import { Clock, Headphones } from "lucide-react";
 import { PlayYoutubeButton } from "@/components/ui/play-youtube-button";
 import { buildMetadata } from "@/lib/seo/metadata";
-import { isDirectYoutubeWatch, youtubeThumbnail } from "@/lib/youtube";
+import { getArtistImageUrl } from "@/lib/artists/artist-image";
+import { isDirectYoutubeWatch, youtubeThumbnail, youtubeVideoId } from "@/lib/youtube";
 import { getSessionBySlug } from "@/services/sessions.service";
 import { formatDate } from "@/lib/utils";
 
@@ -26,10 +27,12 @@ export default async function SesionDetailPage({ params }: PageProps) {
   const session = await getSessionBySlug(slug);
   if (!session) notFound();
 
+  const videoId = youtubeVideoId(session.youtube_url);
   const thumb =
-    session.youtube_url && isDirectYoutubeWatch(session.youtube_url)
-      ? youtubeThumbnail(session.youtube_url)
-      : null;
+    youtubeThumbnail(session.youtube_url) ??
+    (session.artist
+      ? getArtistImageUrl(session.artist.name, session.artist.image_url)
+      : null);
 
   return (
     <article className="px-4 py-8 lg:px-8">
@@ -44,6 +47,7 @@ export default async function SesionDetailPage({ params }: PageProps) {
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 672px"
                 priority
+                unoptimized={!videoId}
               />
             </div>
           ) : (

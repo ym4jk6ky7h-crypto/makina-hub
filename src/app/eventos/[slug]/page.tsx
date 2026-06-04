@@ -7,6 +7,7 @@ import { EventActions } from "@/components/events/event-actions";
 import { EventTimingBadge } from "@/components/events/event-timing-badge";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { musicEventJsonLd } from "@/lib/seo/json-ld";
+import { eventPosterUrl } from "@/lib/events/event-poster";
 import { getEventBySlug } from "@/services/events.service";
 import { formatDate } from "@/lib/utils";
 
@@ -30,6 +31,7 @@ export default async function EventoDetailPage({ params }: PageProps) {
   if (!event) notFound();
 
   const jsonLd = musicEventJsonLd(event);
+  const poster = eventPosterUrl(event.title, event.image_url);
 
   return (
     <article className="px-4 py-8 lg:px-8">
@@ -40,16 +42,14 @@ export default async function EventoDetailPage({ params }: PageProps) {
       <div className="mx-auto max-w-5xl">
         <div className="grid gap-8 lg:grid-cols-2">
           <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-secondary">
-            {event.image_url && (
-              <Image
-                src={event.image_url}
-                alt={event.title}
-                fill
-                className="object-cover"
-                priority
-                sizes="(max-width: 1024px) 100vw, 50vw"
-              />
-            )}
+            <Image
+              src={poster}
+              alt={event.title}
+              fill
+              className="object-cover"
+              priority
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
           </div>
           <div>
             <EventTimingBadge eventDate={event.event_date} />
