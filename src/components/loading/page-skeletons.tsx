@@ -52,33 +52,44 @@ export function EventListSkeleton({ count = 4 }: { count?: number }) {
 
 export function ArtistGridSkeleton({ count = 10 }: { count?: number }) {
   return (
-    <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 py-10 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 lg:px-8">
+    <div className="mx-auto grid max-w-7xl gap-4 px-4 py-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 lg:px-8">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="glass-card overflow-hidden rounded-xl p-3">
-          <Skeleton className="aspect-square w-full rounded-lg" />
-          <Skeleton className="mt-3 h-4 w-3/4" />
-          <Skeleton className="mt-2 h-3 w-1/2" />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-export function TrackListSkeleton({ count = 6 }: { count?: number }) {
-  return (
-    <div className="mx-auto grid max-w-7xl gap-3 px-4 py-10 sm:grid-cols-2 lg:grid-cols-3 lg:px-8">
-      {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="glass-card flex items-center gap-4 p-4">
-          <Skeleton className="h-14 w-14 shrink-0 rounded-lg" />
-          <div className="flex-1 space-y-2">
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-3 w-1/2" />
+        <div
+          key={i}
+          className="overflow-hidden rounded-xl border border-white/10 bg-card/70"
+        >
+          <Skeleton className="aspect-[4/5] w-full rounded-none" />
+          <div className="p-4">
+            <Skeleton className="h-9 w-full rounded-lg" />
           </div>
         </div>
       ))}
     </div>
   );
 }
+
+export function MediaCardGridSkeleton({ count = 6 }: { count?: number }) {
+  return (
+    <div className="mx-auto grid max-w-7xl gap-4 px-4 py-10 sm:grid-cols-2 lg:grid-cols-3 lg:px-8">
+      {Array.from({ length: count }).map((_, i) => (
+        <div
+          key={i}
+          className="overflow-hidden rounded-xl border border-white/10 bg-card/70"
+        >
+          <Skeleton className="aspect-video w-full rounded-none" />
+          <div className="space-y-2 p-4">
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-3 w-1/2" />
+            <Skeleton className="mt-2 h-9 w-full rounded-lg" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** @deprecated Usa MediaCardGridSkeleton */
+export const TrackListSkeleton = MediaCardGridSkeleton;
 
 export function SessionGridSkeleton({ count = 8 }: { count?: number }) {
   return (

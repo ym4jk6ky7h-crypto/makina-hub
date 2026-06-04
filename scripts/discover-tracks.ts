@@ -9,6 +9,7 @@ import {
   getArtistSlugsWithTracks,
   getTracksForArtist,
 } from "../data/merge-classic-tracks";
+import { CURATED_TRACK_WATCH_BY_SLUG } from "../src/data/curated-track-youtube";
 import { createAdminClient, loadEnv } from "./lib/supabase-admin";
 import { fetchYouTubeForTrack } from "./lib/youtube";
 
@@ -48,8 +49,9 @@ async function main() {
     for (const t of tracks) {
       total++;
       const trackSlug = `${artistSlug}-${t.slug}`;
-
-      let youtube_url = await fetchYouTubeForTrack(artist.name, t.title, youtubeKey);
+      let youtube_url =
+        CURATED_TRACK_WATCH_BY_SLUG[trackSlug] ??
+        (await fetchYouTubeForTrack(artist.name, t.title, youtubeKey));
       await new Promise((r) => setTimeout(r, youtubeKey ? 300 : 50));
 
       const label_id = t.labelSlug ? labelBySlug.get(t.labelSlug) ?? null : null;

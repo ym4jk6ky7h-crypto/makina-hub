@@ -6,6 +6,8 @@ type SectionHeaderProps = {
   subtitle?: string;
   href?: string;
   linkLabel?: string;
+  /** Contador opcional junto al título */
+  badge?: string;
 };
 
 export function SectionHeader({
@@ -13,6 +15,7 @@ export function SectionHeader({
   subtitle,
   href,
   linkLabel = "Ver todo",
+  badge,
 }: SectionHeaderProps) {
   return (
     <div className="mb-8">
@@ -21,6 +24,11 @@ export function SectionHeader({
         <div>
           <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
             {title}
+            {badge && (
+              <span className="ml-2 text-base font-normal text-muted-foreground">
+                ({badge})
+              </span>
+            )}
           </h2>
           {subtitle && (
             <p className="mt-1.5 text-sm text-muted-foreground sm:text-base">

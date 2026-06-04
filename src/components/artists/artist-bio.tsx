@@ -2,20 +2,13 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { parseParagraphs } from "@/lib/artists/artist-bio-utils";
 
 type ArtistBioProps = {
   biography: string;
   /** Párrafos visibles antes de «Leer más» */
   previewCount?: number;
 };
-
-function parseParagraphs(biography: string): string[] {
-  return biography
-    .replace(/\*\*[^*]+\*\*/g, "")
-    .split(/\n\n+/)
-    .map((p) => p.trim())
-    .filter((p) => p.length > 40);
-}
 
 export function ArtistBio({ biography, previewCount = 2 }: ArtistBioProps) {
   const [expanded, setExpanded] = useState(false);
@@ -54,11 +47,3 @@ export function ArtistBio({ biography, previewCount = 2 }: ArtistBioProps) {
   );
 }
 
-export function parseProductionsFromBio(biography: string): string[] {
-  const match = biography.match(/referentes destacan ([^.]+)\./i);
-  if (!match) return [];
-  return match[1]
-    .split(",")
-    .map((t) => t.trim())
-    .filter(Boolean);
-}

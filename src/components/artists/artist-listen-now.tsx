@@ -2,7 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { Headphones, Music2 } from "lucide-react";
 import { PlayYoutubeButton } from "@/components/ui/play-youtube-button";
-import { isDirectYoutubeWatch, youtubeThumbnail } from "@/lib/youtube";
+import { resolveSessionPlay } from "@/lib/session-play";
+import { resolveTrackPlay } from "@/lib/track-play";
+import { youtubeThumbnail } from "@/lib/youtube";
 import type { Session, Track, TrackWithRelations } from "@/types/database";
 
 type ArtistListenNowProps = {
@@ -19,18 +21,18 @@ function pickListenItems(
   tracks: Track[] | TrackWithRelations[],
   sessions: Session[]
 ): ListenItem[] {
-  const withYoutube = tracks.filter((t) => isDirectYoutubeWatch(t.youtube_url));
-  const rest = tracks.filter((t) => !isDirectYoutubeWatch(t.youtube_url));
+  const withPlay = tracks.filter((t) => resolveTrackPlay(t).videoId);
+  const rest = tracks.filter((t) => !resolveTrackPlay(t).videoId);
   const picked: ListenItem[] = [
-    ...withYoutube.slice(0, 3).map((track) => ({ kind: "track" as const, track })),
-    ...rest.slice(0, Math.max(0, 3 - withYoutube.length)).map((track) => ({
+    ...withPlay.slice(0, 3).map((track) => ({ kind: "track" as const, track })),
+    ...rest.slice(0, Math.max(0, 3 - withPlay.length)).map((track) => ({
       kind: "track" as const,
       track,
     })),
   ].slice(0, 3);
 
   if (picked.length < 3) {
-    const session = sessions.find((s) => isDirectYoutubeWatch(s.youtube_url));
+    const session = sessions.find((s) => resolveSessionPlay(s).videoId);
     if (session) picked.push({ kind: "session", session });
   }
 
@@ -52,10 +54,13 @@ export function ArtistListenNow({
         {items.map((item) => {
           if (item.kind === "track") {
             const { track } = item;
-            const thumb = youtubeThumbnail(track.youtube_url);
-            const playUrl = isDirectYoutubeWatch(track.youtube_url)
-              ? track.youtube_url!
-              : null;
+            const { videoId, watchUrl } = resolveTrackPlay(track);
+            const thumb =
+              youtubeThumbnail(watchUrl) ??
+              (videoId
+                ? youtubeThumbnail(`https://www.youtube.com/watch?v=${videoId}`)
+                : null);
+            const playUrl = watchUrl;
             return (
               <li
                 key={`track-${track.id}`}
@@ -79,7 +84,7 @@ export function ArtistListenNow({
                   </Link>
                   <p className="text-xs text-muted-foreground">{artistName}</p>
                 </div>
-                {playUrl ? (
+                {videoId && playUrl ? (
                   <PlayYoutubeButton href={playUrl} size="sm" label="" />
                 ) : (
                   <Link
@@ -94,7 +99,8 @@ export function ArtistListenNow({
           }
 
           const { session } = item;
-          const thumb = youtubeThumbnail(session.youtube_url);
+          const { videoId, watchUrl } = resolveSessionPlay(session);
+          const thumb = youtubeThumbnail(watchUrl);
           return (
             <li
               key={`session-${session.id}`}
@@ -118,8 +124,8 @@ export function ArtistListenNow({
                 </Link>
                 <p className="text-xs text-muted-foreground">Sesión</p>
               </div>
-              {session.youtube_url && isDirectYoutubeWatch(session.youtube_url) && (
-                <PlayYoutubeButton href={session.youtube_url} size="sm" label="" />
+              {videoId && watchUrl && (
+                <PlayYoutubeButton href={watchUrl} size="sm" label="" />
               )}
             </li>
           );

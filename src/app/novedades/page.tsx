@@ -60,7 +60,7 @@ export default async function NovedadesPage() {
                   <p className="mb-6 text-sm text-muted-foreground">
                     Producciones mákina con enlace directo a tienda digital.
                   </p>
-                  <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {curated.map((release) => (
                       <ReleaseCard key={release.id} release={release} />
                     ))}

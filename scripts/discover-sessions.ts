@@ -3,6 +3,7 @@
  * npm run db:discover-sessions
  */
 import { MAKINA_ARTISTS } from "../data/makina-artists";
+import { CURATED_SESSION_WATCH_BY_SLUG } from "../src/data/curated-session-youtube";
 import { createAdminClient, loadEnv } from "./lib/supabase-admin";
 import { fetchYouTubeForArtist } from "./lib/youtube";
 
@@ -42,8 +43,15 @@ async function main() {
 
     const title = `${seed.name} — Sesión mákina`;
     const slug = `${seed.slug}-sesion-makina`;
+    const classic = seed.classics?.[0];
+    const searchQ = classic
+      ? `${seed.name} ${classic} makina remember sesion`
+      : `${seed.name} makina remember DJ session`;
     const yt = await fetchYouTubeForArtist(seed.name, youtubeKey);
-    const youtube_url = yt.videoUrl ?? yt.searchUrl;
+    const youtube_url =
+      CURATED_SESSION_WATCH_BY_SLUG[slug] ??
+      yt.videoUrl ??
+      `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQ)}`;
 
     const row = {
       slug,

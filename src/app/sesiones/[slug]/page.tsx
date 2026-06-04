@@ -1,11 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Clock, Headphones } from "lucide-react";
+import { Clock, ExternalLink, Headphones } from "lucide-react";
 import { PlayYoutubeButton } from "@/components/ui/play-youtube-button";
+import { YoutubeEmbed } from "@/components/ui/youtube-embed";
 import { buildMetadata } from "@/lib/seo/metadata";
-import { getArtistImageUrl } from "@/lib/artists/artist-image";
-import { isDirectYoutubeWatch, youtubeThumbnail, youtubeVideoId } from "@/lib/youtube";
+import { resolveSessionPlay } from "@/lib/session-play";
+import { getSessionThumbnail } from "@/lib/session-thumbnail";
 import { getSessionBySlug } from "@/services/sessions.service";
 import { formatDate } from "@/lib/utils";
 
@@ -27,19 +28,37 @@ export default async function SesionDetailPage({ params }: PageProps) {
   const session = await getSessionBySlug(slug);
   if (!session) notFound();
 
-  const videoId = youtubeVideoId(session.youtube_url);
-  const thumb =
-    youtubeThumbnail(session.youtube_url) ??
-    (session.artist
-      ? getArtistImageUrl(session.artist.name, session.artist.image_url)
-      : null);
+  const { videoId, youtubeHref, watchUrl, isSearch } = resolveSessionPlay(session);
+  const { url: thumb, fromYoutube } = getSessionThumbnail(session);
 
   return (
     <article className="px-4 py-8 lg:px-8">
       <div className="mx-auto max-w-3xl">
         <div className="glass-card p-8">
-          {thumb ? (
+          {videoId ? (
+            <div id="reproductor" className="mb-6 scroll-mt-24">
+              <YoutubeEmbed videoId={videoId} title={session.title} />
+              <a
+                href={watchUrl ?? youtubeHref!}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-makina-pink"
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                Abrir en YouTube
+              </a>
+            </div>
+          ) : thumb ? (
             <div className="relative mb-6 aspect-video w-full overflow-hidden rounded-xl bg-secondary">
+              {youtubeHref ? (
+                <a
+                  href={youtubeHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute inset-0 z-10"
+                  aria-label="Abrir en YouTube"
+                />
+              ) : null}
               <Image
                 src={thumb}
                 alt={session.title}
@@ -47,12 +66,13 @@ export default async function SesionDetailPage({ params }: PageProps) {
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 672px"
                 priority
-                unoptimized={!videoId}
+                unoptimized={!fromYoutube}
               />
             </div>
           ) : (
             <Headphones className="mb-4 h-10 w-10 text-makina-purple" />
           )}
+
           <h1 className="text-2xl font-bold lg:text-3xl">{session.title}</h1>
           {session.artist && (
             <Link
@@ -71,11 +91,16 @@ export default async function SesionDetailPage({ params }: PageProps) {
               </span>
             )}
           </div>
-          {session.youtube_url && isDirectYoutubeWatch(session.youtube_url) && (
-            <div className="mt-6">
+          {!videoId && youtubeHref && (
+            <div className="mt-6 space-y-2">
+              <p className="text-sm text-muted-foreground">
+                {isSearch
+                  ? "No hay un vídeo fijo en la base de datos; te llevamos a resultados en YouTube."
+                  : "Abre el enlace para escuchar."}
+              </p>
               <PlayYoutubeButton
-                href={session.youtube_url}
-                label="Ver sesión en YouTube"
+                href={youtubeHref}
+                label="Buscar sesión en YouTube"
                 size="lg"
               />
             </div>

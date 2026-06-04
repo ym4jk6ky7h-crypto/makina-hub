@@ -1,95 +1,106 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Clock, Youtube } from "lucide-react";
-import { getArtistImageUrl } from "@/lib/artists/artist-image";
+import { Clock, Play, Youtube } from "lucide-react";
 import { MakinaPlaceholder } from "@/components/ui/makina-placeholder";
-import { PlayThumbnailOverlay } from "@/components/ui/play-youtube-button";
-import { PlayYoutubeButton } from "@/components/ui/play-youtube-button";
+import { MediaCardShell } from "@/components/ui/media-card-shell";
 import type { SessionWithRelations } from "@/types/database";
-import {
-  isDirectYoutubeWatch,
-  youtubeThumbnail,
-  youtubeVideoId,
-} from "@/lib/youtube";
+import { resolveSessionPlay } from "@/lib/session-play";
+import { getSessionThumbnail } from "@/lib/session-thumbnail";
+import { cn } from "@/lib/utils";
 
 type SessionCardProps = {
   session: SessionWithRelations;
 };
 
 export function SessionCard({ session }: SessionCardProps) {
-  const thumb =
-    youtubeThumbnail(session.youtube_url) ??
-    (session.artist
-      ? getArtistImageUrl(session.artist.name, session.artist.image_url)
-      : null);
-  const videoId = youtubeVideoId(session.youtube_url);
-  const external = isDirectYoutubeWatch(session.youtube_url);
-  const href = external && session.youtube_url
-    ? session.youtube_url
-    : `/sesiones/${session.slug}`;
+  const { videoId, youtubeHref, isSearch } = resolveSessionPlay(session);
+  const { url: thumb, fromYoutube } = getSessionThumbnail(session);
 
-  const inner = (
-    <>
-      <div className="relative aspect-video w-full overflow-hidden rounded-t-xl bg-gradient-to-br from-makina-purple/30 to-makina-pink/20">
+  const detailHref = `/sesiones/${session.slug}`;
+
+  return (
+    <MediaCardShell>
+      <Link
+        href={detailHref}
+        className="relative block aspect-video w-full overflow-hidden bg-gradient-to-br from-makina-purple/30 to-makina-pink/20"
+      >
         {thumb ? (
           <Image
             src={thumb}
-            alt={session.title}
+            alt=""
             fill
             className="object-cover transition-transform group-hover:scale-105"
             sizes="(max-width: 640px) 100vw, 320px"
-            unoptimized={!videoId}
+            unoptimized={!fromYoutube}
           />
         ) : (
-          <MakinaPlaceholder aspect="video" fill className="rounded-t-xl" />
+          <MakinaPlaceholder aspect="video" fill />
         )}
-        <PlayThumbnailOverlay className="opacity-100 transition-opacity sm:opacity-80 sm:group-hover:opacity-100" />
-      </div>
-      <div className="flex flex-1 flex-col p-4">
-        <h3 className="line-clamp-2 font-semibold leading-snug">{session.title}</h3>
-        <p className="mt-1 text-sm text-muted-foreground">{session.artist?.name}</p>
-        {external && session.youtube_url && (
-          <div className="mt-3 sm:hidden">
-            <PlayYoutubeButton href={session.youtube_url} size="sm" label="Ver en YouTube" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/30">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-600 shadow-lg">
+            <Play className="h-6 w-6 fill-white text-white" />
           </div>
-        )}
-        <div className="mt-3 flex items-center gap-3 text-xs text-muted-foreground">
+        </div>
+      </Link>
+
+      <div className="flex flex-col gap-2 p-4">
+        <Link href={detailHref} className="block min-w-0">
+          <h3 className="line-clamp-2 font-semibold leading-snug text-foreground group-hover:text-makina-pink">
+            {session.title}
+          </h3>
+          {session.artist?.name && (
+            <p className="mt-1 text-sm text-muted-foreground">{session.artist.name}</p>
+          )}
+        </Link>
+
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           {session.duration != null && (
             <span className="flex items-center gap-1">
               <Clock className="h-3 w-3" />
               {session.duration} min
             </span>
           )}
-          {videoId && (
+          {(videoId || youtubeHref) && (
             <span className="flex items-center gap-1 text-red-400">
               <Youtube className="h-3 w-3" />
-              YouTube
+              {videoId ? "Reproductor" : isSearch ? "Buscar" : "YouTube"}
             </span>
           )}
         </div>
+
+        {videoId ? (
+          <Link
+            href={`${detailHref}#reproductor`}
+            className={cn(
+              "mt-1 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-red-600 px-3 py-2.5 text-sm font-semibold text-white",
+              "transition-colors hover:bg-red-500 sm:w-auto"
+            )}
+          >
+            <Play className="h-4 w-4 fill-white" />
+            Escuchar aquí
+          </Link>
+        ) : youtubeHref ? (
+          <a
+            href={youtubeHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(
+              "mt-1 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-red-600 px-3 py-2.5 text-sm font-semibold text-white",
+              "transition-colors hover:bg-red-500 sm:w-auto"
+            )}
+          >
+            <Play className="h-4 w-4 fill-white" />
+            Buscar en YouTube
+          </a>
+        ) : (
+          <Link
+            href={detailHref}
+            className="mt-1 inline-flex w-full items-center justify-center rounded-lg border border-white/15 px-3 py-2.5 text-sm font-medium text-foreground hover:bg-white/5 sm:w-auto"
+          >
+            Ver sesión
+          </Link>
+        )}
       </div>
-    </>
-  );
-
-  const className =
-    "group glass-card flex flex-col overflow-hidden transition-colors hover:bg-secondary/80";
-
-  if (external) {
-    return (
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={className}
-      >
-        {inner}
-      </a>
-    );
-  }
-
-  return (
-    <Link href={href} className={className}>
-      {inner}
-    </Link>
+    </MediaCardShell>
   );
 }

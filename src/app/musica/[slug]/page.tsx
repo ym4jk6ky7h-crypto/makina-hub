@@ -1,15 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Music2 } from "lucide-react";
+import { ExternalLink, Music2 } from "lucide-react";
 import { TrackCard } from "@/components/cards/track-card";
 import { PlayYoutubeButton } from "@/components/ui/play-youtube-button";
-import { isDirectYoutubeWatch, youtubeThumbnail } from "@/lib/youtube";
-import { Badge } from "@/components/ui/badge";
+import { YoutubeEmbed } from "@/components/ui/youtube-embed";
+import { getTrackArtworkUrl } from "@/lib/track-artwork";
+import { resolveTrackPlay } from "@/lib/track-play";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { musicRecordingJsonLd } from "@/lib/seo/json-ld";
 import { getTrackBySlug } from "@/services/tracks.service";
 import { formatGenre } from "@/lib/utils";
+import { youtubeThumbnail } from "@/lib/youtube";
+import { Badge } from "@/components/ui/badge";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -36,10 +39,13 @@ export default async function TrackDetailPage({ params }: PageProps) {
     artistName: track.artist?.name ?? "Desconocido",
   });
 
+  const { videoId, youtubeHref, watchUrl, isSearch } = resolveTrackPlay(track);
+  const artwork =
+    (await getTrackArtworkUrl(track.artist?.name ?? "", track.title)) ?? null;
   const thumb =
-    track.youtube_url && isDirectYoutubeWatch(track.youtube_url)
-      ? youtubeThumbnail(track.youtube_url)
-      : null;
+    youtubeThumbnail(watchUrl) ??
+    youtubeThumbnail(track.youtube_url) ??
+    artwork;
 
   return (
     <article className="px-4 py-8 lg:px-8">
@@ -49,9 +55,39 @@ export default async function TrackDetailPage({ params }: PageProps) {
       />
       <div className="mx-auto max-w-3xl">
         <div className="glass-card p-8">
-          {thumb ? (
-            <div className="relative mb-6 aspect-video w-full max-w-md overflow-hidden rounded-xl bg-secondary">
-              <Image src={thumb} alt={track.title} fill className="object-cover" sizes="400px" />
+          {videoId ? (
+            <div id="reproductor" className="mb-6 scroll-mt-24">
+              <YoutubeEmbed videoId={videoId} title={track.title} />
+              <a
+                href={watchUrl ?? youtubeHref!}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-makina-pink"
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                Abrir en YouTube
+              </a>
+            </div>
+          ) : thumb ? (
+            <div className="relative mb-6 aspect-square w-full max-w-sm overflow-hidden rounded-xl bg-secondary sm:aspect-video sm:max-w-md">
+              {youtubeHref ? (
+                <a
+                  href={youtubeHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute inset-0 z-10"
+                  aria-label="Abrir en YouTube"
+                />
+              ) : null}
+              <Image
+                src={thumb}
+                alt={track.title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 400px"
+                priority
+                unoptimized={Boolean(artwork && !youtubeThumbnail(watchUrl))}
+              />
             </div>
           ) : (
             <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-makina-pink/30 to-makina-purple/30">
@@ -86,21 +122,21 @@ export default async function TrackDetailPage({ params }: PageProps) {
               </Link>
             </p>
           )}
-          {track.youtube_url && isDirectYoutubeWatch(track.youtube_url) && (
+          {!videoId && youtubeHref ? (
             <div className="mt-6">
               <PlayYoutubeButton
-                href={track.youtube_url}
+                href={youtubeHref}
                 size="lg"
-                label="Escuchar en YouTube"
+                label={isSearch ? "Buscar en YouTube" : "Escuchar en YouTube"}
               />
             </div>
-          )}
+          ) : null}
         </div>
 
         {track.similar && track.similar.length > 0 && (
           <section className="mt-12">
             <h2 className="mb-6 text-xl font-bold">Canciones similares</h2>
-            <div className="grid gap-3">
+            <div className="grid gap-4 sm:grid-cols-2">
               {track.similar.map((t) => (
                 <TrackCard key={t.id} track={t} />
               ))}

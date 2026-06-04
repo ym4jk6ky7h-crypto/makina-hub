@@ -13,6 +13,8 @@
     "db:discover-labels": "tsx scripts/discover-labels.ts",
     "db:discover-events": "tsx scripts/discover-events.ts",
     "db:discover-tracks": "tsx scripts/discover-tracks.ts",
+    "db:curate-tracks-youtube": "tsx scripts/curate-track-youtube.ts",
+    "db:curate-sessions-youtube": "tsx scripts/curate-session-youtube.ts",
     "db:discover-releases": "tsx scripts/discover-releases.ts",
     "db:discover-sessions": "tsx scripts/discover-sessions.ts",
     "db:fetch-auto": "tsx scripts/fetch-auto.ts",

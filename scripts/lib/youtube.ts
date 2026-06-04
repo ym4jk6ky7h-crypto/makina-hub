@@ -20,7 +20,12 @@ export async function fetchYouTubeForArtist(
     const res = await fetch(
       `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=3&q=${q}&key=${apiKey}&relevanceLanguage=es`
     );
-    if (!res.ok) return { channelUrl: null, videoUrl: null, searchUrl };
+    if (!res.ok) {
+      if (res.status === 403 || res.status === 429) {
+        console.warn(`  ⚠ YouTube API (${res.status}) — usando búsqueda para ${artistName}`);
+      }
+      return { channelUrl: null, videoUrl: null, searchUrl };
+    }
 
     const data = (await res.json()) as {
       items?: Array<{ id?: { videoId?: string } }>;

@@ -28,6 +28,9 @@ export default async function SesionesPage() {
 
   try {
     const sessions = await listSessions();
+    const withEmbed = sessions.filter(
+      (s) => s.youtube_url?.includes("watch?v=") || s.youtube_url?.includes("youtu.be/")
+    ).length;
 
     return (
       <>
@@ -38,6 +41,16 @@ export default async function SesionesPage() {
           badge={`${sessions.length} sesiones`}
         />
         <div className="mx-auto max-w-7xl px-4 py-10 lg:px-8">
+          {sessions.length > 0 && withEmbed === 0 && (
+            <p className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100/90">
+              Las sesiones abren <strong>YouTube</strong> (búsqueda del DJ). Si tu clave de YouTube
+              tiene cuota, ejecuta mañana{" "}
+              <code className="rounded bg-black/30 px-1.5 py-0.5 text-xs">
+                npm run db:discover-sessions
+              </code>{" "}
+              para activar el reproductor embebido.
+            </p>
+          )}
           {sessions.length === 0 ? (
             <EmptyState
               icon={Headphones}

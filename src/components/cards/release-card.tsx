@@ -1,11 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ExternalLink, Music2, ShoppingBag } from "lucide-react";
+import { ExternalLink, ShoppingBag } from "lucide-react";
 import { MakinaPlaceholder } from "@/components/ui/makina-placeholder";
+import { MediaCardShell } from "@/components/ui/media-card-shell";
 import type { NewReleaseWithRelations } from "@/types/database";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { formatGenre } from "@/lib/utils";
+import { formatGenre, cn } from "@/lib/utils";
 
 type ReleaseCardProps = {
   release: NewReleaseWithRelations;
@@ -13,8 +13,7 @@ type ReleaseCardProps = {
 };
 
 function formatReleaseDate(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleDateString("es-ES", {
+  return new Date(iso).toLocaleDateString("es-ES", {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -22,124 +21,98 @@ function formatReleaseDate(iso: string): string {
 }
 
 export function ReleaseCard({ release, variant = "grid" }: ReleaseCardProps) {
-  const buyLabel = `Comprar en ${release.store_name}`;
+  const buyLabel = `Comprar · ${release.store_name}`;
+  const detailHref = `/novedades/${release.slug}`;
 
-  if (variant === "featured") {
-    return (
-      <article className="glass-card-hover overflow-hidden">
-        <div className="relative aspect-square bg-gradient-to-br from-makina-pink/30 via-makina-purple/20 to-makina-cyan/10">
-          {release.cover_url ? (
-            <Image
-              src={release.cover_url}
-              alt={release.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 400px"
-            />
-          ) : (
-            <MakinaPlaceholder aspect="square" fill />
-          )}
-          <div className="absolute left-3 top-3">
-            <Badge className="bg-makina-pink/90 text-white">Nuevo</Badge>
-          </div>
-        </div>
-        <div className="p-5">
-          <p className="text-xs font-medium text-makina-cyan">
-            {formatReleaseDate(release.release_date)}
-          </p>
-          <Link href={`/novedades/${release.slug}`}>
-            <h3 className="mt-1 font-display text-xl font-bold hover:text-makina-pink">
-              {release.title}
-            </h3>
-          </Link>
-          {release.artist && (
-            <Link
-              href={`/artistas/${release.artist.slug}`}
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              {release.artist.name}
-            </Link>
-          )}
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Badge variant="genre">{formatGenre(release.genre)}</Badge>
-          </div>
-          {release.description && (
-            <p className="mt-3 line-clamp-2 text-sm text-muted-foreground">
-              {release.description}
-            </p>
-          )}
-          <div className="mt-4 flex flex-wrap gap-2">
-            <a href={release.purchase_url} target="_blank" rel="noopener noreferrer">
-              <Button variant="makina" size="sm" className="gap-2">
-                <ShoppingBag className="h-4 w-4" />
-                {buyLabel}
-              </Button>
-            </a>
-            <Link href={`/novedades/${release.slug}`}>
-              <Button size="sm" variant="outline">
-                Detalles
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </article>
-    );
-  }
+  const cover = (
+    <div className="relative aspect-square w-full overflow-hidden bg-gradient-to-br from-makina-pink/25 to-makina-purple/25">
+      {release.cover_url ? (
+        <Image
+          src={release.cover_url}
+          alt={release.title}
+          fill
+          className="object-cover transition-transform group-hover:scale-105"
+          sizes="(max-width: 640px) 50vw, 320px"
+        />
+      ) : (
+        <MakinaPlaceholder aspect="square" fill />
+      )}
+      <div className="absolute left-3 top-3">
+        <Badge className="bg-makina-pink/90 text-white">Nuevo</Badge>
+      </div>
+    </div>
+  );
 
-  return (
-    <article className="glass-card-hover flex flex-col overflow-hidden sm:flex-row">
-      <Link
-        href={`/novedades/${release.slug}`}
-        className="relative aspect-square w-full shrink-0 bg-gradient-to-br from-makina-pink/25 to-makina-purple/25 sm:w-36"
-      >
-        {release.cover_url ? (
-          <Image
-            src={release.cover_url}
-            alt={release.title}
-            fill
-            className="object-cover"
-            sizes="144px"
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center">
-            <Music2 className="h-10 w-10 text-makina-pink/60" />
-          </div>
-        )}
+  const body = (
+    <div className="flex flex-col gap-2 p-4">
+      <p className="text-xs font-medium text-makina-cyan">
+        {formatReleaseDate(release.release_date)}
+      </p>
+      <Link href={detailHref}>
+        <h3
+          className={cn(
+            "font-display font-bold leading-tight hover:text-makina-pink",
+            variant === "featured" ? "text-xl" : "text-base"
+          )}
+        >
+          {release.title}
+        </h3>
       </Link>
-      <div className="flex flex-1 flex-col justify-between p-4">
-        <div>
-          <p className="text-xs text-makina-cyan">{formatReleaseDate(release.release_date)}</p>
-          <Link href={`/novedades/${release.slug}`}>
-            <h3 className="font-display text-lg font-bold hover:text-makina-pink">
-              {release.title}
-            </h3>
-          </Link>
-          {release.artist && (
-            <Link
-              href={`/artistas/${release.artist.slug}`}
-              className="text-sm text-muted-foreground hover:underline"
-            >
-              {release.artist.name}
-            </Link>
-          )}
-          {release.description && (
-            <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
-              {release.description}
-            </p>
-          )}
-        </div>
+      {release.artist && (
+        <Link
+          href={`/artistas/${release.artist.slug}`}
+          className="text-sm text-muted-foreground hover:text-foreground"
+        >
+          {release.artist.name}
+        </Link>
+      )}
+      <Badge variant="genre" className="w-fit text-[10px]">
+        {formatGenre(release.genre)}
+      </Badge>
+      {variant === "featured" && release.description && (
+        <p className="line-clamp-2 text-sm text-muted-foreground">{release.description}</p>
+      )}
+      <div className="mt-1 flex flex-col gap-2 sm:flex-row">
         <a
           href={release.purchase_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-4 inline-flex"
+          className={cn(
+            "inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-makina-pink to-makina-purple px-3 py-2.5 text-sm font-semibold text-white",
+            "transition-opacity hover:opacity-90"
+          )}
         >
-          <Button variant="makina" size="sm" className="w-full gap-2 sm:w-auto">
-            <ExternalLink className="h-4 w-4" />
-            {buyLabel}
-          </Button>
+          <ShoppingBag className="h-4 w-4" />
+          {buyLabel}
         </a>
+        <Link
+          href={detailHref}
+          className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-white/15 px-3 py-2.5 text-sm font-medium hover:bg-white/5"
+        >
+          <ExternalLink className="h-3.5 w-3.5" />
+          Detalles
+        </Link>
       </div>
-    </article>
+    </div>
+  );
+
+  if (variant === "featured") {
+    return (
+      <MediaCardShell className="lg:flex-row">
+        <Link href={detailHref} className="relative block w-full shrink-0 lg:w-72">
+          {cover}
+        </Link>
+        {body}
+      </MediaCardShell>
+    );
+  }
+
+  return (
+    <MediaCardShell>
+      <Link href={detailHref} className="block">
+        {cover}
+      </Link>
+      {body}
+    </MediaCardShell>
   );
 }

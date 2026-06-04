@@ -222,11 +222,11 @@ export default async function HomePage() {
               href="/artistas"
             />
             {artists.length > 0 ? (
-              <ResponsiveCardRow desktopGrid="lg:grid lg:grid-cols-3 xl:grid-cols-6 lg:gap-4">
+              <ResponsiveCardRow desktopGrid="lg:grid lg:grid-cols-3 xl:grid-cols-4 lg:gap-4">
                 {artists.slice(0, 6).map((artist) => (
                   <CarouselItem
                     key={artist.id}
-                    className="w-[min(42vw,140px)] lg:w-auto"
+                    className="w-[min(72vw,220px)] lg:w-auto"
                   >
                     <ArtistCard artist={artist} />
                   </CarouselItem>
@@ -270,7 +270,7 @@ export default async function HomePage() {
               href="/musica"
             />
             {tracks.length > 0 ? (
-              <ResponsiveCardRow desktopGrid="lg:grid lg:grid-cols-1 lg:gap-3">
+              <ResponsiveCardRow desktopGrid="lg:grid lg:grid-cols-3 lg:gap-4">
                 {tracks.map((track) => (
                   <CarouselItem
                     key={track.id}
