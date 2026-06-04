@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Calendar, MapPin } from "lucide-react";
 import { EventActions } from "@/components/events/event-actions";
 import { EventTimingBadge } from "@/components/events/event-timing-badge";
+import { MakinaPlaceholder } from "@/components/ui/makina-placeholder";
 import type { Event } from "@/types/database";
 import { formatDate } from "@/lib/utils";
 
@@ -34,9 +35,7 @@ export function EventListRow({ event, showDateColumn = true }: EventListRowProps
                 sizes="208px"
               />
             ) : (
-              <div className="flex h-full items-center justify-center bg-gradient-to-br from-makina-pink/20 to-makina-purple/20 text-2xl font-bold text-white/20">
-                MH
-              </div>
+              <MakinaPlaceholder aspect="poster" fill className="rounded-xl" />
             )}
           </div>
           <div className="flex min-w-0 flex-1 flex-col justify-center py-1">

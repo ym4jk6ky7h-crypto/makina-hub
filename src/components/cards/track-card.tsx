@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Music2 } from "lucide-react";
+import { MakinaPlaceholder } from "@/components/ui/makina-placeholder";
 import { PlayThumbnailOverlay } from "@/components/ui/play-youtube-button";
 import { PlayYoutubeButton } from "@/components/ui/play-youtube-button";
 import type { TrackWithRelations } from "@/types/database";
@@ -37,9 +37,7 @@ export function TrackCard({ track }: TrackCardProps) {
               )}
             </>
           ) : (
-            <div className="flex h-full w-full items-center justify-center">
-              <Music2 className="h-5 w-5 text-makina-pink" />
-            </div>
+            <MakinaPlaceholder aspect="square" fill className="rounded-lg" />
           )}
         </div>
         <div className="min-w-0 flex-1">

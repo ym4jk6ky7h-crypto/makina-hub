@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Clock, Youtube } from "lucide-react";
+import { MakinaPlaceholder } from "@/components/ui/makina-placeholder";
 import { PlayThumbnailOverlay } from "@/components/ui/play-youtube-button";
 import { PlayYoutubeButton } from "@/components/ui/play-youtube-button";
 import type { SessionWithRelations } from "@/types/database";
@@ -34,9 +35,7 @@ export function SessionCard({ session }: SessionCardProps) {
             sizes="(max-width: 640px) 100vw, 320px"
           />
         ) : (
-          <div className="flex h-full items-center justify-center">
-            <Youtube className="h-12 w-12 text-red-500/70" />
-          </div>
+          <MakinaPlaceholder aspect="video" fill className="rounded-t-xl" />
         )}
         <PlayThumbnailOverlay className="opacity-100 transition-opacity sm:opacity-80 sm:group-hover:opacity-100" />
       </div>

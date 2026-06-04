@@ -6,3 +6,4 @@ export * from "./labels.service";
 export * from "./vinyls.service";
 export * from "./releases.service";
 export * from "./search.service";
+export * from "./stats.service";

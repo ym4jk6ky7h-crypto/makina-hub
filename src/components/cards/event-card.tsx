@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Calendar, MapPin } from "lucide-react";
+import { MakinaPlaceholder } from "@/components/ui/makina-placeholder";
 import type { Event } from "@/types/database";
 import { formatDate } from "@/lib/utils";
 
@@ -26,9 +27,7 @@ export function EventCard({ event, variant = "grid" }: EventCardProps) {
               sizes="208px"
             />
           ) : (
-            <div className="flex h-full items-center justify-center bg-gradient-to-br from-makina-pink/20 to-makina-purple/20 text-2xl font-bold text-white/20">
-              MH
-            </div>
+            <MakinaPlaceholder aspect="poster" fill className="rounded-xl" />
           )}
         </div>
         <div className="flex min-w-0 flex-1 flex-col justify-center py-1">
@@ -71,9 +70,7 @@ export function EventCard({ event, variant = "grid" }: EventCardProps) {
             sizes="(max-width: 768px) 50vw, 25vw"
           />
         ) : (
-          <div className="flex h-full items-center justify-center bg-gradient-to-br from-makina-pink/20 to-makina-purple/20 text-4xl font-bold text-white/20">
-            MH
-          </div>
+          <MakinaPlaceholder aspect="poster" fill />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-4">

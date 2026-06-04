@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ExternalLink, Music2, ShoppingBag } from "lucide-react";
+import { MakinaPlaceholder } from "@/components/ui/makina-placeholder";
 import type { NewReleaseWithRelations } from "@/types/database";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -36,9 +37,7 @@ export function ReleaseCard({ release, variant = "grid" }: ReleaseCardProps) {
               sizes="(max-width: 768px) 100vw, 400px"
             />
           ) : (
-            <div className="flex h-full items-center justify-center">
-              <Music2 className="h-16 w-16 text-makina-pink/50" />
-            </div>
+            <MakinaPlaceholder aspect="square" fill />
           )}
           <div className="absolute left-3 top-3">
             <Badge className="bg-makina-pink/90 text-white">Nuevo</Badge>
