@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { ChevronDown, Menu, Sparkles, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { MakinaLogo } from "@/components/layout/makina-logo";
-import { NAV_GROUPS, NAV_ITEMS, NAV_MORE, NAV_PRIMARY } from "@/lib/constants";
+import { NAV_MORE, NAV_PRIMARY } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { SearchBar } from "@/components/search/search-bar";
 import { Button } from "@/components/ui/button";

@@ -1,15 +1,25 @@
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+
 type ArtistBioProps = {
   biography: string;
+  /** Párrafos visibles antes de «Leer más» */
+  previewCount?: number;
 };
 
-/** Biografía en prosa (3–4 párrafos), sin mini-apartados repetitivos. */
-export function ArtistBio({ biography }: ArtistBioProps) {
-  const paragraphs = biography
+function parseParagraphs(biography: string): string[] {
+  return biography
     .replace(/\*\*[^*]+\*\*/g, "")
     .split(/\n\n+/)
     .map((p) => p.trim())
-    .filter((p) => p.length > 40)
-    .slice(0, 4);
+    .filter((p) => p.length > 40);
+}
+
+export function ArtistBio({ biography, previewCount = 2 }: ArtistBioProps) {
+  const [expanded, setExpanded] = useState(false);
+  const paragraphs = parseParagraphs(biography);
 
   if (paragraphs.length === 0) {
     return (
@@ -19,11 +29,27 @@ export function ArtistBio({ biography }: ArtistBioProps) {
     );
   }
 
+  const visible = expanded ? paragraphs : paragraphs.slice(0, previewCount);
+  const hasMore = paragraphs.length > previewCount;
+
   return (
-    <div className="space-y-4 text-base leading-relaxed text-muted-foreground">
-      {paragraphs.map((p, i) => (
-        <p key={i}>{p}</p>
-      ))}
+    <div>
+      <div className="space-y-4 text-base leading-relaxed text-muted-foreground">
+        {visible.map((p, i) => (
+          <p key={i}>{p}</p>
+        ))}
+      </div>
+      {hasMore && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="mt-4 text-makina-pink hover:text-makina-pink"
+          onClick={() => setExpanded((e) => !e)}
+        >
+          {expanded ? "Leer menos" : "Leer más"}
+        </Button>
+      )}
     </div>
   );
 }

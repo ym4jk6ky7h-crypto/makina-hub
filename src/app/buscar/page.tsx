@@ -162,7 +162,10 @@ export default async function BuscarPage({ searchParams }: PageProps) {
         Artistas, canciones, eventos, sesiones, vinilos y sellos
       </p>
       <div className="mt-6 max-w-xl">
-        <SearchBar placeholder={query || "Buscar en Makina Hub…"} />
+        <SearchBar
+          defaultQuery={query}
+          placeholder={query || "Buscar en Makina Hub…"}
+        />
       </div>
 
       {!query && <SearchExamples />}

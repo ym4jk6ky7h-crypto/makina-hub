@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { Disc3, Instagram, Music2, Youtube } from "lucide-react";
 import { ArtistBio, parseProductionsFromBio } from "@/components/artists/artist-bio";
+import { ArtistListenNow } from "@/components/artists/artist-listen-now";
+import { ArtistMetaChips } from "@/components/artists/artist-meta-chips";
 import { EventCard } from "@/components/cards/event-card";
 import { TrackCard } from "@/components/cards/track-card";
 import { SessionCard } from "@/components/cards/session-card";
@@ -45,11 +47,11 @@ export async function ArtistDetail({ slug }: { slug: string }) {
                 {artistData.real_name}
               </p>
             )}
-            {(artistData.city || artistData.country) && (
-              <p className="mt-1 text-muted-foreground">
-                {[artistData.city, artistData.country].filter(Boolean).join(" · ")}
-              </p>
-            )}
+            <ArtistMetaChips
+              city={artistData.city}
+              country={artistData.country}
+              tracks={tracksWithArtist}
+            />
             <div className="mt-4 flex flex-wrap justify-center gap-3 md:justify-start">
               {artistData.instagram_url && (
                 <a
@@ -86,6 +88,12 @@ export async function ArtistDetail({ slug }: { slug: string }) {
             </div>
           </div>
         </header>
+
+        <ArtistListenNow
+          artistName={artistData.name}
+          tracks={tracksWithArtist}
+          sessions={artistData.sessions ?? []}
+        />
 
         <section className="mt-10">
           <h2 className="mb-4 text-xl font-bold">Biografía</h2>
