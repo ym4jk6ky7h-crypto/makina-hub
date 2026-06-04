@@ -1,5 +1,7 @@
+import { Mic2 } from "lucide-react";
 import { ArtistCard } from "@/components/cards/artist-card";
 import { PageHero } from "@/components/layout/page-hero";
+import { EmptyState } from "@/components/ui/empty-state";
 import { SetupRequired } from "@/components/setup/setup-required";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { SITE_IMAGES } from "@/lib/site-images";
@@ -36,11 +38,24 @@ export default async function ArtistasPage() {
           badge={`${artists.length} artistas`}
         />
         <div className="mx-auto max-w-7xl px-4 py-10 lg:px-8">
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {artists.map((artist) => (
-              <ArtistCard key={artist.id} artist={artist} />
-            ))}
-          </div>
+          {artists.length === 0 ? (
+            <EmptyState
+              icon={Mic2}
+              title="Aún no hay artistas"
+              description="Sincroniza el roster mákina catalán desde tu Mac para poblar la base de datos."
+              hint={
+                <code className="rounded bg-white/5 px-2 py-1 text-xs">
+                  npm run db:discover-artists -- --skip-mb
+                </code>
+              }
+            />
+          ) : (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+              {artists.map((artist) => (
+                <ArtistCard key={artist.id} artist={artist} />
+              ))}
+            </div>
+          )}
         </div>
       </>
     );

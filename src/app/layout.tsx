@@ -49,11 +49,9 @@ export default function RootLayout({
         />
         <div className="flex min-h-screen flex-col">
           <Navbar />
-          <div className="flex flex-1">
+          <div className="flex min-h-0 w-full flex-1">
             <Sidebar />
-            <main className="flex-1 pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
-              {children}
-            </main>
+            <main className="min-w-0 flex-1 pb-20 lg:pb-0">{children}</main>
           </div>
           <Footer />
           <MobileBottomNav />

@@ -1,7 +1,10 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Clock, ExternalLink, Headphones } from "lucide-react";
+import { Clock, Headphones } from "lucide-react";
+import { PlayYoutubeButton } from "@/components/ui/play-youtube-button";
 import { buildMetadata } from "@/lib/seo/metadata";
+import { isDirectYoutubeWatch, youtubeThumbnail } from "@/lib/youtube";
 import { getSessionBySlug } from "@/services/sessions.service";
 import { formatDate } from "@/lib/utils";
 
@@ -23,11 +26,29 @@ export default async function SesionDetailPage({ params }: PageProps) {
   const session = await getSessionBySlug(slug);
   if (!session) notFound();
 
+  const thumb =
+    session.youtube_url && isDirectYoutubeWatch(session.youtube_url)
+      ? youtubeThumbnail(session.youtube_url)
+      : null;
+
   return (
     <article className="px-4 py-8 lg:px-8">
       <div className="mx-auto max-w-3xl">
         <div className="glass-card p-8">
-          <Headphones className="mb-4 h-10 w-10 text-makina-purple" />
+          {thumb ? (
+            <div className="relative mb-6 aspect-video w-full overflow-hidden rounded-xl bg-secondary">
+              <Image
+                src={thumb}
+                alt={session.title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 672px"
+                priority
+              />
+            </div>
+          ) : (
+            <Headphones className="mb-4 h-10 w-10 text-makina-purple" />
+          )}
           <h1 className="text-2xl font-bold lg:text-3xl">{session.title}</h1>
           {session.artist && (
             <Link
@@ -46,16 +67,14 @@ export default async function SesionDetailPage({ params }: PageProps) {
               </span>
             )}
           </div>
-          {session.youtube_url && (
-            <a
-              href={session.youtube_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-6 inline-flex items-center gap-2 rounded-lg bg-red-600/20 px-4 py-2 text-sm font-medium text-red-400"
-            >
-              <ExternalLink className="h-4 w-4" />
-              Ver sesión en YouTube
-            </a>
+          {session.youtube_url && isDirectYoutubeWatch(session.youtube_url) && (
+            <div className="mt-6">
+              <PlayYoutubeButton
+                href={session.youtube_url}
+                label="Ver sesión en YouTube"
+                size="lg"
+              />
+            </div>
           )}
         </div>
 

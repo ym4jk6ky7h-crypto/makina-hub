@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Calendar, MapPin } from "lucide-react";
 import { ArtistCard } from "@/components/cards/artist-card";
+import { EventActions } from "@/components/events/event-actions";
+import { EventTimingBadge } from "@/components/events/event-timing-badge";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { musicEventJsonLd } from "@/lib/seo/json-ld";
 import { getEventBySlug } from "@/services/events.service";
@@ -50,6 +52,7 @@ export default async function EventoDetailPage({ params }: PageProps) {
             )}
           </div>
           <div>
+            <EventTimingBadge eventDate={event.event_date} />
             <h1 className="text-3xl font-bold lg:text-4xl">{event.title}</h1>
             <div className="mt-4 space-y-2 text-muted-foreground">
               <p className="flex items-center gap-2">
@@ -64,6 +67,7 @@ export default async function EventoDetailPage({ params }: PageProps) {
             <p className="mt-6 leading-relaxed text-muted-foreground">
               {event.description}
             </p>
+            <EventActions event={event} />
           </div>
         </div>
 

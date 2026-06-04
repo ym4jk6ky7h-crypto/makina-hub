@@ -1,6 +1,7 @@
 import { Suspense } from "react";
-import Link from "next/link";
-import { EventCard } from "@/components/cards/event-card";
+import { Calendar } from "lucide-react";
+import { EventsAgenda } from "@/components/events/events-agenda";
+import { EmptyState } from "@/components/ui/empty-state";
 import { EventFilters } from "@/components/events/event-filters";
 import { PageHero } from "@/components/layout/page-hero";
 import { SetupRequired } from "@/components/setup/setup-required";
@@ -11,7 +12,6 @@ import {
   isSupabaseConfigured,
   SupabaseConfigError,
 } from "@/lib/supabase/config";
-import { formatDate } from "@/lib/utils";
 import { listEvents } from "@/services/events.service";
 
 export const metadata = buildMetadata({
@@ -61,39 +61,18 @@ export default async function EventosPage({ searchParams }: PageProps) {
         </Suspense>
 
         <div className="mx-auto max-w-7xl px-4 py-8 pb-6 lg:px-8 lg:py-10">
-          <div className="space-y-6">
-            {events.map((event) => (
-              <div
-                key={event.id}
-                className="glass-card-hover grid gap-4 rounded-2xl p-4 sm:grid-cols-[180px_1fr] lg:grid-cols-[220px_1fr]"
-              >
-                <div className="hidden text-sm font-semibold text-makina-cyan sm:block sm:pt-2">
-                  {formatDate(event.event_date)}
-                </div>
-                <EventCard event={event} variant="row" />
-              </div>
-            ))}
-          </div>
+          <EventsAgenda events={events} />
 
           {events.length === 0 && (
-            <div className="mt-12 space-y-4 text-center text-muted-foreground">
-              <p>No hay eventos con estos filtros.</p>
-              <p className="text-sm">
-                Prueba{" "}
-                <Link href="/eventos" className="text-makina-pink hover:underline">
-                  quitar filtros
-                </Link>
-                ,{" "}
-                <Link
-                  href="/eventos?fecha=all"
-                  className="text-makina-pink hover:underline"
-                >
-                  ver toda la agenda
-                </Link>{" "}
-                o sincroniza datos:{" "}
-                <code className="text-xs">npm run db:discover-events</code>
-              </p>
-            </div>
+            <EmptyState
+              icon={Calendar}
+              title="No hay eventos con estos filtros"
+              description="Prueba otra ciudad, muestra toda la agenda o quita los filtros activos."
+              actions={[
+                { label: "Quitar filtros", href: "/eventos" },
+                { label: "Toda la agenda", href: "/eventos?fecha=all", variant: "outline" },
+              ]}
+            />
           )}
         </div>
       </>

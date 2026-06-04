@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { MakinaLogo } from "@/components/layout/makina-logo";
-import { NAV_GROUPS, NAV_ITEMS } from "@/lib/constants";
+import { NAV_ITEMS, NAV_MORE, NAV_PRIMARY } from "@/lib/constants";
 import { SITE_IMAGES } from "@/lib/site-images";
 import { cn } from "@/lib/utils";
 
@@ -14,46 +14,77 @@ function isActive(pathname: string, href: string) {
   return pathname.startsWith(href);
 }
 
+function NavLink({
+  item,
+  pathname,
+}: {
+  item: (typeof NAV_ITEMS)[number];
+  pathname: string;
+}) {
+  const Icon = item.icon;
+  const active = isActive(pathname, item.href);
+  return (
+    <Link
+      href={item.href}
+      className={cn(
+        "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all",
+        active
+          ? "nav-glow-active shadow-makina-glow-sm"
+          : "text-muted-foreground hover:bg-white/5 hover:text-foreground",
+        item.highlight && !active && "text-makina-cyan hover:text-makina-cyan"
+      )}
+    >
+      <Icon
+        className={cn(
+          "h-4 w-4 shrink-0 transition-colors",
+          active ? "text-makina-pink" : "group-hover:text-makina-pink/70"
+        )}
+      />
+      {item.label}
+    </Link>
+  );
+}
+
 export function Sidebar() {
   const pathname = usePathname();
+  const home = NAV_ITEMS.find((i) => i.href === "/")!;
 
   return (
     <aside className="hidden w-60 shrink-0 border-r border-white/5 bg-card/30 lg:block xl:w-64">
       <nav className="sticky top-[4.125rem] flex max-h-[calc(100vh-4.125rem)] flex-col gap-6 overflow-y-auto p-4">
-        {(["escena", "catalogo", "tools"] as const).map((group) => (
-          <div key={group}>
-            <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-              {NAV_GROUPS[group]}
-            </p>
-            <div className="flex flex-col gap-0.5">
-              {NAV_ITEMS.filter((i) => i.group === group).map((item) => {
-                const Icon = item.icon;
-                const active = isActive(pathname, item.href);
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={cn(
-                      "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all",
-                      active
-                        ? "nav-glow-active shadow-makina-glow-sm"
-                        : "text-muted-foreground hover:bg-white/5 hover:text-foreground",
-                      item.highlight && !active && "text-makina-cyan hover:text-makina-cyan"
-                    )}
-                  >
-                    <Icon
-                      className={cn(
-                        "h-4 w-4 shrink-0 transition-colors",
-                        active ? "text-makina-pink" : "group-hover:text-makina-pink/70"
-                      )}
-                    />
-                    {item.label}
-                  </Link>
-                );
-              })}
-            </div>
+        <div>
+          <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+            Principal
+          </p>
+          <div className="flex flex-col gap-0.5">
+            <NavLink item={home} pathname={pathname} />
+            {NAV_PRIMARY.map((item) => (
+              <NavLink key={item.href} item={item} pathname={pathname} />
+            ))}
+            <Link
+              href="/buscar"
+              className={cn(
+                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all",
+                isActive(pathname, "/buscar")
+                  ? "nav-glow-active shadow-makina-glow-sm"
+                  : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+              )}
+            >
+              Buscar
+            </Link>
           </div>
-        ))}
+        </div>
+
+        <div>
+          <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+            Más
+          </p>
+          <div className="flex flex-col gap-0.5">
+            {NAV_MORE.map((item) => (
+              <NavLink key={item.href} item={item} pathname={pathname} />
+            ))}
+          </div>
+        </div>
 
         <Link
           href="/eventos"

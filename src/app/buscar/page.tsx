@@ -7,7 +7,10 @@ import { SessionCard } from "@/components/cards/session-card";
 import { VinylCard } from "@/components/cards/vinyl-card";
 import { LabelCard } from "@/components/cards/label-card";
 import { SearchBar } from "@/components/search/search-bar";
+import { SearchExamples } from "@/components/search/search-examples";
+import { SearchTabs } from "@/components/search/search-tabs";
 import { buildMetadata } from "@/lib/seo/metadata";
+import type { SearchTab } from "@/lib/constants";
 import { globalSearch } from "@/services/search.service";
 
 export const metadata = buildMetadata({
@@ -18,30 +21,60 @@ export const metadata = buildMetadata({
 });
 
 type PageProps = {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; tab?: string }>;
 };
 
-async function SearchResults({ query }: { query: string }) {
-  const results = await globalSearch(query);
-  const total =
-    results.artists.length +
-    results.tracks.length +
-    results.events.length +
-    results.sessions.length +
-    results.vinyls.length +
-    results.labels.length;
+const VALID_TABS = new Set([
+  "todos",
+  "artistas",
+  "eventos",
+  "musica",
+  "sesiones",
+  "sellos",
+  "vinilos",
+]);
 
-  if (total === 0) {
+function parseTab(tab?: string): SearchTab {
+  if (tab && VALID_TABS.has(tab)) return tab as SearchTab;
+  return "todos";
+}
+
+async function SearchResults({
+  query,
+  tab,
+}: {
+  query: string;
+  tab: SearchTab;
+}) {
+  const results = await globalSearch(query);
+  const show = (section: SearchTab) => tab === "todos" || tab === section;
+
+  const sections: { key: SearchTab; count: number }[] = [
+    { key: "artistas", count: results.artists.length },
+    { key: "eventos", count: results.events.length },
+    { key: "musica", count: results.tracks.length },
+    { key: "sesiones", count: results.sessions.length },
+    { key: "vinilos", count: results.vinyls.length },
+    { key: "sellos", count: results.labels.length },
+  ];
+  const total = sections.reduce((n, s) => n + s.count, 0);
+  const visibleTotal =
+    tab === "todos"
+      ? total
+      : sections.find((s) => s.key === tab)?.count ?? 0;
+
+  if (visibleTotal === 0) {
     return (
       <p className="mt-8 text-center text-muted-foreground">
         No se encontraron resultados para &quot;{query}&quot;
+        {tab !== "todos" ? ` en ${tab}` : ""}.
       </p>
     );
   }
 
   return (
     <div className="mt-8 space-y-10">
-      {results.artists.length > 0 && (
+      {show("artistas") && results.artists.length > 0 && (
         <section>
           <h2 className="mb-4 text-lg font-semibold">
             Artistas ({results.artists.length})
@@ -53,7 +86,7 @@ async function SearchResults({ query }: { query: string }) {
           </div>
         </section>
       )}
-      {results.tracks.length > 0 && (
+      {show("musica") && results.tracks.length > 0 && (
         <section>
           <h2 className="mb-4 text-lg font-semibold">
             Canciones ({results.tracks.length})
@@ -65,7 +98,7 @@ async function SearchResults({ query }: { query: string }) {
           </div>
         </section>
       )}
-      {results.events.length > 0 && (
+      {show("eventos") && results.events.length > 0 && (
         <section>
           <h2 className="mb-4 text-lg font-semibold">
             Eventos ({results.events.length})
@@ -77,7 +110,7 @@ async function SearchResults({ query }: { query: string }) {
           </div>
         </section>
       )}
-      {results.sessions.length > 0 && (
+      {show("sesiones") && results.sessions.length > 0 && (
         <section>
           <h2 className="mb-4 text-lg font-semibold">
             Sesiones ({results.sessions.length})
@@ -89,7 +122,7 @@ async function SearchResults({ query }: { query: string }) {
           </div>
         </section>
       )}
-      {results.vinyls.length > 0 && (
+      {show("vinilos") && results.vinyls.length > 0 && (
         <section>
           <h2 className="mb-4 text-lg font-semibold">
             Vinilos ({results.vinyls.length})
@@ -101,7 +134,7 @@ async function SearchResults({ query }: { query: string }) {
           </div>
         </section>
       )}
-      {results.labels.length > 0 && (
+      {show("sellos") && results.labels.length > 0 && (
         <section>
           <h2 className="mb-4 text-lg font-semibold">
             Sellos ({results.labels.length})
@@ -118,8 +151,9 @@ async function SearchResults({ query }: { query: string }) {
 }
 
 export default async function BuscarPage({ searchParams }: PageProps) {
-  const { q } = await searchParams;
+  const { q, tab: tabParam } = await searchParams;
   const query = q?.trim() ?? "";
+  const tab = parseTab(tabParam);
 
   return (
     <div className="px-4 py-8 lg:px-8">
@@ -131,10 +165,17 @@ export default async function BuscarPage({ searchParams }: PageProps) {
         <SearchBar placeholder={query || "Buscar en Makina Hub…"} />
       </div>
 
+      {!query && <SearchExamples />}
+
       {query ? (
-        <Suspense fallback={<p className="mt-8 text-muted-foreground">Buscando…</p>}>
-          <SearchResults query={query} />
-        </Suspense>
+        <>
+          <Suspense fallback={null}>
+            <SearchTabs query={query} />
+          </Suspense>
+          <Suspense fallback={<p className="mt-8 text-muted-foreground">Buscando…</p>}>
+            <SearchResults query={query} tab={tab} />
+          </Suspense>
+        </>
       ) : (
         <p className="mt-8 text-muted-foreground">
           Escribe para buscar en toda la base de datos.

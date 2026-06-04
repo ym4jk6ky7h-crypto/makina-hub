@@ -7,6 +7,7 @@ import { ReleaseCard } from "@/components/cards/release-card";
 import { TrackCard } from "@/components/cards/track-card";
 import { SessionCard } from "@/components/cards/session-card";
 import { SectionHeader } from "@/components/layout/section-header";
+import { HomeSectionEmpty } from "@/components/ui/home-section-empty";
 import { SearchBar } from "@/components/search/search-bar";
 import { SetupRequired } from "@/components/setup/setup-required";
 import { EmptyDatabase } from "@/components/setup/empty-database";
@@ -197,11 +198,20 @@ export default async function HomePage() {
               subtitle="Remember, mákina y revival en Catalunya"
               href="/eventos"
             />
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {events.slice(0, 4).map((event) => (
-                <EventCard key={event.id} event={event} />
-              ))}
-            </div>
+            {events.length > 0 ? (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {events.slice(0, 4).map((event) => (
+                  <EventCard key={event.id} event={event} />
+                ))}
+              </div>
+            ) : (
+              <HomeSectionEmpty
+                className="mt-6"
+                message="No hay eventos próximos en la agenda."
+                actionLabel="Ver agenda completa"
+                actionHref="/eventos?fecha=all"
+              />
+            )}
           </section>
 
           <section>
@@ -210,11 +220,20 @@ export default async function HomePage() {
               subtitle="Los referentes de la escena catalana"
               href="/artistas"
             />
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-              {artists.slice(0, 6).map((artist) => (
-                <ArtistCard key={artist.id} artist={artist} />
-              ))}
-            </div>
+            {artists.length > 0 ? (
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+                {artists.slice(0, 6).map((artist) => (
+                  <ArtistCard key={artist.id} artist={artist} />
+                ))}
+              </div>
+            ) : (
+              <HomeSectionEmpty
+                className="mt-6"
+                message="El roster de artistas se está preparando."
+                actionLabel="Explorar artistas"
+                actionHref="/artistas"
+              />
+            )}
           </section>
 
           {releases.length > 0 && (
@@ -238,11 +257,20 @@ export default async function HomePage() {
               subtitle="Himnos remember y clásicos mákina"
               href="/musica"
             />
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {tracks.map((track) => (
-                <TrackCard key={track.id} track={track} />
-              ))}
-            </div>
+            {tracks.length > 0 ? (
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {tracks.map((track) => (
+                  <TrackCard key={track.id} track={track} />
+                ))}
+              </div>
+            ) : (
+              <HomeSectionEmpty
+                className="mt-6"
+                message="Aún no hay temas en el catálogo."
+                actionLabel="Ir a Música"
+                actionHref="/musica"
+              />
+            )}
           </section>
 
           <section>
@@ -251,11 +279,20 @@ export default async function HomePage() {
               subtitle="Sets históricos y revival en YouTube"
               href="/sesiones"
             />
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {sessions.map((session) => (
-                <SessionCard key={session.id} session={session} />
-              ))}
-            </div>
+            {sessions.length > 0 ? (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {sessions.map((session) => (
+                  <SessionCard key={session.id} session={session} />
+                ))}
+              </div>
+            ) : (
+              <HomeSectionEmpty
+                className="mt-6"
+                message="Las sesiones en YouTube se cargarán pronto."
+                actionLabel="Ver sesiones"
+                actionHref="/sesiones"
+              />
+            )}
           </section>
         </div>
       </div>

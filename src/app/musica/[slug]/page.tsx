@@ -1,7 +1,10 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ExternalLink, Music2 } from "lucide-react";
+import { Music2 } from "lucide-react";
 import { TrackCard } from "@/components/cards/track-card";
+import { PlayYoutubeButton } from "@/components/ui/play-youtube-button";
+import { isDirectYoutubeWatch, youtubeThumbnail } from "@/lib/youtube";
 import { Badge } from "@/components/ui/badge";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { musicRecordingJsonLd } from "@/lib/seo/json-ld";
@@ -33,6 +36,11 @@ export default async function TrackDetailPage({ params }: PageProps) {
     artistName: track.artist?.name ?? "Desconocido",
   });
 
+  const thumb =
+    track.youtube_url && isDirectYoutubeWatch(track.youtube_url)
+      ? youtubeThumbnail(track.youtube_url)
+      : null;
+
   return (
     <article className="px-4 py-8 lg:px-8">
       <script
@@ -41,9 +49,15 @@ export default async function TrackDetailPage({ params }: PageProps) {
       />
       <div className="mx-auto max-w-3xl">
         <div className="glass-card p-8">
-          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-makina-pink/30 to-makina-purple/30">
-            <Music2 className="h-10 w-10 text-makina-pink" />
-          </div>
+          {thumb ? (
+            <div className="relative mb-6 aspect-video w-full max-w-md overflow-hidden rounded-xl bg-secondary">
+              <Image src={thumb} alt={track.title} fill className="object-cover" sizes="400px" />
+            </div>
+          ) : (
+            <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-makina-pink/30 to-makina-purple/30">
+              <Music2 className="h-10 w-10 text-makina-pink" />
+            </div>
+          )}
           <h1 className="text-3xl font-bold">{track.title}</h1>
           {track.artist && (
             <Link
@@ -72,16 +86,14 @@ export default async function TrackDetailPage({ params }: PageProps) {
               </Link>
             </p>
           )}
-          {track.youtube_url && (
-            <a
-              href={track.youtube_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-6 inline-flex items-center gap-2 rounded-lg bg-red-600/20 px-4 py-2 text-sm font-medium text-red-400 hover:bg-red-600/30"
-            >
-              <ExternalLink className="h-4 w-4" />
-              Ver en YouTube
-            </a>
+          {track.youtube_url && isDirectYoutubeWatch(track.youtube_url) && (
+            <div className="mt-6">
+              <PlayYoutubeButton
+                href={track.youtube_url}
+                size="lg"
+                label="Escuchar en YouTube"
+              />
+            </div>
           )}
         </div>
 

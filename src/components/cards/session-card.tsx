@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Clock, Play, Youtube } from "lucide-react";
+import { Clock, Youtube } from "lucide-react";
+import { PlayThumbnailOverlay } from "@/components/ui/play-youtube-button";
+import { PlayYoutubeButton } from "@/components/ui/play-youtube-button";
 import type { SessionWithRelations } from "@/types/database";
 import {
   isDirectYoutubeWatch,
@@ -36,15 +38,16 @@ export function SessionCard({ session }: SessionCardProps) {
             <Youtube className="h-12 w-12 text-red-500/70" />
           </div>
         )}
-        <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity group-hover:opacity-100">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-600 shadow-lg">
-            <Play className="h-6 w-6 fill-white text-white" />
-          </div>
-        </div>
+        <PlayThumbnailOverlay className="opacity-100 transition-opacity sm:opacity-80 sm:group-hover:opacity-100" />
       </div>
       <div className="flex flex-1 flex-col p-4">
         <h3 className="line-clamp-2 font-semibold leading-snug">{session.title}</h3>
         <p className="mt-1 text-sm text-muted-foreground">{session.artist?.name}</p>
+        {external && session.youtube_url && (
+          <div className="mt-3 sm:hidden">
+            <PlayYoutubeButton href={session.youtube_url} size="sm" label="Ver en YouTube" />
+          </div>
+        )}
         <div className="mt-3 flex items-center gap-3 text-xs text-muted-foreground">
           {session.duration != null && (
             <span className="flex items-center gap-1">

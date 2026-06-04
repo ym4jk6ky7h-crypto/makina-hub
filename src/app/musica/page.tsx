@@ -1,7 +1,10 @@
+import { Music2 } from "lucide-react";
 import { ReleaseCard } from "@/components/cards/release-card";
 import { TrackCard } from "@/components/cards/track-card";
 import { PageHero } from "@/components/layout/page-hero";
 import { SectionHeader } from "@/components/layout/section-header";
+import { EmptyState } from "@/components/ui/empty-state";
+import { HomeSectionEmpty } from "@/components/ui/home-section-empty";
 import { SetupRequired } from "@/components/setup/setup-required";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { SITE_IMAGES } from "@/lib/site-images";
@@ -42,33 +45,50 @@ export default async function MusicaPage() {
           badge="Producciones"
         />
         <div className="mx-auto max-w-7xl space-y-14 px-4 py-10 lg:px-8">
-          {releases.length > 0 && (
-            <section>
-              <SectionHeader
-                title="Nuevas producciones"
-                href="/novedades"
-                linkLabel="Ver todas"
-              />
+          <section>
+            <SectionHeader
+              title="Nuevas producciones"
+              href="/novedades"
+              linkLabel="Ver todas"
+            />
+            {releases.length > 0 ? (
               <div className="mt-6 grid gap-4 lg:grid-cols-2">
                 {releases.map((release) => (
                   <ReleaseCard key={release.id} release={release} />
                 ))}
               </div>
-            </section>
-          )}
+            ) : (
+              <HomeSectionEmpty
+                className="mt-6"
+                message="Sin novedades publicadas aún."
+                actionLabel="Cómo añadirlas"
+                actionHref="/novedades"
+              />
+            )}
+          </section>
 
           <section>
             <SectionHeader title="Catálogo de temas" />
-            <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {tracks.map((track) => (
-                <TrackCard key={track.id} track={track} />
-              ))}
-            </div>
-            {tracks.length === 0 && (
-              <p className="mt-8 text-center text-muted-foreground">
-                Sin temas en la base de datos. Ejecuta{" "}
-                <code className="text-xs">npm run db:sync-all</code>.
-              </p>
+            {tracks.length > 0 ? (
+              <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {tracks.map((track) => (
+                  <TrackCard key={track.id} track={track} />
+                ))}
+              </div>
+            ) : (
+              <div className="mt-6">
+                <EmptyState
+                  icon={Music2}
+                  title="Sin temas en el catálogo"
+                  description="Sincroniza clásicos y novedades mákina desde tu Mac."
+                  hint={
+                    <code className="rounded bg-white/5 px-2 py-1 text-xs">
+                      npm run db:sync-all -- --skip-mb
+                    </code>
+                  }
+                  compact
+                />
+              </div>
             )}
           </section>
         </div>

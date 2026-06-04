@@ -1,5 +1,7 @@
+import { ShoppingBag } from "lucide-react";
 import { ReleaseCard } from "@/components/cards/release-card";
 import { PageHero } from "@/components/layout/page-hero";
+import { EmptyState } from "@/components/ui/empty-state";
 import { SetupRequired } from "@/components/setup/setup-required";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { SITE_IMAGES } from "@/lib/site-images";
@@ -37,22 +39,19 @@ export default async function NovedadesPage() {
         />
         <div className="mx-auto max-w-7xl px-4 py-10 lg:px-8">
           {releases.length === 0 ? (
-            <div className="glass-card rounded-2xl p-10 text-center">
-              <p className="text-muted-foreground">
-                Aún no hay lanzamientos en la base de datos.
-              </p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Ejecuta la migración{" "}
-                <code className="rounded bg-white/5 px-1.5 py-0.5 text-xs">
-                  003_new_releases.sql
-                </code>{" "}
-                en Supabase y luego{" "}
-                <code className="rounded bg-white/5 px-1.5 py-0.5 text-xs">
-                  npm run db:discover-releases
-                </code>
-                .
-              </p>
-            </div>
+            <EmptyState
+              icon={ShoppingBag}
+              title="Sin novedades todavía"
+              description="Crea la tabla en Supabase y sincroniza lanzamientos con enlace de compra."
+              hint={
+                <span className="block space-y-1 text-xs">
+                  <span className="block">1. SQL: 003_new_releases.sql</span>
+                  <span className="block">
+                    2. Terminal: npm run db:discover-releases
+                  </span>
+                </span>
+              }
+            />
           ) : (
             <div className="grid gap-4 sm:grid-cols-2">
               {releases.map((release) => (

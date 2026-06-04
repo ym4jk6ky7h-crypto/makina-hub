@@ -1,5 +1,7 @@
+import { Headphones } from "lucide-react";
 import { SessionCard } from "@/components/cards/session-card";
 import { PageHero } from "@/components/layout/page-hero";
+import { EmptyState } from "@/components/ui/empty-state";
 import { SetupRequired } from "@/components/setup/setup-required";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { SITE_IMAGES } from "@/lib/site-images";
@@ -37,11 +39,17 @@ export default async function SesionesPage() {
         />
         <div className="mx-auto max-w-7xl px-4 py-10 lg:px-8">
           {sessions.length === 0 ? (
-            <p className="text-center text-muted-foreground">
-              No hay sesiones. Ejecuta{" "}
-              <code className="text-xs">npm run db:discover-sessions</code> (recomendado
-              con YOUTUBE_API_KEY en .env.local).
-            </p>
+            <EmptyState
+              icon={Headphones}
+              title="No hay sesiones todavía"
+              description="Vinculamos cada artista del roster con un set en YouTube. Ejecuta el script de sincronización en tu Mac."
+              hint={
+                <code className="rounded bg-white/5 px-2 py-1 text-xs">
+                  npm run db:discover-sessions
+                </code>
+              }
+              actions={[{ label: "Ver artistas", href: "/artistas", variant: "outline" }]}
+            />
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {sessions.map((session) => (
