@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { EventCard } from "@/components/cards/event-card";
 import { EventFilters } from "@/components/events/event-filters";
 import { PageHero } from "@/components/layout/page-hero";
@@ -75,16 +76,16 @@ export default async function EventosPage({ searchParams }: PageProps) {
               <p>No hay eventos con estos filtros.</p>
               <p className="text-sm">
                 Prueba{" "}
-                <a href="/eventos" className="text-makina-pink hover:underline">
+                <Link href="/eventos" className="text-makina-pink hover:underline">
                   quitar filtros
-                </a>
+                </Link>
                 ,{" "}
-                <a
+                <Link
                   href="/eventos?fecha=all"
                   className="text-makina-pink hover:underline"
                 >
                   ver toda la agenda
-                </a>{" "}
+                </Link>{" "}
                 o sincroniza datos:{" "}
                 <code className="text-xs">npm run db:discover-events</code>
               </p>

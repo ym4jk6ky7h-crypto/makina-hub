@@ -235,4 +235,179 @@ Vercel y Supabase tienen plan gratuito para proyectos pequeños. El cron diario 
 
 ---
 
+## PASO 4 SIN LIARSE (copiar y pegar, una por una)
+
+Abre **dos ventanas** en el Mac:
+
+1. **Cursor** → archivo `makina-hub/CLAVES-SUPABASE.env`
+2. **Navegador** → Vercel, pantalla del proyecto → sección **Environment Variables**
+
+En Vercel verás algo así:
+
+```text
+[ Key / Name ]  [ Value ]  [ Add ]
+```
+
+Cada fila de abajo = pulsas **Add** una vez. En **Key** va el nombre exacto (copiado). En **Value** va lo de la derecha de tu archivo (sin comillas).
+
+Marca las tres casillas: **Production**, **Preview**, **Development**.
+
+### Fila 1 (obligatoria)
+
+| En Vercel (Key) | En Value pegas desde CLAVES-SUPABASE.env |
+|-----------------|------------------------------------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Línea 5: lo que va después del `=` → empieza por `https://acsyjnzgyjzfetvtpsay...` |
+
+### Fila 2 (obligatoria)
+
+| En Vercel (Key) | En Value |
+|-----------------|----------|
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Línea 6: empieza por `sb_publishable_` |
+
+### Fila 3 (obligatoria para cron; la web puede ir sin ella al principio)
+
+| En Vercel (Key) | En Value |
+|-----------------|----------|
+| `SUPABASE_SECRET_KEY` | Línea 10: empieza por `eyJ` (es larga, cópiala entera) |
+
+### Fila 4 (obligatoria si quieres actualización automática)
+
+| En Vercel (Key) | En Value |
+|-----------------|----------|
+| `CRON_SECRET` | **No está en el archivo.** Inventa una frase, por ejemplo: `makina-hub-cron-2026-mi-clave-secreta` (mínimo 20 caracteres) |
+
+### Fila 5 (puedes ponerla ya o después del deploy)
+
+| En Vercel (Key) | En Value |
+|-----------------|----------|
+| `NEXT_PUBLIC_SITE_URL` | Por ahora: `https://makina-hub.vercel.app` (cámbiala cuando Vercel te dé la URL real) |
+
+### Opcionales (solo si quieres; puedes saltarlas)
+
+| Key | Value |
+|-----|--------|
+| `DISCOGS_TOKEN` | Línea 18 de CLAVES-SUPABASE.env |
+| `YOUTUBE_API_KEY` | Línea 19 de CLAVES-SUPABASE.env |
+
+### Errores típicos al liarse
+
+| Error | Solución |
+|-------|----------|
+| Puse la URL en **Key** y el nombre en **Value** | Al revés: Key = nombre fijo de la tabla, Value = tu clave |
+| Copié `NEXT_PUBLIC_SUPABASE_URL=https://...` entero | Solo la parte después del `=`, sin espacios |
+| Puse la clave **secret** en PUBLISHABLE | Publishable = `sb_publishable_...` (línea 6). Secret = `eyJ...` (línea 10), otro nombre |
+| No marqué Production / Preview / Development | Marca las tres en cada variable |
+| Añadí 6 variables en un solo cuadro | Una variable = un par Key + Value + Add |
+
+Cuando tengas **mínimo las filas 1 y 2**, ya puedes pulsar **Deploy**.
+
+---
+
+## PASO 5 — Deploy (publicar la web)
+
+1. En la misma pantalla de Vercel, baja y pulsa el botón grande **Deploy**.
+2. Verás una pantalla con logs que se mueven (Building…). **No cierres la pestaña.** Tarda 2–5 minutos.
+3. Si todo va bien:
+   - Aparece **Congratulations** o un tick verde.
+   - Hay un botón **Visit** o un enlace tipo `https://makina-hub-xxxxx.vercel.app`.
+4. Haz clic en **Visit** → se abre tu web en internet.
+
+### Si sale error rojo (Build Failed)
+
+1. Clic en el deploy fallido.
+2. Pestaña **Building** → baja al final del texto.
+3. Copia las últimas 10–15 líneas (o haz captura) para revisar.
+
+Causas frecuentes:
+
+| Mensaje | Qué hacer |
+|---------|-----------|
+| `Module not found` | En tu Mac: `npm install`, luego `git push` |
+| Error TypeScript | Corrige en local, `git push`, Vercel reintenta solo |
+| `Root Directory` incorrecto | Settings → General → Root Directory = `makina-hub` si el repo es la carpeta padre |
+
+---
+
+## PASO 6 — Arreglar la URL del sitio (2 minutos)
+
+Tras el primer deploy, Vercel te da una URL real. Hay que ponerla en la variable 5 del paso 4.
+
+1. Copia la URL completa (ej. `https://makina-hub-abc123.vercel.app`).
+2. Vercel → tu proyecto → **Settings** → **Environment Variables**.
+3. Busca `NEXT_PUBLIC_SITE_URL` → **Edit** (o créala si no existe).
+4. Pega esa URL en **Value** → **Save**.
+5. Arriba: pestaña **Deployments** → en el último deploy, menú **⋮** (tres puntos) → **Redeploy** → confirma.
+
+Sin redeploy, el cambio de variable no se aplica a la web publicada.
+
+---
+
+## PASO 7 — Comprobar que funciona
+
+Abre tu URL de Vercel y prueba estas páginas:
+
+| URL | Qué deberías ver |
+|-----|------------------|
+| `/` | Inicio con secciones |
+| `/eventos` | Lista de fiestas (número “X próximos”) |
+| `/artistas` | Grid de DJs |
+| `/sesiones` | Tarjetas con miniatura |
+
+### Si ves “Configura Supabase”
+
+Faltan variables en Vercel. Vuelve al paso 4: mínimo filas 1 y 2. Luego **Redeploy**.
+
+### Si la web abre pero `/eventos` está vacío
+
+Los datos están en Supabase, pero puede que no los hayas cargado. En tu Mac:
+
+```bash
+cd "/Users/eduardogarcialopez/Music/Analizr Vinyl Dj/makina-hub"
+npm run db:sync-all -- --skip-mb
+```
+
+Usa el **mismo** proyecto Supabase que en `CLAVES-SUPABASE.env`. Recarga `/eventos` en Vercel (no hace falta otro deploy).
+
+### Si `/novedades` está vacío
+
+En Supabase SQL Editor ejecuta el contenido de `003_new_releases.sql`, luego en Mac:
+
+```bash
+npm run db:discover-releases
+```
+
+---
+
+## PASO 8 — Cambios futuros (flujo normal)
+
+Cada vez que edites código:
+
+```bash
+git add .
+git commit -m "Descripción del cambio"
+git push
+```
+
+Vercel detecta el push y despliega solo (1–3 min). Puedes ver el progreso en **Deployments**.
+
+---
+
+## PASO 9 — Dominio propio (solo si lo tienes)
+
+1. **Settings → Domains** → añade `www.tudominio.com`.
+2. En tu proveedor de dominio (GoDaddy, etc.), crea el registro DNS que indique Vercel.
+3. Actualiza `NEXT_PUBLIC_SITE_URL` con ese dominio → **Redeploy**.
+
+---
+
+## Checklist final
+
+- [ ] Variables 1 y 2 en Vercel  
+- [ ] Deploy verde  
+- [ ] `NEXT_PUBLIC_SITE_URL` = URL real + Redeploy  
+- [ ] `/eventos` muestra fiestas  
+- [ ] (Opcional) `npm run db:sync-all` hecho en Mac  
+
+---
+
 Si algo falla, copia el mensaje de error del deploy o una captura de Environment Variables (tapando las claves) y lo revisamos.
