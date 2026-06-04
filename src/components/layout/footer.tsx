@@ -10,7 +10,7 @@ export function Footer() {
   const catalog = NAV_ITEMS.filter((i) => i.group === "catalogo");
 
   return (
-    <footer className="relative mt-auto overflow-hidden border-t border-white/10">
+    <footer className="relative mt-auto overflow-hidden border-t border-white/10 pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
       <div className="absolute inset-0">
         <Image
           src={SITE_IMAGES.footerCrowd}

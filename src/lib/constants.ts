@@ -6,6 +6,7 @@ import {
   Home,
   Mic2,
   Music2,
+  Search,
   ShoppingBag,
   Sparkles,
   Tag,
@@ -54,6 +55,15 @@ export const NAV_GROUPS = {
   catalogo: "Catálogo",
   tools: "Herramientas",
 } as const;
+
+/** Barra inferior móvil (5 accesos rápidos) */
+export const MOBILE_TAB_NAV = [
+  { href: "/", label: "Inicio", icon: Home },
+  { href: "/eventos", label: "Eventos", icon: Calendar },
+  { href: "/artistas", label: "Artistas", icon: Mic2 },
+  { href: "/musica", label: "Música", icon: Music2 },
+  { href: "/buscar", label: "Buscar", icon: Search },
+] as const;
 
 export const EVENT_CITIES = [
   "Barcelona",

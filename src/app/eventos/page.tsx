@@ -50,13 +50,17 @@ export default async function EventosPage({ searchParams }: PageProps) {
           subtitle="Agenda en Catalunya: grandes festivales, Makina Legends, Xque!, Love Makina, Chasis y fiestas en locales pequeños."
           image={SITE_IMAGES.heroEvents}
           badge={`${events.length} próximos`}
-        >
-          <Suspense fallback={<div className="h-10" />}>
-            <EventFilters />
-          </Suspense>
-        </PageHero>
+        />
 
-        <div className="mx-auto max-w-7xl px-4 py-10 lg:px-8">
+        <Suspense
+          fallback={
+            <div className="sticky top-16 z-40 h-24 border-b border-white/5 bg-background/80" />
+          }
+        >
+          <EventFilters sticky />
+        </Suspense>
+
+        <div className="mx-auto max-w-7xl px-4 py-8 pb-6 lg:px-8 lg:py-10">
           <div className="space-y-6">
             {events.map((event) => (
               <div

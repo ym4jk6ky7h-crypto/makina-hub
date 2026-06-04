@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Syne } from "next/font/google";
 import { Navbar } from "@/components/layout/navbar";
+import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Footer } from "@/components/layout/footer";
 import { buildMetadata } from "@/lib/seo/metadata";
@@ -50,9 +51,12 @@ export default function RootLayout({
           <Navbar />
           <div className="flex flex-1">
             <Sidebar />
-            <main className="flex-1">{children}</main>
+            <main className="flex-1 pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
+              {children}
+            </main>
           </div>
           <Footer />
+          <MobileBottomNav />
         </div>
       </body>
     </html>

@@ -86,40 +86,44 @@ export default async function HomePage() {
               <div className="mt-8 max-w-lg">
                 <SearchBar placeholder="Buscar Skudero, Flying Free, eventos…" />
               </div>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Link href="/eventos">
-                  <Button size="lg" variant="makina" className="gap-2">
-                    <Calendar className="h-4 w-4" />
+              <div className="mt-6 flex flex-col gap-4 sm:mt-8 sm:flex-row sm:flex-wrap">
+                <Link href="/eventos" className="w-full sm:w-auto">
+                  <Button
+                    size="lg"
+                    variant="makina"
+                    className="h-12 w-full gap-2 text-base sm:w-auto"
+                  >
+                    <Calendar className="h-5 w-5" />
                     Ver eventos
                   </Button>
                 </Link>
-                <Link href="/artistas">
+                <Link href="/artistas" className="w-full sm:w-auto">
                   <Button
                     size="lg"
                     variant="outline"
-                    className="border-white/20 bg-black/30 backdrop-blur-sm hover:bg-white/10"
+                    className="h-12 w-full gap-2 border-white/20 bg-black/30 text-base backdrop-blur-sm hover:bg-white/10 sm:w-auto"
                   >
-                    <Mic2 className="mr-1 h-4 w-4" />
+                    <Mic2 className="h-5 w-5" />
                     Artistas
                   </Button>
                 </Link>
-                <Link href="/novedades">
+                <Link href="/novedades" className="w-full sm:w-auto">
                   <Button
                     size="lg"
                     variant="outline"
-                    className="gap-2 border-makina-pink/40 bg-makina-pink/5"
+                    className="h-12 w-full gap-2 border-makina-pink/40 bg-makina-pink/5 text-base sm:w-auto"
                   >
-                    <ShoppingBag className="h-4 w-4 text-makina-pink" />
+                    <ShoppingBag className="h-5 w-5 text-makina-pink" />
                     Novedades
                   </Button>
                 </Link>
-                <Link href="/ask">
+                <Link href="/ask" className="w-full sm:w-auto">
                   <Button
                     size="lg"
                     variant="outline"
-                    className="gap-2 border-makina-cyan/40 bg-makina-cyan/5"
+                    className="h-12 w-full gap-2 border-makina-cyan/40 bg-makina-cyan/5 text-base sm:w-auto"
                   >
-                    <Sparkles className="h-4 w-4 text-makina-cyan" />
+                    <Sparkles className="h-5 w-5 text-makina-cyan" />
                     Ask AI
                   </Button>
                 </Link>

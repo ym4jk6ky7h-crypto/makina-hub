@@ -77,16 +77,16 @@ export function Navbar() {
         <Button
           variant="ghost"
           size="icon"
-          className="xl:hidden"
+          className="lg:hidden"
           onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Menú"
+          aria-label="Más secciones"
         >
           {mobileOpen ? <X /> : <Menu />}
         </Button>
       </div>
 
       {mobileOpen && (
-        <div className="border-t border-white/5 bg-background/95 px-4 py-4 backdrop-blur-xl xl:hidden">
+        <div className="border-t border-white/5 bg-background/95 px-4 py-4 backdrop-blur-xl lg:hidden">
           <div className="mb-4">
             <SearchBar placeholder="Buscar DJ, tema, evento…" />
           </div>
