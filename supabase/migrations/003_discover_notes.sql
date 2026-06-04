@@ -1,0 +1,2 @@
+-- Nota: los scripts db:discover-* usan SUPABASE_SERVICE_ROLE_KEY (bypass RLS).
+-- Si no tienes service role, ejecuta seed.sql en el SQL Editor de Supabase.

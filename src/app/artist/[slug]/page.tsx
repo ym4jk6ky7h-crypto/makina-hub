@@ -1,0 +1,36 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ArtistDetail } from "@/features/artists/artist-detail";
+import { buildMetadata } from "@/lib/seo/metadata";
+import { getArtistBySlug } from "@/services/artists.service";
+
+type PageProps = { params: Promise<{ slug: string }> };
+
+export async function generateMetadata({ params }: PageProps) {
+  const { slug } = await params;
+  const artist = await getArtistBySlug(slug);
+  if (!artist) return {};
+  return buildMetadata({
+    title: artist.name,
+    description: artist.biography.slice(0, 160),
+    path: `/artist/${slug}`,
+    image: artist.image_url ?? undefined,
+  });
+}
+
+export default async function ArtistDetailPageEn({ params }: PageProps) {
+  const { slug } = await params;
+  const artist = await getArtistBySlug(slug);
+  if (!artist) notFound();
+
+  return (
+    <>
+      <ArtistDetail slug={slug} />
+      <div className="mx-auto max-w-5xl px-4 pb-8 lg:px-8">
+        <Link href="/artistas" className="text-sm text-makina-pink hover:underline">
+          ← Back to artists
+        </Link>
+      </div>
+    </>
+  );
+}

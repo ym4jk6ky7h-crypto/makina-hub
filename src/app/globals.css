@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 12% 3%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 6%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 6%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 340 100% 58%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 8% 12%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 8% 12%;
+    --muted-foreground: 240 5% 58%;
+    --accent: 262 83% 58%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 8% 14%;
+    --input: 240 8% 14%;
+    --ring: 340 100% 58%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    background-image:
+      radial-gradient(ellipse 100% 80% at 50% -30%, rgba(255, 45, 106, 0.07), transparent),
+      radial-gradient(ellipse 60% 50% at 100% 50%, rgba(139, 92, 246, 0.05), transparent);
+  }
+}
+
+@layer utilities {
+  .text-gradient-makina {
+    @apply bg-gradient-to-r from-makina-pink via-makina-purple to-makina-cyan bg-clip-text text-transparent;
+  }
+  .glass-card {
+    @apply rounded-xl border border-white/10 bg-card/70 shadow-lg shadow-black/20 backdrop-blur-md;
+  }
+  .glass-card-hover {
+    @apply glass-card transition-all duration-300 hover:border-makina-pink/30 hover:shadow-makina-pink/10 hover:shadow-xl;
+  }
+  .nav-glow-active {
+    @apply bg-gradient-to-r from-makina-pink/15 via-makina-purple/10 to-transparent text-foreground shadow-[inset_3px_0_0_0_#ff2d6a];
+  }
+  .btn-makina {
+    @apply bg-gradient-to-r from-makina-pink to-makina-purple text-white shadow-lg shadow-makina-pink/25 transition-all hover:shadow-makina-pink/40 hover:brightness-110;
+  }
+  .section-glow-line {
+    @apply h-px w-full bg-gradient-to-r from-transparent via-makina-pink/50 to-transparent;
+  }
+  .noise-overlay {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
