@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { SearchX } from "lucide-react";
 import { ArtistCard } from "@/components/cards/artist-card";
+import { HomeSectionEmpty } from "@/components/ui/home-section-empty";
 import { EventCard } from "@/components/cards/event-card";
 import { TrackCard } from "@/components/cards/track-card";
 import { SessionCard } from "@/components/cards/session-card";
@@ -63,10 +65,13 @@ async function SearchResults({
 
   if (visibleTotal === 0) {
     return (
-      <p className="mt-8 text-center text-muted-foreground">
-        No se encontraron resultados para &quot;{query}&quot;
-        {tab !== "todos" ? ` en ${tab}` : ""}.
-      </p>
+      <HomeSectionEmpty
+        className="mt-8"
+        icon={SearchX}
+        message={`No se encontraron resultados para "${query}"${tab !== "todos" ? ` en ${tab}` : ""}.`}
+        actionLabel="Ver artistas"
+        actionHref="/artistas"
+      />
     );
   }
 

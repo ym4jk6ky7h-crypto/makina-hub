@@ -13,7 +13,7 @@ type SessionCardProps = {
 };
 
 export function SessionCard({ session }: SessionCardProps) {
-  const { videoId, youtubeHref, isSearch } = resolveSessionPlay(session);
+  const { videoId, youtubeHref, isSearch, durationMinutes } = resolveSessionPlay(session);
   const { url: thumb, fromYoutube } = getSessionThumbnail(session);
 
   const detailHref = `/sesiones/${session.slug}`;
@@ -54,10 +54,10 @@ export function SessionCard({ session }: SessionCardProps) {
         </Link>
 
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          {session.duration != null && (
+          {(durationMinutes ?? session.duration) != null && (
             <span className="flex items-center gap-1">
               <Clock className="h-3 w-3" />
-              {session.duration} min
+              {durationMinutes ?? session.duration} min
             </span>
           )}
           {(videoId || youtubeHref) && (

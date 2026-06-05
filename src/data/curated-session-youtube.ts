@@ -85,3 +85,6 @@ export const CURATED_SESSION_WATCH_BY_SLUG: Record<string, string> = {
   "darren-styles-sesion-makina": "https://www.youtube.com/watch?v=tj8wyU9bPEs",
   "delirium-sesion-makina": "https://www.youtube.com/watch?v=06Qofb8_hzo"
 };
+
+/** Duración en segundos (generado con db:curate-sessions-youtube). */
+export const CURATED_SESSION_DURATION_SEC_BY_SLUG: Record<string, number> = {};

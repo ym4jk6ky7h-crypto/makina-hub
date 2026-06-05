@@ -1,5 +1,8 @@
 import { getTracksForArtist } from "../../../data/merge-classic-tracks";
-import { CURATED_SESSION_WATCH_BY_SLUG } from "@/data/curated-session-youtube";
+import {
+  CURATED_SESSION_DURATION_SEC_BY_SLUG,
+  CURATED_SESSION_WATCH_BY_SLUG,
+} from "@/data/curated-session-youtube";
 import type { Artist, Session, Track } from "@/types/database";
 
 /** Sesión del roster aunque no esté aún en Supabase. */
@@ -12,13 +15,16 @@ export function ensureArtistSessions(
   const youtube_url = CURATED_SESSION_WATCH_BY_SLUG[`${artist.slug}-sesion-makina`];
   if (!youtube_url) return [];
 
+  const durationSec =
+    CURATED_SESSION_DURATION_SEC_BY_SLUG[`${artist.slug}-sesion-makina`];
+
   return [
     {
       id: `curated-${artist.slug}-session`,
       slug: `${artist.slug}-sesion-makina`,
       title: `${artist.name} — Sesión mákina`,
       artist_id: artist.id,
-      duration: 60,
+      duration: durationSec ? Math.round(durationSec / 60) : null,
       youtube_url,
       tracklist: [],
       created_at: new Date(0).toISOString(),

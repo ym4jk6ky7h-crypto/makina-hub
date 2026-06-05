@@ -2,9 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ExternalLink, Music2, ShoppingBag } from "lucide-react";
+import { TrackPlayerSection } from "@/components/media/track-player-section";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { buildMetadata } from "@/lib/seo/metadata";
+import { resolveReleasePreview } from "@/lib/release-play";
 import { getNewReleaseBySlug } from "@/services/releases.service";
 import { formatGenre } from "@/lib/utils";
 
@@ -34,12 +36,25 @@ export default async function ReleaseDetailPage({ params }: PageProps) {
   const release = await getNewReleaseBySlug(slug);
   if (!release) notFound();
 
+  const { videoId, watchUrl } = resolveReleasePreview(release);
   const buyLabel = `Comprar en ${release.store_name}`;
 
   return (
     <article className="px-4 py-8 lg:px-8">
       <div className="mx-auto max-w-3xl">
         <div className="glass-card overflow-hidden">
+          {videoId && (
+            <div className="border-b border-white/10 p-4 sm:p-6">
+              <TrackPlayerSection
+                videoId={videoId}
+                title={release.title}
+                subtitle={release.artist?.name ?? "Preview"}
+                artworkUrl={release.cover_url}
+                watchUrl={watchUrl}
+                badge="Preview"
+              />
+            </div>
+          )}
           <div className="relative aspect-[2/1] bg-gradient-to-br from-makina-pink/30 via-makina-purple/20 to-makina-cyan/10 sm:aspect-[21/9]">
             {release.cover_url ? (
               <Image
@@ -88,12 +103,12 @@ export default async function ReleaseDetailPage({ params }: PageProps) {
               </p>
             )}
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <div className="mt-8">
               <a
                 href={release.purchase_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex"
+                className="inline-flex w-full sm:w-auto"
               >
                 <Button variant="makina" size="lg" className="w-full gap-2 sm:w-auto">
                   <ShoppingBag className="h-5 w-5" />
@@ -101,19 +116,6 @@ export default async function ReleaseDetailPage({ params }: PageProps) {
                   <ExternalLink className="h-4 w-4 opacity-80" />
                 </Button>
               </a>
-              {release.youtube_url && (
-                <a
-                  href={release.youtube_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex"
-                >
-                  <Button size="lg" variant="outline" className="w-full gap-2 sm:w-auto">
-                    Escuchar
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
-                </a>
-              )}
             </div>
             <p className="mt-4 text-xs text-muted-foreground">
               El enlace de compra te lleva a {release.store_name}. Makina Hub no gestiona pagos.

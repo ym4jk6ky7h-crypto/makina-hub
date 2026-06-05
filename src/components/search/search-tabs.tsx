@@ -30,9 +30,9 @@ export function SearchTabs({ query }: { query: string }) {
           role="tab"
           aria-selected={active === tab.id}
           className={cn(
-            "shrink-0 rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+            "shrink-0 rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-200 motion-reduce:transition-none",
             active === tab.id
-              ? "border-makina-pink/50 bg-makina-pink/15 text-foreground"
+              ? "border-makina-pink/50 bg-makina-pink/15 text-foreground shadow-sm shadow-makina-pink/10"
               : "border-white/10 bg-white/5 text-muted-foreground hover:border-white/20 hover:text-foreground"
           )}
         >

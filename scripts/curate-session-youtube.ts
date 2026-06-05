@@ -1,46 +1,14 @@
 /**
  * Genera enlaces watch?v= verificados para sesiones ({slug}-sesion-makina).
+ * Solo vídeos ≥15 min; prioriza los más recientes.
  *
  * npm run db:curate-sessions-youtube
  */
-import { execSync } from "node:child_process";
 import { writeFileSync } from "fs";
 import path from "path";
 import { MAKINA_ARTISTS } from "../data/makina-artists";
-
-function curlText(url: string, maxBuffer = 4 * 1024 * 1024): string {
-  return execSync(`curl -fsSL --max-redirs 5 -A "Mozilla/5.0 (MakinaHub)" ${JSON.stringify(url)}`, {
-    encoding: "utf8",
-    maxBuffer,
-    timeout: 25_000,
-  });
-}
-
-function oembedTitle(videoId: string): string | null {
-  try {
-    const out = curlText(
-      `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`,
-      512 * 1024
-    );
-    return (JSON.parse(out) as { title?: string }).title ?? null;
-  } catch {
-    return null;
-  }
-}
-
-function searchVideoIds(query: string): string[] {
-  try {
-    const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
-    const html = curlText(url);
-    return [
-      ...new Set(
-        [...html.matchAll(/watch\?v=([a-zA-Z0-9_-]{11})/g)].map((m) => m[1])
-      ),
-    ].slice(0, 10);
-  } catch {
-    return [];
-  }
-}
+import { MIN_SESSION_SECONDS } from "../src/lib/media-constants";
+import { scrapeVideoMeta, searchVideoIds } from "./lib/youtube-scrape";
 
 function sessionMatches(artistName: string, ytTitle: string): boolean {
   const parts = artistName
@@ -56,49 +24,72 @@ function sessionMatches(artistName: string, ytTitle: string): boolean {
   return parts.some((p) => tl.includes(p));
 }
 
+type Candidate = {
+  id: string;
+  title: string;
+  durationSeconds: number;
+  publishedAt: string;
+};
+
+function pickSession(candidates: Candidate[], artistName: string): Candidate | null {
+  const valid = candidates.filter((c) => c.durationSeconds >= MIN_SESSION_SECONDS);
+  if (valid.length === 0) return null;
+
+  const matched = valid.filter((c) => sessionMatches(artistName, c.title));
+  const pool = matched.length > 0 ? matched : valid;
+  pool.sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+  return pool[0];
+}
+
 async function main() {
   const curated: Record<string, string> = {};
+  const durations: Record<string, number> = {};
 
   for (const seed of MAKINA_ARTISTS) {
     const slug = `${seed.slug}-sesion-makina`;
     const classic = seed.classics?.[0];
     const query = classic
-      ? `${seed.name} ${classic} makina remember sesion`
-      : `${seed.name} makina remember DJ session`;
+      ? `${seed.name} ${classic} makina remember sesion DJ set`
+      : `${seed.name} makina remember DJ session set`;
 
     process.stderr.write(`${slug}… `);
-    const ids = searchVideoIds(query);
-    let picked: string | null = null;
+    const ids = searchVideoIds(query, 15);
+    const candidates: Candidate[] = [];
 
     for (const id of ids) {
-      const ytTitle = oembedTitle(id);
-      if (!ytTitle) continue;
-      if (sessionMatches(seed.name, ytTitle)) {
-        picked = id;
-        process.stderr.write(`${id} (${ytTitle.slice(0, 45)})\n`);
-        break;
-      }
+      const meta = scrapeVideoMeta(id);
+      if (meta.durationSeconds == null || !meta.title) continue;
+      candidates.push({
+        id,
+        title: meta.title,
+        durationSeconds: meta.durationSeconds,
+        publishedAt: meta.publishedAt ?? "",
+      });
     }
 
-    if (!picked && ids[0]) {
-      picked = ids[0];
-      const ytTitle = oembedTitle(picked);
-      process.stderr.write(`${picked}? (${ytTitle?.slice(0, 45) ?? "?"})\n`);
-    } else if (!picked) {
-      process.stderr.write("none\n");
+    const picked = pickSession(candidates, seed.name);
+    if (picked) {
+      curated[slug] = `https://www.youtube.com/watch?v=${picked.id}`;
+      durations[slug] = picked.durationSeconds;
+      process.stderr.write(
+        `${picked.id} ${Math.round(picked.durationSeconds / 60)}min (${picked.title.slice(0, 40)})\n`
+      );
+    } else {
+      process.stderr.write("none ≥15min\n");
     }
 
-    if (picked) curated[slug] = `https://www.youtube.com/watch?v=${picked}`;
-    await new Promise((r) => setTimeout(r, 200));
+    await new Promise((r) => setTimeout(r, 250));
   }
 
   const outPath = path.join(__dirname, "../src/data/curated-session-youtube.ts");
   const body = `/** Generado con npm run db:curate-sessions-youtube */
 export const CURATED_SESSION_WATCH_BY_SLUG: Record<string, string> = ${JSON.stringify(curated, null, 2)};
+
+export const CURATED_SESSION_DURATION_SEC_BY_SLUG: Record<string, number> = ${JSON.stringify(durations, null, 2)};
 `;
   writeFileSync(outPath, body);
   console.log(
-    `\n✅ ${Object.keys(curated).length}/${MAKINA_ARTISTS.length} sesiones → src/data/curated-session-youtube.ts\n`
+    `\n✅ ${Object.keys(curated).length}/${MAKINA_ARTISTS.length} sesiones (≥15 min) → src/data/curated-session-youtube.ts\n`
   );
 }
 

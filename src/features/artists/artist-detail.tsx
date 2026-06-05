@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Instagram, Music2, Youtube } from "lucide-react";
+import { Headphones, Instagram, Music2, Youtube } from "lucide-react";
 import { ArtistBio } from "@/components/artists/artist-bio";
 import { ArtistListenNow } from "@/components/artists/artist-listen-now";
 import { ArtistMetaChips } from "@/components/artists/artist-meta-chips";
@@ -13,14 +13,12 @@ import { HomeSectionEmpty } from "@/components/ui/home-section-empty";
 import { parseProductionsFromBio } from "@/lib/artists/artist-bio-utils";
 import { getArtistImageUrl } from "@/lib/artists/artist-image";
 import { resolveSessionPlay } from "@/lib/session-play";
-import { resolveTrackPlay } from "@/lib/track-play";
 import { personJsonLd } from "@/lib/seo/json-ld";
 import { getArtistWithRelations } from "@/services/artists.service";
 import type { TrackWithRelations } from "@/types/database";
 
-function pickPrimaryVideo(
-  tracks: TrackWithRelations[],
-  sessions: { title: string; slug: string; youtube_url: string | null }[]
+function pickPrimarySession(
+  sessions: { title: string; slug: string; youtube_url: string | null; duration?: number | null }[]
 ) {
   for (const session of sessions) {
     const { videoId, watchUrl } = resolveSessionPlay(session);
@@ -30,17 +28,6 @@ function pickPrimaryVideo(
         title: session.title,
         watchUrl,
         subtitle: "Sesión mákina",
-      };
-    }
-  }
-  for (const track of tracks) {
-    const { videoId, watchUrl } = resolveTrackPlay(track);
-    if (videoId) {
-      return {
-        videoId,
-        title: track.title,
-        watchUrl,
-        subtitle: track.artist?.name ?? "Tema",
       };
     }
   }
@@ -64,7 +51,7 @@ export async function ArtistDetail({ slug }: { slug: string }) {
     artist: artistData,
   }));
   const bioProductions = parseProductionsFromBio(artistData.biography ?? "");
-  const primaryVideo = pickPrimaryVideo(tracksWithArtist, sessions);
+  const primaryVideo = pickPrimarySession(sessions);
   const jsonLd = personJsonLd(artistData);
 
   return (
@@ -217,6 +204,7 @@ export async function ArtistDetail({ slug }: { slug: string }) {
             </div>
           ) : (
             <HomeSectionEmpty
+              icon={Headphones}
               message="Sin sesión publicada para este DJ."
               actionLabel="Ver sesiones"
               actionHref="/sesiones"

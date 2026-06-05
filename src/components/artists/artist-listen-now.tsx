@@ -42,10 +42,10 @@ function pickListenItems(
   return picked.slice(0, 3);
 }
 
-function InlinePlayButton() {
+function InlinePlayButton({ anchor = "#reproductor-audio" }: { anchor?: string }) {
   return (
     <Link
-      href="#reproductor"
+      href={anchor}
       className={cn(
         "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-600",
         "text-white shadow-lg shadow-red-900/30 transition-transform hover:scale-105"
@@ -79,7 +79,6 @@ export function ArtistListenNow({
               (videoId
                 ? youtubeThumbnail(`https://www.youtube.com/watch?v=${videoId}`)
                 : null);
-            const playUrl = watchUrl;
             return (
               <li
                 key={`track-${track.id}`}
@@ -103,10 +102,17 @@ export function ArtistListenNow({
                   </Link>
                   <p className="text-xs text-muted-foreground">{artistName}</p>
                 </div>
-                {videoId && inlinePlayer ? (
-                  <InlinePlayButton />
-                ) : videoId && playUrl ? (
-                  <PlayYoutubeButton href={playUrl} size="sm" label="" />
+                {videoId ? (
+                  <Link
+                    href={`/musica/${track.slug}#reproductor-audio`}
+                    className={cn(
+                      "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-makina-pink",
+                      "text-white shadow-lg shadow-makina-pink/30 transition-transform hover:scale-105 motion-reduce:hover:scale-100"
+                    )}
+                    aria-label="Escuchar tema"
+                  >
+                    <Play className="h-5 w-5 fill-white" />
+                  </Link>
                 ) : (
                   <Link
                     href={`/musica/${track.slug}`}
@@ -146,9 +152,19 @@ export function ArtistListenNow({
                 <p className="text-xs text-muted-foreground">Sesión</p>
               </div>
               {videoId && inlinePlayer ? (
-                <InlinePlayButton />
+                <InlinePlayButton anchor="#reproductor" />
+              ) : videoId ? (
+                <Link
+                  href={`/sesiones/${session.slug}#reproductor`}
+                  className={cn(
+                    "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-600",
+                    "text-white shadow-lg shadow-red-900/30 transition-transform hover:scale-105 motion-reduce:hover:scale-100"
+                  )}
+                  aria-label="Ver sesión"
+                >
+                  <Play className="h-5 w-5 fill-white" />
+                </Link>
               ) : (
-                videoId &&
                 watchUrl && <PlayYoutubeButton href={watchUrl} size="sm" label="" />
               )}
             </li>

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Clock, Play, Youtube } from "lucide-react";
+import { Clock, Music2, Play } from "lucide-react";
 import { MakinaPlaceholder } from "@/components/ui/makina-placeholder";
 import { MediaCardShell } from "@/components/ui/media-card-shell";
 import type { TrackWithRelations } from "@/types/database";
@@ -18,11 +18,12 @@ export function TrackCard({ track }: TrackCardProps) {
   const thumb = getTrackThumbnailSync(track);
 
   const detailHref = `/musica/${track.slug}`;
+  const listenHref = videoId ? `${detailHref}#reproductor-audio` : detailHref;
 
   return (
     <MediaCardShell>
       <Link
-        href={detailHref}
+        href={listenHref}
         className="relative block aspect-square w-full overflow-hidden bg-gradient-to-br from-makina-purple/30 to-makina-pink/20 sm:aspect-video"
       >
         {thumb ? (
@@ -30,14 +31,14 @@ export function TrackCard({ track }: TrackCardProps) {
             src={thumb}
             alt=""
             fill
-            className="object-cover transition-transform group-hover:scale-105"
+            className="object-cover transition-transform group-hover:scale-105 motion-reduce:transform-none"
             sizes="(max-width: 640px) 100vw, 320px"
           />
         ) : (
           <MakinaPlaceholder aspect="square" fill className="sm:aspect-video" />
         )}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/30">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-600 shadow-lg">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-makina-pink shadow-lg">
             <Play className="h-6 w-6 fill-white text-white" />
           </div>
         </div>
@@ -64,24 +65,29 @@ export function TrackCard({ track }: TrackCardProps) {
             </span>
           )}
           {track.year != null && <span>{track.year}</span>}
-          {youtubeHref && (
-            <span className="flex items-center gap-1 text-red-400">
-              <Youtube className="h-3 w-3" />
-              {videoId ? "Reproductor" : isSearch ? "Buscar" : "YouTube"}
+          {videoId && (
+            <span className="flex items-center gap-1 text-makina-pink">
+              <Music2 className="h-3 w-3" />
+              Audio
             </span>
+          )}
+          {!videoId && youtubeHref && isSearch && (
+            <span className="text-muted-foreground">Buscar</span>
           )}
         </div>
 
         <Link
-          href={videoId ? `${detailHref}#reproductor` : detailHref}
+          href={listenHref}
           className={cn(
-            "mt-1 inline-flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-white",
+            "mt-1 inline-flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold",
             "transition-colors sm:w-auto",
-            videoId ? "bg-red-600 hover:bg-red-500" : "border border-white/15 text-foreground hover:bg-white/5"
+            videoId
+              ? "bg-makina-pink text-white hover:bg-makina-pink/90"
+              : "border border-white/15 text-foreground hover:bg-white/5"
           )}
         >
           <Play className={cn("h-4 w-4", videoId && "fill-white")} />
-          {videoId ? "Escuchar aquí" : "Ver tema"}
+          {videoId ? "Escuchar" : "Ver tema"}
         </Link>
       </div>
     </MediaCardShell>

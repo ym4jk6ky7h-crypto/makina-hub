@@ -107,21 +107,8 @@ export function SessionGridSkeleton({ count = 8 }: { count?: number }) {
   );
 }
 
-export function ReleaseListSkeleton({ count = 4 }: { count?: number }) {
-  return (
-    <div className="mx-auto grid max-w-7xl gap-4 px-4 py-10 sm:grid-cols-2 lg:px-8">
-      {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="glass-card flex overflow-hidden rounded-xl">
-          <Skeleton className="h-28 w-28 shrink-0 rounded-none sm:h-32 sm:w-32" />
-          <div className="flex flex-1 flex-col justify-center gap-2 p-4">
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-3 w-1/2" />
-            <Skeleton className="h-8 w-32 rounded-md" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+export function ReleaseListSkeleton({ count = 6 }: { count?: number }) {
+  return <MediaCardGridSkeleton count={count} />;
 }
 
 export function HomePageSkeleton() {

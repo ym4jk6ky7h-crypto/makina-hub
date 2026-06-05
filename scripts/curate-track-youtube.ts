@@ -6,6 +6,8 @@
 import { writeFileSync } from "fs";
 import path from "path";
 import { MAKINA_CLASSIC_TRACKS } from "../data/makina-classic-tracks";
+import { MIN_TRACK_SECONDS, MAX_TRACK_SECONDS } from "../src/lib/media-constants";
+import { scrapeVideoMeta, searchVideoIds as scrapeSearchVideoIds } from "./lib/youtube-scrape";
 
 const ARTIST_SEARCH: Record<string, string> = {
   pastis: "Pastis Buenri",
@@ -32,16 +34,13 @@ async function oembedTitle(videoId: string): Promise<string | null> {
   return data.title ?? null;
 }
 
-async function searchVideoIds(artist: string, title: string): Promise<string[]> {
-  const q = encodeURIComponent(`${artist} ${title} makina`);
-  const html = await fetch(`https://www.youtube.com/results?search_query=${q}`, {
-    headers: { "User-Agent": "Mozilla/5.0 (compatible; MakinaHub/1.0)" },
-  }).then((r) => r.text());
-  return [
-    ...new Set(
-      [...html.matchAll(/watch\?v=([a-zA-Z0-9_-]{11})/g)].map((m) => m[1])
-    ),
-  ].slice(0, 8);
+async function findTrackVideoIds(artist: string, title: string): Promise<string[]> {
+  const q = `${artist} ${title} makina`;
+  return scrapeSearchVideoIds(q, 10);
+}
+
+function isFullTrackDuration(seconds: number): boolean {
+  return seconds >= MIN_TRACK_SECONDS && seconds <= MAX_TRACK_SECONDS;
 }
 
 function titleMatches(trackTitle: string, ytTitle: string, artist: string): boolean {
@@ -68,21 +67,37 @@ async function main() {
     for (const t of tracks) {
       const slug = `${artistSlug}-${t.slug}`;
       process.stderr.write(`${slug}… `);
-      const ids = await searchVideoIds(artist, t.title);
+      const ids = await findTrackVideoIds(artist, t.title);
       let picked: string | null = null;
       for (const id of ids) {
-        const ytTitle = await oembedTitle(id);
+        const meta = scrapeVideoMeta(id);
+        const ytTitle = meta.title ?? (await oembedTitle(id));
         if (!ytTitle) continue;
+        if (
+          meta.durationSeconds != null &&
+          !isFullTrackDuration(meta.durationSeconds)
+        ) {
+          continue;
+        }
         if (titleMatches(t.title, ytTitle, artist)) {
           picked = id;
           process.stderr.write(`${id} (${ytTitle.slice(0, 40)})\n`);
           break;
         }
       }
-      if (!picked && ids[0]) {
-        picked = ids[0];
-        const ytTitle = await oembedTitle(picked);
-        process.stderr.write(`${picked}? (${ytTitle?.slice(0, 40) ?? "?"})\n`);
+      if (!picked) {
+        for (const id of ids) {
+          const meta = scrapeVideoMeta(id);
+          if (
+            meta.durationSeconds != null &&
+            isFullTrackDuration(meta.durationSeconds)
+          ) {
+            picked = id;
+            const ytTitle = meta.title ?? (await oembedTitle(id));
+            process.stderr.write(`${picked}? (${ytTitle?.slice(0, 40) ?? "?"})\n`);
+            break;
+          }
+        }
       }
       if (picked) curated[slug] = `https://www.youtube.com/watch?v=${picked}`;
       else process.stderr.write("none\n");

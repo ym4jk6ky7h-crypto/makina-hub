@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Music2 } from "lucide-react";
 import { TrackCard } from "@/components/cards/track-card";
-import { DetailPlayerSection } from "@/components/media/detail-player-section";
+import { TrackPlayerSection } from "@/components/media/track-player-section";
 import { PlayYoutubeButton } from "@/components/ui/play-youtube-button";
 import { getTrackArtworkUrl } from "@/lib/track-artwork";
 import { resolveTrackPlay } from "@/lib/track-play";
@@ -56,11 +56,12 @@ export default async function TrackDetailPage({ params }: PageProps) {
       <div className="mx-auto max-w-3xl">
         <div className="glass-card p-8">
           {videoId ? (
-            <DetailPlayerSection
+            <TrackPlayerSection
               videoId={videoId}
               title={track.title}
               watchUrl={watchUrl ?? youtubeHref}
               subtitle={track.artist?.name}
+              artworkUrl={artwork ?? thumb}
             />
           ) : thumb ? (
             <div className="relative mb-6 aspect-square w-full max-w-sm overflow-hidden rounded-xl bg-secondary sm:aspect-video sm:max-w-md">
