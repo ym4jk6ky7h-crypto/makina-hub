@@ -1,7 +1,9 @@
-/** Hostnames permitidos en next.config.ts → images.remotePatterns */
-const ALLOWED_IMAGE_HOSTS = new Set([
+/** Hostnames permitidos para next/image (sincronizar con next.config.ts). */
+export const IMAGE_REMOTE_HOSTS = [
   "images.unsplash.com",
   "i.ytimg.com",
+  "yt3.ggpht.com",
+  "yt3.googleusercontent.com",
   "is1-ssl.mzstatic.com",
   "is2-ssl.mzstatic.com",
   "is3-ssl.mzstatic.com",
@@ -17,19 +19,28 @@ const ALLOWED_IMAGE_HOSTS = new Set([
   "www.barcelonarememberfestival.com",
   "scontent.cdninstagram.com",
   "platform-lookaside.fbsbx.com",
-]);
+  "lh3.googleusercontent.com",
+] as const;
+
+const ALLOWED_IMAGE_HOSTS = new Set<string>(IMAGE_REMOTE_HOSTS);
 
 export function isAllowedImageUrl(url: string | null | undefined): boolean {
   if (!url) return false;
   try {
     const host = new URL(url).hostname.toLowerCase();
-    return [...ALLOWED_IMAGE_HOSTS].some((allowed) => {
-      const a = allowed.toLowerCase();
-      return host === a || host === `www.${a}` || host.endsWith(`.${a}`);
-    });
+    if ([...ALLOWED_IMAGE_HOSTS].some((allowed) => hostMatches(host, allowed))) {
+      return true;
+    }
+    // Instagram CDN regional (scontent-mad1-1.cdninstagram.com, etc.)
+    return host.includes("cdninstagram.com") || host.endsWith(".fbcdn.net");
   } catch {
     return false;
   }
+}
+
+function hostMatches(host: string, allowed: string): boolean {
+  const a = allowed.toLowerCase();
+  return host === a || host === `www.${a}` || host.endsWith(`.${a}`);
 }
 
 export function safeAbsoluteUrl(url: string | null | undefined): string | undefined {

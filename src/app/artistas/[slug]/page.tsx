@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: PageProps) {
     title: artist.name,
     description: (artist.biography ?? "").slice(0, 160),
     path: `/artistas/${slug}`,
-    image: getArtistImageUrl(artist.name, artist.image_url),
+    image: getArtistImageUrl(artist.name, artist.image_url, artist.slug),
   });
 }
 

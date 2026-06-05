@@ -16,7 +16,11 @@ export function getSessionThumbnail(session: SessionWithRelations): {
   if (yt) return { url: yt, fromYoutube: true };
 
   const artistUrl = session.artist
-    ? getArtistImageUrl(session.artist.name, session.artist.image_url)
+    ? getArtistImageUrl(
+        session.artist.name,
+        session.artist.image_url,
+        session.artist.slug
+      )
     : null;
 
   return { url: artistUrl, fromYoutube: false };

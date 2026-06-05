@@ -21,7 +21,8 @@
     "db:daily-sync": "tsx scripts/daily-sync.ts",
     "db:enrich-ai": "tsx scripts/enrich-artists-ai.ts",
     "db:sync-all": "tsx scripts/sync-all.ts",
-    "db:fix-media": "tsx scripts/fix-media.ts"
+    "db:fix-media": "tsx scripts/fix-media.ts",
+    "db:refresh-artist-images": "tsx scripts/refresh-artist-images.ts"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.3",

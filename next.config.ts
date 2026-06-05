@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import { config } from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
+import { IMAGE_REMOTE_HOSTS } from "./src/lib/images/safe-image-url";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 config({ path: path.join(root, ".env.local") });
@@ -53,23 +54,12 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: [
-      { protocol: "https", hostname: "images.unsplash.com" },
-      { protocol: "https", hostname: "i.ytimg.com" },
-      { protocol: "https", hostname: "is1-ssl.mzstatic.com" },
-      { protocol: "https", hostname: "is2-ssl.mzstatic.com" },
-      { protocol: "https", hostname: "is3-ssl.mzstatic.com" },
-      { protocol: "https", hostname: "is4-ssl.mzstatic.com" },
-      { protocol: "https", hostname: "is5-ssl.mzstatic.com" },
-      { protocol: "https", hostname: "upload.wikimedia.org" },
-      { protocol: "https", hostname: "ui-avatars.com" },
-      { protocol: "https", hostname: "i.discogs.com" },
-      { protocol: "https", hostname: "img.discogs.com" },
-      { protocol: "https", hostname: "commons.wikimedia.org" },
-      { protocol: "https", hostname: "www.makinalegends.com" },
-      { protocol: "https", hostname: "makinalegends.com" },
-      { protocol: "https", hostname: "www.barcelonarememberfestival.com" },
-      { protocol: "https", hostname: "scontent.cdninstagram.com" },
-      { protocol: "https", hostname: "platform-lookaside.fbsbx.com" },
+      ...IMAGE_REMOTE_HOSTS.map((hostname) => ({
+        protocol: "https" as const,
+        hostname,
+      })),
+      { protocol: "https", hostname: "**.cdninstagram.com" },
+      { protocol: "https", hostname: "**.fbcdn.net" },
     ],
   },
 };

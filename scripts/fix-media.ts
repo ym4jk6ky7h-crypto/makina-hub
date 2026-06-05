@@ -48,6 +48,8 @@ async function fixDiscogsPurchaseUrls() {
 async function main() {
   console.log("\n🔧 Makina Hub — reparar medios\n");
   await fixDiscogsPurchaseUrls();
+  console.log("\n👤 Actualizando fotos de artistas…\n");
+  await runScript("refresh-artist-images.ts");
   console.log("\n📅 Actualizando carteles de eventos (puede tardar)…\n");
   await runScript("discover-events.ts");
   console.log("\n🎧 Actualizando sesiones YouTube…\n");

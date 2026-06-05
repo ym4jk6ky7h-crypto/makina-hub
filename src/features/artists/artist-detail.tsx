@@ -18,7 +18,11 @@ export async function ArtistDetail({ slug }: { slug: string }) {
   const artistData = await getArtistWithRelations(slug);
   if (!artistData) return null;
 
-  const photoUrl = getArtistImageUrl(artistData.name, artistData.image_url);
+  const photoUrl = getArtistImageUrl(
+    artistData.name,
+    artistData.image_url,
+    artistData.slug
+  );
   const tracksWithArtist: TrackWithRelations[] = (artistData.tracks ?? []).map(
     (track) => ({ ...track, artist: artistData })
   );

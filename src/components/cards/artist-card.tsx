@@ -12,7 +12,7 @@ type ArtistCardProps = {
 };
 
 export function ArtistCard({ artist, variant = "grid" }: ArtistCardProps) {
-  const photoUrl = getArtistImageUrl(artist.name, artist.image_url);
+  const photoUrl = getArtistImageUrl(artist.name, artist.image_url, artist.slug);
   const bioPreview = (artist.biography ?? "")
     .replace(/\*\*[^*]+\*\*/g, "")
     .slice(0, 120);

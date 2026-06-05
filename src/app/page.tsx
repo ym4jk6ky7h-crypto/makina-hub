@@ -164,7 +164,7 @@ export default async function HomePage() {
                 >
                   <div className="relative h-16 w-16 overflow-hidden rounded-full ring-2 ring-white/10 transition-all group-hover:ring-makina-pink group-hover:shadow-makina-glow-sm">
                     <Image
-                      src={getArtistImageUrl(artist.name, artist.image_url)}
+                      src={getArtistImageUrl(artist.name, artist.image_url, artist.slug)}
                       alt={artist.name}
                       fill
                       className="object-cover"
