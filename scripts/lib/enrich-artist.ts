@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import type { MakinaArtistSeed } from "../../data/makina-artists";
+import { formatArtistBiography } from "../../src/lib/artists/format-artist-biography";
 import type { AiArtistEnrichment } from "./openai-artist";
 import { fetchCommonsImageBest } from "./commons-image";
 import { fetchDiscogsArtist, type DiscogsResult } from "./discogs";
@@ -57,28 +58,25 @@ function loadAiCache(slug: string): AiArtistEnrichment | null {
 
 function mergeBiography(
   seed: MakinaArtistSeed,
-  wiki: string,
+  wiki: { extract: string; title: string; found: boolean },
   discogs: DiscogsResult,
-  mb: MusicBrainzResult,
   ai: AiArtistEnrichment | null
 ): string {
-  const country = seed.country ?? "España";
-  const venues = seed.venues?.length
-    ? ` Ha actuado en ${seed.venues.join(", ")} y en el circuito Pont Aeri–Granollers–Chasis.`
-    : "";
+  const realName = ai?.realName ?? discogs.realName ?? null;
 
-  const classics = [...new Set([...(ai?.productions ?? []), ...(seed.classics ?? [])])];
-  const classicsLine = classics.length
-    ? ` Entre sus referentes destacan ${classics.slice(0, 6).join(", ")}.`
-    : "";
-
-  const origins = ai?.extendedOrigins ?? seed.bio.origins;
-  const peak = ai?.extendedPeak ?? seed.bio.peak;
-  const today = ai?.extendedToday ?? seed.bio.today;
-
-  const intro = `${seed.name} es DJ y productor de la escena mákina y remember catalana, con base en ${seed.city} (${country}). Lleva activo desde ${seed.activeFrom} y forma parte del sonido hard melódico que llenó macrodiscotecas y verbenas en los 90 y el revival actual.${venues}${classicsLine}`;
-
-  return [intro, origins, peak, today].join("\n\n").slice(0, 6000);
+  return formatArtistBiography({
+    name: seed.name,
+    city: seed.city,
+    country: seed.country,
+    activeFrom: seed.activeFrom,
+    classics: seed.classics,
+    bio: seed.bio,
+    realName,
+    wikiExtract: wiki.found ? wiki.extract : undefined,
+    wikiTitle: wiki.found ? wiki.title : undefined,
+    discogsProfile: discogs.profile,
+    ai,
+  });
 }
 
 function wikiSearchTerms(seed: MakinaArtistSeed, ai: AiArtistEnrichment | null): string[] {
@@ -175,7 +173,7 @@ export async function enrichArtistFull(
   if (yt.videoUrl) sources.push("youtube");
 
   const youtube_url = mb.youtubeUrl ?? yt.videoUrl ?? yt.searchUrl;
-  const biography = mergeBiography(seed, wiki.extract, discogs, mb, ai);
+  const biography = mergeBiography(seed, wiki, discogs, ai);
   const { url: image_url, sources: imgSources } = await pickImage(
     seed,
     upscaleWikiThumb(wiki.thumbnailUrl),
@@ -202,4 +200,25 @@ export async function enrichArtistFull(
     spotify_url,
     sources,
   };
+}
+
+/** Solo biografía y nombre real — rápido, sin imágenes ni YouTube. */
+export async function enrichArtistBioOnly(
+  seed: MakinaArtistSeed,
+  opts: Pick<EnrichOptions, "discogsToken"> = {}
+): Promise<Pick<EnrichedArtist, "slug" | "real_name" | "biography" | "sources">> {
+  const sources: string[] = ["curated"];
+  const ai = loadAiCache(seed.slug);
+  if (ai) sources.push("openai");
+
+  const wiki = await fetchWikipediaArtistBest(wikiSearchTerms(seed, ai));
+  if (wiki.found) sources.push("wikipedia");
+
+  const discogs = await fetchDiscogsArtist(seed.name, opts.discogsToken);
+  if (discogs.id) sources.push("discogs");
+
+  const biography = mergeBiography(seed, wiki, discogs, ai);
+  const real_name = ai?.realName ?? discogs.realName ?? null;
+
+  return { slug: seed.slug, real_name, biography, sources };
 }
