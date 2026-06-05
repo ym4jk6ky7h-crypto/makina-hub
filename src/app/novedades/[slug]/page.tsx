@@ -2,7 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ExternalLink, Music2, ShoppingBag } from "lucide-react";
+import { DetailSaveShare } from "@/components/favorites/detail-save-share";
 import { TrackPlayerSection } from "@/components/media/track-player-section";
+import { favoriteFromRelease } from "@/lib/favorites/build-item";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { buildMetadata } from "@/lib/seo/metadata";
@@ -102,6 +104,12 @@ export default async function ReleaseDetailPage({ params }: PageProps) {
                 </Link>
               </p>
             )}
+
+            <DetailSaveShare
+              item={favoriteFromRelease(release)}
+              shareTitle={`${release.title}${release.artist ? ` — ${release.artist.name}` : ""}`}
+              sharePath={`/novedades/${release.slug}`}
+            />
 
             <div className="mt-8">
               <a

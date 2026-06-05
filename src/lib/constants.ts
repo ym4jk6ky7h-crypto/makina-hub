@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   Calendar,
   Headphones,
+  Heart,
   Home,
   Mic2,
   Music2,
@@ -60,6 +61,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   { href: "/sesiones", label: "Sesiones", icon: Headphones, group: "catalogo" },
   { href: "/sellos", label: "Sellos", icon: Tag, group: "catalogo" },
+  { href: "/favoritos", label: "Mis favoritos", icon: Heart, group: "tools" },
   {
     href: "/ask",
     label: "Ask Makina AI",

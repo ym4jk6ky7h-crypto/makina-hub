@@ -2,8 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Clock, Headphones } from "lucide-react";
+import { DetailSaveShare } from "@/components/favorites/detail-save-share";
 import { DetailPlayerSection } from "@/components/media/detail-player-section";
 import { PlayYoutubeButton } from "@/components/ui/play-youtube-button";
+import { favoriteFromSession } from "@/lib/favorites/build-item";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { resolveSessionPlay } from "@/lib/session-play";
 import { getSessionThumbnail } from "@/lib/session-thumbnail";
@@ -99,6 +101,11 @@ export default async function SesionDetailPage({ params }: PageProps) {
               />
             </div>
           )}
+          <DetailSaveShare
+            item={favoriteFromSession(session)}
+            shareTitle={session.title}
+            sharePath={`/sesiones/${session.slug}`}
+          />
         </div>
 
         {session.tracklist.length > 0 && (

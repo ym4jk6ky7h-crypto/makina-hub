@@ -8,6 +8,7 @@ import {
   RefreshCw,
   Shield,
   Sparkles,
+  Heart,
 } from "lucide-react";
 import { PageHero } from "@/components/layout/page-hero";
 import { SectionHeader } from "@/components/layout/section-header";
@@ -67,6 +68,12 @@ const DATA_SOURCES: SourceItem[] = [
     title: "Ask Makina AI",
     body: "Preguntas en lenguaje natural sobre la escena. Usa el mismo catálogo de la web; no inventa datos fuera de la base.",
     link: { href: "/ask", label: "Probar Ask Makina" },
+  },
+  {
+    icon: Heart,
+    title: "Mis favoritos",
+    body: "Guarda artistas, fiestas, temas y sesiones en tu navegador para volver a ellos desde /favoritos.",
+    link: { href: "/favoritos", label: "Ver mis favoritos" },
   },
 ];
 

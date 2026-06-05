@@ -3,8 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Calendar, MapPin } from "lucide-react";
 import { ArtistCard } from "@/components/cards/artist-card";
+import { FavoriteButton } from "@/components/favorites/favorite-button";
 import { EventActions } from "@/components/events/event-actions";
 import { EventTimingBadge } from "@/components/events/event-timing-badge";
+import { favoriteFromEvent } from "@/lib/favorites/build-item";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { musicEventJsonLd } from "@/lib/seo/json-ld";
 import { eventPosterUrl } from "@/lib/events/event-poster";
@@ -67,6 +69,9 @@ export default async function EventoDetailPage({ params }: PageProps) {
             <p className="mt-6 leading-relaxed text-muted-foreground">
               {event.description}
             </p>
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <FavoriteButton item={favoriteFromEvent(event)} showLabel />
+            </div>
             <EventActions event={event} />
           </div>
         </div>

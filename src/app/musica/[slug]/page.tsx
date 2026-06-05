@@ -3,7 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Music2 } from "lucide-react";
 import { TrackCard } from "@/components/cards/track-card";
+import { DetailSaveShare } from "@/components/favorites/detail-save-share";
 import { TrackPlayerSection } from "@/components/media/track-player-section";
+import { favoriteFromTrack } from "@/lib/favorites/build-item";
 import { PlayYoutubeButton } from "@/components/ui/play-youtube-button";
 import { getTrackArtworkUrl } from "@/lib/track-artwork";
 import { resolveTrackPlay } from "@/lib/track-play";
@@ -126,6 +128,11 @@ export default async function TrackDetailPage({ params }: PageProps) {
               />
             </div>
           ) : null}
+          <DetailSaveShare
+            item={favoriteFromTrack(track)}
+            shareTitle={`${track.title}${track.artist ? ` — ${track.artist.name}` : ""}`}
+            sharePath={`/musica/${track.slug}`}
+          />
         </div>
 
         {track.similar && track.similar.length > 0 && (

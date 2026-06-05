@@ -1,5 +1,7 @@
 import Image from "next/image";
 import { Headphones, Instagram, Music2, Youtube } from "lucide-react";
+import { DetailSaveShare } from "@/components/favorites/detail-save-share";
+import { favoriteFromArtist } from "@/lib/favorites/build-item";
 import { ArtistBio } from "@/components/artists/artist-bio";
 import { ArtistListenNow } from "@/components/artists/artist-listen-now";
 import { ArtistMetaChips } from "@/components/artists/artist-meta-chips";
@@ -125,6 +127,11 @@ export async function ArtistDetail({ slug }: { slug: string }) {
                 </a>
               )}
             </div>
+            <DetailSaveShare
+              item={favoriteFromArtist(artistData)}
+              shareTitle={artistData.name}
+              sharePath={`/artistas/${artistData.slug}`}
+            />
           </div>
         </div>
       </section>

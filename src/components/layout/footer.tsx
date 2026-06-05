@@ -1,6 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Calendar, ExternalLink, Info, Mic2, Music2, Sparkles } from "lucide-react";
+import {
+  Calendar,
+  ExternalLink,
+  Heart,
+  Info,
+  Mic2,
+  Music2,
+  Sparkles,
+} from "lucide-react";
 import { MakinaLogo } from "@/components/layout/makina-logo";
 import { NAV_ITEMS, SITE_TAGLINE } from "@/lib/constants";
 import { EXTERNAL_LINKS } from "@/lib/site-links";
@@ -84,6 +92,15 @@ export function Footer() {
               Proyecto
             </p>
             <ul className="mt-4 space-y-2.5">
+              <li>
+                <Link
+                  href="/favoritos"
+                  className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-makina-pink focus-visible:rounded-sm"
+                >
+                  <Heart className="h-3.5 w-3.5" />
+                  Mis favoritos
+                </Link>
+              </li>
               <li>
                 <Link
                   href="/sobre"
