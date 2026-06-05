@@ -32,50 +32,44 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         supabase.from("new_releases").select("slug"),
       ]);
 
-    const dynamicRoutes = [
+    const dynamicRoutes: MetadataRoute.Sitemap = [
       ...(artists.data ?? []).map((a) => ({
         url: `${SITE_URL}/artistas/${a.slug}`,
-        pathEn: `/artist/${a.slug}`,
+        lastModified: new Date(),
+        changeFrequency: "monthly" as const,
+        priority: 0.6,
       })),
       ...(tracks.data ?? []).map((t) => ({
         url: `${SITE_URL}/musica/${t.slug}`,
-        pathEn: `/track/${t.slug}`,
+        lastModified: new Date(),
+        changeFrequency: "monthly" as const,
+        priority: 0.6,
       })),
       ...(events.data ?? []).map((e) => ({
         url: `${SITE_URL}/eventos/${e.slug}`,
-        pathEn: `/event/${e.slug}`,
+        lastModified: new Date(),
+        changeFrequency: "monthly" as const,
+        priority: 0.6,
       })),
       ...(sessions.data ?? []).map((s) => ({
         url: `${SITE_URL}/sesiones/${s.slug}`,
-        pathEn: `/session/${s.slug}`,
+        lastModified: new Date(),
+        changeFrequency: "monthly" as const,
+        priority: 0.6,
       })),
       ...(labels.data ?? []).map((l) => ({
         url: `${SITE_URL}/sellos/${l.slug}`,
-        pathEn: null,
+        lastModified: new Date(),
+        changeFrequency: "monthly" as const,
+        priority: 0.5,
       })),
       ...(releases.data ?? []).map((r) => ({
         url: `${SITE_URL}/novedades/${r.slug}`,
-        pathEn: null,
+        lastModified: new Date(),
+        changeFrequency: "monthly" as const,
+        priority: 0.5,
       })),
-    ].flatMap((item) => {
-      const entries: MetadataRoute.Sitemap = [
-        {
-          url: item.url,
-          lastModified: new Date(),
-          changeFrequency: "monthly",
-          priority: 0.6,
-        },
-      ];
-      if ("pathEn" in item && item.pathEn) {
-        entries.push({
-          url: `${SITE_URL}${item.pathEn}`,
-          lastModified: new Date(),
-          changeFrequency: "monthly",
-          priority: 0.5,
-        });
-      }
-      return entries;
-    });
+    ];
 
     return [...staticRoutes, ...dynamicRoutes];
   } catch {

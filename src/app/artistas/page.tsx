@@ -37,7 +37,7 @@ export default async function ArtistasPage() {
           image={SITE_IMAGES.heroArtists}
           badge={`${artists.length} artistas`}
         />
-        <div className="mx-auto max-w-7xl px-4 py-10 lg:px-8">
+        <div className="page-accent-artists mx-auto max-w-7xl rounded-2xl border px-4 py-10 lg:px-8">
           {artists.length === 0 ? (
             <EmptyState
               icon={Mic2}

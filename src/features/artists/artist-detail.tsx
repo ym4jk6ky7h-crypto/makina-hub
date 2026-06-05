@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { Suspense } from "react";
 import { Instagram, Music2, Youtube } from "lucide-react";
 import { ArtistBio } from "@/components/artists/artist-bio";
 import { ArtistListenNow } from "@/components/artists/artist-listen-now";
@@ -14,22 +13,6 @@ import { getArtistImageUrl } from "@/lib/artists/artist-image";
 import { personJsonLd } from "@/lib/seo/json-ld";
 import { getArtistWithRelations } from "@/services/artists.service";
 import type { TrackWithRelations } from "@/types/database";
-
-function TracksSkeleton() {
-  return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {Array.from({ length: 3 }).map((_, i) => (
-        <div key={i} className="overflow-hidden rounded-xl border border-white/10 bg-card/70">
-          <Skeleton className="aspect-video w-full" />
-          <div className="space-y-2 p-4">
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-3 w-1/2" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 export async function ArtistDetail({ slug }: { slug: string }) {
   const artistData = await getArtistWithRelations(slug);
@@ -135,13 +118,11 @@ export async function ArtistDetail({ slug }: { slug: string }) {
               title="Producciones"
               badge={String(tracksWithArtist.length)}
             />
-            <Suspense fallback={<TracksSkeleton />}>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {tracksWithArtist.map((track) => (
-                  <TrackCard key={track.id} track={track} />
-                ))}
-              </div>
-            </Suspense>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {tracksWithArtist.map((track) => (
+                <TrackCard key={track.id} track={track} />
+              ))}
+            </div>
           </section>
         ) : bioProductions.length > 0 ? (
           <section className="mt-12">

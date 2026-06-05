@@ -27,6 +27,30 @@ const publicEnv =
 
 const nextConfig: NextConfig = {
   env: publicEnv,
+  async redirects() {
+    return [
+      {
+        source: "/artist/:slug",
+        destination: "/artistas/:slug",
+        permanent: true,
+      },
+      {
+        source: "/track/:slug",
+        destination: "/musica/:slug",
+        permanent: true,
+      },
+      {
+        source: "/session/:slug",
+        destination: "/sesiones/:slug",
+        permanent: true,
+      },
+      {
+        source: "/event/:slug",
+        destination: "/eventos/:slug",
+        permanent: true,
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },

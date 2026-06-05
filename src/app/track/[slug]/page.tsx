@@ -45,7 +45,7 @@ export default async function TrackDetailPageEn({ params }: PageProps) {
           <h1 className="text-3xl font-bold">{track.title}</h1>
           {track.artist && (
             <Link
-              href={`/artist/${track.artist.slug}`}
+              href={`/artistas/${track.artist.slug}`}
               className="mt-2 block text-lg text-makina-pink hover:underline"
             >
               {track.artist.name}

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArtistDetail } from "@/features/artists/artist-detail";
 import { buildMetadata } from "@/lib/seo/metadata";
+import { getArtistImageUrl } from "@/lib/artists/artist-image";
 import { getArtistBySlug } from "@/services/artists.service";
 
 type PageProps = { params: Promise<{ slug: string }> };
@@ -14,7 +15,7 @@ export async function generateMetadata({ params }: PageProps) {
     title: artist.name,
     description: (artist.biography ?? "").slice(0, 160),
     path: `/artistas/${slug}`,
-    image: artist.image_url ?? undefined,
+    image: getArtistImageUrl(artist.name, artist.image_url),
   });
 }
 

@@ -60,7 +60,7 @@ export default async function EventosPage({ searchParams }: PageProps) {
           <EventFilters sticky />
         </Suspense>
 
-        <div className="mx-auto max-w-7xl px-4 py-8 pb-6 lg:px-8 lg:py-10">
+        <div className="page-accent-events mx-auto max-w-7xl rounded-2xl border px-4 py-8 pb-6 lg:px-8 lg:py-10">
           <EventsAgenda events={events} />
 
           {events.length === 0 && (

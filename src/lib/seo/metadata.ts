@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/constants";
+import { safeAbsoluteUrl } from "@/lib/images/safe-image-url";
 
 type PageMeta = {
   title: string;
@@ -17,7 +18,7 @@ export function buildMetadata({
   type = "website",
 }: PageMeta): Metadata {
   const url = `${SITE_URL}${path}`;
-  const ogImage = image ?? `${SITE_URL}/og-default.png`;
+  const ogImage = safeAbsoluteUrl(image) ?? `${SITE_URL}/opengraph-image`;
 
   return {
     title: `${title} | ${SITE_NAME}`,

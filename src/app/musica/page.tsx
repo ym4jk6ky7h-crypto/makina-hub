@@ -44,7 +44,7 @@ export default async function MusicaPage() {
           image={SITE_IMAGES.heroMusic}
           badge="Producciones"
         />
-        <div className="mx-auto max-w-7xl space-y-14 px-4 py-10 lg:px-8">
+        <div className="page-accent-music mx-auto max-w-7xl space-y-14 rounded-2xl border px-4 py-10 lg:px-8">
           <section>
             <SectionHeader
               title="Nuevas producciones"

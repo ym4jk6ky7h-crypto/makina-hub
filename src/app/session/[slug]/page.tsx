@@ -30,7 +30,7 @@ export default async function SessionDetailPageEn({ params }: PageProps) {
           <h1 className="text-2xl font-bold lg:text-3xl">{session.title}</h1>
           {session.artist && (
             <Link
-              href={`/artist/${session.artist.slug}`}
+              href={`/artistas/${session.artist.slug}`}
               className="mt-2 block text-makina-pink hover:underline"
             >
               {session.artist.name}

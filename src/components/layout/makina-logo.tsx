@@ -18,12 +18,13 @@ export function MakinaLogo({
     <span className={cn("flex items-center gap-2.5", className)}>
       <span
         className={cn(
-          "relative flex shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-makina-pink via-makina-purple to-makina-cyan font-display font-bold text-white shadow-lg shadow-makina-pink/25",
+          "relative flex shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-makina-pink via-makina-purple to-makina-cyan font-display font-extrabold text-white shadow-lg shadow-makina-pink/30 ring-1 ring-white/20",
           iconSize
         )}
+        aria-hidden
       >
         <span className="absolute inset-0 rounded-xl bg-card-shine opacity-50" />
-        MH
+        <span className="relative">MH</span>
       </span>
       {showText && (
         <span className={cn("font-display font-bold tracking-tight", textSize)}>

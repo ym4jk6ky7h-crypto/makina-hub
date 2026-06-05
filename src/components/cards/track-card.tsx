@@ -4,24 +4,18 @@ import { Clock, Play, Youtube } from "lucide-react";
 import { MakinaPlaceholder } from "@/components/ui/makina-placeholder";
 import { MediaCardShell } from "@/components/ui/media-card-shell";
 import type { TrackWithRelations } from "@/types/database";
-import { getTrackArtworkUrl } from "@/lib/track-artwork";
 import { resolveTrackPlay } from "@/lib/track-play";
+import { getTrackThumbnailSync } from "@/lib/track-thumb";
 import { Badge } from "@/components/ui/badge";
 import { formatGenre, cn } from "@/lib/utils";
-import { youtubeThumbnail } from "@/lib/youtube";
 
 type TrackCardProps = {
   track: TrackWithRelations;
 };
 
-export async function TrackCard({ track }: TrackCardProps) {
+export function TrackCard({ track }: TrackCardProps) {
   const { videoId, youtubeHref, isSearch } = resolveTrackPlay(track);
-  const artwork =
-    (await getTrackArtworkUrl(track.artist?.name ?? "", track.title)) ?? null;
-  const thumb =
-    youtubeThumbnail(track.youtube_url) ??
-    (videoId ? youtubeThumbnail(`https://www.youtube.com/watch?v=${videoId}`) : null) ??
-    artwork;
+  const thumb = getTrackThumbnailSync(track);
 
   const detailHref = `/musica/${track.slug}`;
 
@@ -38,7 +32,6 @@ export async function TrackCard({ track }: TrackCardProps) {
             fill
             className="object-cover transition-transform group-hover:scale-105"
             sizes="(max-width: 640px) 100vw, 320px"
-            unoptimized={!videoId && Boolean(artwork)}
           />
         ) : (
           <MakinaPlaceholder aspect="square" fill className="sm:aspect-video" />
@@ -80,7 +73,7 @@ export async function TrackCard({ track }: TrackCardProps) {
         </div>
 
         <Link
-          href={detailHref}
+          href={videoId ? `${detailHref}#reproductor` : detailHref}
           className={cn(
             "mt-1 inline-flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-white",
             "transition-colors sm:w-auto",
