@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Headphones, Music2 } from "lucide-react";
+import { Headphones, Music2, Play } from "lucide-react";
 import { PlayYoutubeButton } from "@/components/ui/play-youtube-button";
+import { cn } from "@/lib/utils";
 import { resolveSessionPlay } from "@/lib/session-play";
 import { resolveTrackPlay } from "@/lib/track-play";
 import { youtubeThumbnail } from "@/lib/youtube";
@@ -11,6 +12,8 @@ type ArtistListenNowProps = {
   artistName: string;
   tracks: Track[] | TrackWithRelations[];
   sessions: Session[];
+  /** Si hay reproductor en la misma página, el play lleva a #reproductor */
+  inlinePlayer?: boolean;
 };
 
 type ListenItem =
@@ -39,10 +42,26 @@ function pickListenItems(
   return picked.slice(0, 3);
 }
 
+function InlinePlayButton() {
+  return (
+    <Link
+      href="#reproductor"
+      className={cn(
+        "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-600",
+        "text-white shadow-lg shadow-red-900/30 transition-transform hover:scale-105"
+      )}
+      aria-label="Reproducir"
+    >
+      <Play className="h-5 w-5 fill-white" />
+    </Link>
+  );
+}
+
 export function ArtistListenNow({
   artistName,
   tracks,
   sessions,
+  inlinePlayer = false,
 }: ArtistListenNowProps) {
   const items = pickListenItems(tracks, sessions);
   if (items.length === 0) return null;
@@ -84,7 +103,9 @@ export function ArtistListenNow({
                   </Link>
                   <p className="text-xs text-muted-foreground">{artistName}</p>
                 </div>
-                {videoId && playUrl ? (
+                {videoId && inlinePlayer ? (
+                  <InlinePlayButton />
+                ) : videoId && playUrl ? (
                   <PlayYoutubeButton href={playUrl} size="sm" label="" />
                 ) : (
                   <Link
@@ -124,8 +145,11 @@ export function ArtistListenNow({
                 </Link>
                 <p className="text-xs text-muted-foreground">Sesión</p>
               </div>
-              {videoId && watchUrl && (
-                <PlayYoutubeButton href={watchUrl} size="sm" label="" />
+              {videoId && inlinePlayer ? (
+                <InlinePlayButton />
+              ) : (
+                videoId &&
+                watchUrl && <PlayYoutubeButton href={watchUrl} size="sm" label="" />
               )}
             </li>
           );

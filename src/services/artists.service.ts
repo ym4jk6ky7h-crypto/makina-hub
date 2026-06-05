@@ -1,3 +1,8 @@
+import {
+  ensureArtistSessions,
+  expectedTrackSlugsForArtist,
+  mergeArtistTracks,
+} from "@/lib/artists/artist-catalog";
 import { createClient } from "@/lib/supabase/server";
 import type { Artist, ArtistWithRelations, Event, Session, Track } from "@/types/database";
 
@@ -50,14 +55,33 @@ export async function getArtistWithRelations(
   if (sessionsRes.error) throw sessionsRes.error;
   if (eventsRes.error) throw eventsRes.error;
 
+  let tracks = (tracksRes.data ?? []) as Track[];
+  if (tracks.length === 0) {
+    const slugs = expectedTrackSlugsForArtist(slug);
+    if (slugs.length > 0) {
+      const { data: bySlug } = await supabase
+        .from("tracks")
+        .select("*")
+        .in("slug", slugs);
+      tracks = mergeArtistTracks(slug, tracks, (bySlug ?? []) as Track[]);
+    }
+  } else {
+    tracks = mergeArtistTracks(slug, tracks, []);
+  }
+
+  const sessions = ensureArtistSessions(
+    artist,
+    (sessionsRes.data ?? []) as Session[]
+  );
+
   const events = (eventsRes.data ?? [])
     .map((row) => row.events as unknown as Event)
     .filter(Boolean);
 
   return {
     ...artist,
-    tracks: (tracksRes.data ?? []) as Track[],
-    sessions: (sessionsRes.data ?? []) as Session[],
+    tracks,
+    sessions,
     events,
   };
 }

@@ -1,10 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ExternalLink, Music2 } from "lucide-react";
+import { Music2 } from "lucide-react";
 import { TrackCard } from "@/components/cards/track-card";
+import { DetailPlayerSection } from "@/components/media/detail-player-section";
 import { PlayYoutubeButton } from "@/components/ui/play-youtube-button";
-import { YoutubeEmbed } from "@/components/ui/youtube-embed";
 import { getTrackArtworkUrl } from "@/lib/track-artwork";
 import { resolveTrackPlay } from "@/lib/track-play";
 import { buildMetadata } from "@/lib/seo/metadata";
@@ -56,18 +56,12 @@ export default async function TrackDetailPage({ params }: PageProps) {
       <div className="mx-auto max-w-3xl">
         <div className="glass-card p-8">
           {videoId ? (
-            <div id="reproductor" className="mb-6 scroll-mt-24">
-              <YoutubeEmbed videoId={videoId} title={track.title} />
-              <a
-                href={watchUrl ?? youtubeHref!}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-makina-pink"
-              >
-                <ExternalLink className="h-3.5 w-3.5" />
-                Abrir en YouTube
-              </a>
-            </div>
+            <DetailPlayerSection
+              videoId={videoId}
+              title={track.title}
+              watchUrl={watchUrl ?? youtubeHref}
+              subtitle={track.artist?.name}
+            />
           ) : thumb ? (
             <div className="relative mb-6 aspect-square w-full max-w-sm overflow-hidden rounded-xl bg-secondary sm:aspect-video sm:max-w-md">
               {youtubeHref ? (

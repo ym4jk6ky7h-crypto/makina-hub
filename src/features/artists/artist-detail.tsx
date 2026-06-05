@@ -3,16 +3,49 @@ import { Instagram, Music2, Youtube } from "lucide-react";
 import { ArtistBio } from "@/components/artists/artist-bio";
 import { ArtistListenNow } from "@/components/artists/artist-listen-now";
 import { ArtistMetaChips } from "@/components/artists/artist-meta-chips";
+import { ArtistSectionNav } from "@/components/artists/artist-section-nav";
 import { EventCard } from "@/components/cards/event-card";
-import { TrackCard } from "@/components/cards/track-card";
 import { SessionCard } from "@/components/cards/session-card";
+import { TrackCard } from "@/components/cards/track-card";
+import { DetailPlayerSection } from "@/components/media/detail-player-section";
 import { SectionHeader } from "@/components/layout/section-header";
-import { Skeleton } from "@/components/ui/skeleton";
+import { HomeSectionEmpty } from "@/components/ui/home-section-empty";
 import { parseProductionsFromBio } from "@/lib/artists/artist-bio-utils";
 import { getArtistImageUrl } from "@/lib/artists/artist-image";
+import { resolveSessionPlay } from "@/lib/session-play";
+import { resolveTrackPlay } from "@/lib/track-play";
 import { personJsonLd } from "@/lib/seo/json-ld";
 import { getArtistWithRelations } from "@/services/artists.service";
 import type { TrackWithRelations } from "@/types/database";
+
+function pickPrimaryVideo(
+  tracks: TrackWithRelations[],
+  sessions: { title: string; slug: string; youtube_url: string | null }[]
+) {
+  for (const session of sessions) {
+    const { videoId, watchUrl } = resolveSessionPlay(session);
+    if (videoId) {
+      return {
+        videoId,
+        title: session.title,
+        watchUrl,
+        subtitle: "Sesión mákina",
+      };
+    }
+  }
+  for (const track of tracks) {
+    const { videoId, watchUrl } = resolveTrackPlay(track);
+    if (videoId) {
+      return {
+        videoId,
+        title: track.title,
+        watchUrl,
+        subtitle: track.artist?.name ?? "Tema",
+      };
+    }
+  }
+  return null;
+}
 
 export async function ArtistDetail({ slug }: { slug: string }) {
   const artistData = await getArtistWithRelations(slug);
@@ -26,7 +59,12 @@ export async function ArtistDetail({ slug }: { slug: string }) {
   const tracksWithArtist: TrackWithRelations[] = (artistData.tracks ?? []).map(
     (track) => ({ ...track, artist: artistData })
   );
+  const sessions = (artistData.sessions ?? []).map((session) => ({
+    ...session,
+    artist: artistData,
+  }));
   const bioProductions = parseProductionsFromBio(artistData.biography ?? "");
+  const primaryVideo = pickPrimaryVideo(tracksWithArtist, sessions);
   const jsonLd = personJsonLd(artistData);
 
   return (
@@ -105,32 +143,47 @@ export async function ArtistDetail({ slug }: { slug: string }) {
       </section>
 
       <div className="mx-auto max-w-5xl px-4 py-10 lg:px-8">
+        <ArtistSectionNav
+          hasPlayer={Boolean(primaryVideo)}
+          trackCount={tracksWithArtist.length}
+          sessionCount={sessions.length}
+        />
+
+        {primaryVideo && (
+          <section className="mb-10">
+            <SectionHeader title="Escuchar" subtitle="Reproductor integrado" />
+            <DetailPlayerSection
+              videoId={primaryVideo.videoId}
+              title={primaryVideo.title}
+              watchUrl={primaryVideo.watchUrl}
+              subtitle={primaryVideo.subtitle}
+            />
+          </section>
+        )}
+
         <ArtistListenNow
           artistName={artistData.name}
           tracks={tracksWithArtist}
-          sessions={artistData.sessions ?? []}
+          sessions={sessions}
+          inlinePlayer={Boolean(primaryVideo)}
         />
 
-        <section className="mt-10">
-          <SectionHeader title="Biografía" />
-          <ArtistBio biography={artistData.biography ?? ""} />
-        </section>
-
-        {tracksWithArtist.length > 0 ? (
-          <section className="mt-12">
-            <SectionHeader
-              title="Producciones"
-              badge={String(tracksWithArtist.length)}
-            />
+        <section id="canciones" className="scroll-mt-28">
+          <SectionHeader
+            title="Canciones"
+            badge={
+              tracksWithArtist.length > 0
+                ? String(tracksWithArtist.length)
+                : undefined
+            }
+          />
+          {tracksWithArtist.length > 0 ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {tracksWithArtist.map((track) => (
                 <TrackCard key={track.id} track={track} />
               ))}
             </div>
-          </section>
-        ) : bioProductions.length > 0 ? (
-          <section className="mt-12">
-            <SectionHeader title="Producciones conocidas" />
+          ) : bioProductions.length > 0 ? (
             <ul className="grid gap-3 sm:grid-cols-2">
               {bioProductions.map((title) => (
                 <li
@@ -142,22 +195,39 @@ export async function ArtistDetail({ slug }: { slug: string }) {
                 </li>
               ))}
             </ul>
-          </section>
-        ) : null}
+          ) : (
+            <HomeSectionEmpty
+              message="Aún no hay temas vinculados a este artista."
+              actionLabel="Explorar música"
+              actionHref="/musica"
+            />
+          )}
+        </section>
 
-        {artistData.sessions && artistData.sessions.length > 0 && (
-          <section className="mt-12">
-            <SectionHeader title="Sesiones" />
+        <section id="sesiones" className="mt-12 scroll-mt-28">
+          <SectionHeader
+            title="Sesiones"
+            badge={sessions.length > 0 ? String(sessions.length) : undefined}
+          />
+          {sessions.length > 0 ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {artistData.sessions.map((session) => (
-                <SessionCard
-                  key={session.id}
-                  session={{ ...session, artist: artistData }}
-                />
+              {sessions.map((session) => (
+                <SessionCard key={session.id} session={session} />
               ))}
             </div>
-          </section>
-        )}
+          ) : (
+            <HomeSectionEmpty
+              message="Sin sesión publicada para este DJ."
+              actionLabel="Ver sesiones"
+              actionHref="/sesiones"
+            />
+          )}
+        </section>
+
+        <section id="bio" className="mt-12 scroll-mt-28">
+          <SectionHeader title="Biografía" />
+          <ArtistBio biography={artistData.biography ?? ""} />
+        </section>
 
         {artistData.events && artistData.events.length > 0 && (
           <section className="mt-12">

@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Clock, ExternalLink, Headphones } from "lucide-react";
+import { Clock, Headphones } from "lucide-react";
+import { DetailPlayerSection } from "@/components/media/detail-player-section";
 import { PlayYoutubeButton } from "@/components/ui/play-youtube-button";
-import { YoutubeEmbed } from "@/components/ui/youtube-embed";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { resolveSessionPlay } from "@/lib/session-play";
 import { getSessionThumbnail } from "@/lib/session-thumbnail";
@@ -36,18 +36,12 @@ export default async function SesionDetailPage({ params }: PageProps) {
       <div className="mx-auto max-w-3xl">
         <div className="glass-card p-8">
           {videoId ? (
-            <div id="reproductor" className="mb-6 scroll-mt-24">
-              <YoutubeEmbed videoId={videoId} title={session.title} />
-              <a
-                href={watchUrl ?? youtubeHref!}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-makina-pink"
-              >
-                <ExternalLink className="h-3.5 w-3.5" />
-                Abrir en YouTube
-              </a>
-            </div>
+            <DetailPlayerSection
+              videoId={videoId}
+              title={session.title}
+              watchUrl={watchUrl ?? youtubeHref}
+              subtitle={session.artist?.name ?? "Sesión"}
+            />
           ) : thumb ? (
             <div className="relative mb-6 aspect-video w-full overflow-hidden rounded-xl bg-secondary">
               {youtubeHref ? (
