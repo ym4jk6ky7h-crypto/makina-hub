@@ -22,7 +22,7 @@ export const metadata = buildMetadata({
 });
 
 type PageProps = {
-  searchParams: Promise<{ ciudad?: string; fecha?: string }>;
+  searchParams: Promise<{ ciudad?: string; fecha?: string; vista?: string }>;
 };
 
 export default async function EventosPage({ searchParams }: PageProps) {
@@ -37,6 +37,7 @@ export default async function EventosPage({ searchParams }: PageProps) {
     const showAll = params.fecha === "all";
     const city =
       params.ciudad && params.ciudad !== "all" ? params.ciudad : undefined;
+    const view = params.vista === "compacta" ? "compacta" : "cartel";
 
     const events = await listEvents({
       city,
@@ -61,7 +62,7 @@ export default async function EventosPage({ searchParams }: PageProps) {
         </Suspense>
 
         <div className="page-accent-events mx-auto max-w-7xl rounded-2xl border px-4 py-8 pb-6 lg:px-8 lg:py-10">
-          <EventsAgenda events={events} />
+          <EventsAgenda events={events} view={view} />
 
           {events.length === 0 && (
             <EmptyState

@@ -2,8 +2,10 @@
 
 import type { ReactNode } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { MapPin } from "lucide-react";
+import { MapPin, Rows3 } from "lucide-react";
 import { EVENT_CITIES } from "@/lib/constants";
+import { EVENT_VIEW_MODES } from "@/lib/site-links";
+import type { EventViewMode } from "@/lib/site-links";
 import { cn } from "@/lib/utils";
 
 function FilterChip({
@@ -23,6 +25,7 @@ function FilterChip({
       onClick={onClick}
       className={cn(
         "shrink-0 rounded-full border px-3.5 py-2 text-sm font-medium transition-colors",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-makina-pink focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         active
           ? "border-makina-pink/50 bg-makina-pink/15 text-foreground shadow-sm shadow-makina-pink/10"
           : "border-white/10 bg-secondary/60 text-muted-foreground hover:border-white/20 hover:text-foreground",
@@ -40,13 +43,19 @@ export function EventFilters({ sticky = true }: { sticky?: boolean }) {
 
   const city = searchParams.get("ciudad") ?? "all";
   const fecha = searchParams.get("fecha") ?? "upcoming";
+  const vista: EventViewMode =
+    searchParams.get("vista") === "compacta" ? "compacta" : "cartel";
 
   function updateFilter(key: string, value: string) {
     const params = new URLSearchParams(searchParams.toString());
-    if (value && value !== "all") {
-      params.set(key, value);
-    } else {
+    const omit =
+      (key === "ciudad" && value === "all") ||
+      (key === "fecha" && value === "upcoming") ||
+      (key === "vista" && value === "cartel");
+    if (omit || !value) {
       params.delete(key);
+    } else {
+      params.set(key, value);
     }
     const q = params.toString();
     router.push(q ? `/eventos?${q}` : "/eventos");
@@ -77,6 +86,24 @@ export function EventFilters({ sticky = true }: { sticky?: boolean }) {
             >
               Toda la agenda
             </FilterChip>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="flex shrink-0 items-center gap-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            <Rows3 className="h-3.5 w-3.5" />
+            Vista
+          </span>
+          <div className="flex flex-wrap gap-2">
+            {EVENT_VIEW_MODES.map((mode) => (
+              <FilterChip
+                key={mode.id}
+                active={vista === mode.id}
+                onClick={() => updateFilter("vista", mode.id)}
+              >
+                {mode.label}
+              </FilterChip>
+            ))}
           </div>
         </div>
 
