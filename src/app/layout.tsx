@@ -1,9 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Syne } from "next/font/google";
 import { Navbar } from "@/components/layout/navbar";
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Footer } from "@/components/layout/footer";
+import { InstallAppBanner } from "@/components/pwa/install-app-banner";
+import { PwaRegister } from "@/components/pwa/pwa-register";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { organizationJsonLd } from "@/lib/seo/json-ld";
 import "./globals.css";
@@ -31,6 +33,13 @@ export const metadata: Metadata = buildMetadata({
   path: "/",
 });
 
+export const viewport: Viewport = {
+  themeColor: "#ff2d6a",
+  colorScheme: "dark",
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -47,6 +56,7 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        <PwaRegister />
         <div className="flex min-h-screen flex-col">
           <Navbar />
           <div className="flex min-h-0 w-full flex-1">
@@ -55,6 +65,7 @@ export default function RootLayout({
           </div>
           <Footer />
           <MobileBottomNav />
+          <InstallAppBanner />
         </div>
       </body>
     </html>

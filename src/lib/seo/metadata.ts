@@ -44,5 +44,14 @@ export function buildMetadata({
       index: true,
       follow: true,
     },
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "black-translucent",
+      title: SITE_NAME,
+    },
+    applicationName: SITE_NAME,
+    formatDetection: {
+      telephone: false,
+    },
   };
 }

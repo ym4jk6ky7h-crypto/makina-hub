@@ -10,6 +10,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { MakinaLogo } from "@/components/layout/makina-logo";
+import { InstallAppButton } from "@/components/pwa/install-app-button";
 import { NAV_ITEMS, SITE_TAGLINE } from "@/lib/constants";
 import { EXTERNAL_LINKS } from "@/lib/site-links";
 import { SITE_IMAGES } from "@/lib/site-images";
@@ -39,7 +40,7 @@ export function Footer() {
               {SITE_TAGLINE}. Artistas, eventos remember, sesiones históricas,
               sellos discográficos y la cultura mákina en Catalunya.
             </p>
-            <div className="mt-6 flex flex-wrap gap-2">
+            <div className="mt-6 flex flex-wrap items-center gap-2">
               {["Remember", "Mákina", "Hardcore", "Revival"].map((tag) => (
                 <span
                   key={tag}
@@ -48,6 +49,7 @@ export function Footer() {
                   {tag}
                 </span>
               ))}
+              <InstallAppButton />
             </div>
           </div>
           <div>
