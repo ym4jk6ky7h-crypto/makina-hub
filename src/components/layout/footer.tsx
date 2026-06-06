@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { MakinaLogo } from "@/components/layout/makina-logo";
 import { InstallAppButton } from "@/components/pwa/install-app-button";
+import { NewsletterSignup } from "@/components/newsletter/newsletter-signup";
 import { NAV_ITEMS, SITE_TAGLINE } from "@/lib/constants";
 import { EXTERNAL_LINKS } from "@/lib/site-links";
 import { SITE_IMAGES } from "@/lib/site-images";
@@ -33,7 +34,7 @@ export function Footer() {
       </div>
       <div className="section-glow-line relative" />
       <div className="relative mx-auto max-w-7xl px-4 py-14 lg:px-8">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-6">
           <div className="lg:col-span-2">
             <MakinaLogo size="md" />
             <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">
@@ -141,6 +142,9 @@ export function Footer() {
                 </Link>
               </li>
             </ul>
+          </div>
+          <div className="lg:col-span-2">
+            <NewsletterSignup source="footer" />
           </div>
         </div>
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-8 sm:flex-row">

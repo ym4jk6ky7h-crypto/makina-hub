@@ -23,7 +23,8 @@
     "db:sync-all": "tsx scripts/sync-all.ts",
     "db:fix-media": "tsx scripts/fix-media.ts",
     "db:refresh-artist-images": "tsx scripts/refresh-artist-images.ts",
-    "db:refresh-artist-bios": "tsx scripts/refresh-artist-bios.ts"
+    "db:refresh-artist-bios": "tsx scripts/refresh-artist-bios.ts",
+    "db:setup-newsletter": "tsx scripts/setup-newsletter.ts"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.3",

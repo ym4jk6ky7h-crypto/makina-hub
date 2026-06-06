@@ -4,6 +4,7 @@ import {
   Database,
   ExternalLink,
   Headphones,
+  Mail,
   Music2,
   RefreshCw,
   Shield,
@@ -12,6 +13,7 @@ import {
 } from "lucide-react";
 import { PageHero } from "@/components/layout/page-hero";
 import { SectionHeader } from "@/components/layout/section-header";
+import { NewsletterSignup } from "@/components/newsletter/newsletter-signup";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { EXTERNAL_LINKS } from "@/lib/site-links";
 import { SITE_IMAGES } from "@/lib/site-images";
@@ -162,6 +164,25 @@ export default function SobrePage() {
               </Link>
             </li>
           </ul>
+        </section>
+
+        <section className="mb-12">
+          <SectionHeader title="Newsletter" />
+          <div className="glass-card p-6">
+            <div className="flex gap-3">
+              <Mail className="mt-0.5 h-6 w-6 shrink-0 text-makina-pink" aria-hidden />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  La newsletter es un email ocasional con lo nuevo del hub: fiestas remember,
+                  sesiones largas recién añadidas y novedades del catálogo. No vendemos tu email ni
+                  enviamos spam diario — solo cuando hay algo relevante para la escena mákina.
+                </p>
+                <div className="mt-5 max-w-md">
+                  <NewsletterSignup source="sobre" />
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         <section className="glass-card border-makina-cyan/20 p-6">
