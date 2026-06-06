@@ -7,6 +7,8 @@ import { ReleaseCard } from "@/components/cards/release-card";
 import { TrackCard } from "@/components/cards/track-card";
 import { SessionCard } from "@/components/cards/session-card";
 import { HomeStatsBar } from "@/components/home/home-stats-bar";
+import { HomeFeatured } from "@/components/home/home-featured";
+import { HomeQuickDiscover } from "@/components/home/home-quick-discover";
 import {
   CarouselItem,
   ResponsiveCardRow,
@@ -24,6 +26,7 @@ import {
   isSupabaseConfigured,
   SupabaseConfigError,
 } from "@/lib/supabase/config";
+import { resolveSessionPlay } from "@/lib/session-play";
 import type { NewReleaseWithRelations } from "@/types/database";
 import {
   getHomeStats,
@@ -63,6 +66,10 @@ export default async function HomePage() {
       month: "long",
       year: "numeric",
     });
+
+    const nextEvent = events[0] ?? null;
+    const featuredSession =
+      sessions.find((s) => resolveSessionPlay(s).videoId) ?? sessions[0] ?? null;
 
     return (
       <div>
@@ -149,6 +156,9 @@ export default async function HomePage() {
             <HomeStatsBar stats={stats} />
           </div>
         </section>
+
+        <HomeFeatured nextEvent={nextEvent} featuredSession={featuredSession} />
+        <HomeQuickDiscover />
 
         <section className="border-b border-white/5 bg-card/40 py-6">
           <div className="mx-auto max-w-7xl px-4 lg:px-8">

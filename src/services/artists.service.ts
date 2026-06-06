@@ -51,9 +51,8 @@ export async function getArtistWithRelations(
       .eq("artist_id", artist.id),
   ]);
 
-  if (tracksRes.error) throw tracksRes.error;
-  if (sessionsRes.error) throw sessionsRes.error;
-  if (eventsRes.error) throw eventsRes.error;
+  if (tracksRes.error) throw new Error(`tracks: ${tracksRes.error.message}`);
+  if (sessionsRes.error) throw new Error(`sessions: ${sessionsRes.error.message}`);
 
   let tracks = (tracksRes.data ?? []) as Track[];
   if (tracks.length === 0) {
@@ -74,9 +73,11 @@ export async function getArtistWithRelations(
     (sessionsRes.data ?? []) as Session[]
   );
 
-  const events = (eventsRes.data ?? [])
-    .map((row) => row.events as unknown as Event)
-    .filter(Boolean);
+  const events = eventsRes.error
+    ? []
+    : (eventsRes.data ?? [])
+        .map((row) => row.events as unknown as Event)
+        .filter(Boolean);
 
   return {
     ...artist,

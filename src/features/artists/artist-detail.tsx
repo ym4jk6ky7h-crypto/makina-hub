@@ -16,8 +16,7 @@ import { parseProductionsFromBio } from "@/lib/artists/artist-bio-utils";
 import { getArtistImageUrl } from "@/lib/artists/artist-image";
 import { resolveSessionPlay } from "@/lib/session-play";
 import { personJsonLd } from "@/lib/seo/json-ld";
-import { getArtistWithRelations } from "@/services/artists.service";
-import type { TrackWithRelations } from "@/types/database";
+import type { ArtistWithRelations, TrackWithRelations } from "@/types/database";
 
 function pickPrimarySession(
   sessions: { title: string; slug: string; youtube_url: string | null; duration?: number | null }[]
@@ -36,10 +35,11 @@ function pickPrimarySession(
   return null;
 }
 
-export async function ArtistDetail({ slug }: { slug: string }) {
-  const artistData = await getArtistWithRelations(slug);
-  if (!artistData) return null;
-
+export async function ArtistDetail({
+  artistData,
+}: {
+  artistData: ArtistWithRelations;
+}) {
   const photoUrl = getArtistImageUrl(
     artistData.name,
     artistData.image_url,
@@ -75,7 +75,7 @@ export async function ArtistDetail({ slug }: { slug: string }) {
               className="object-cover"
               sizes="256px"
               priority
-              unoptimized={!artistData.image_url}
+              unoptimized
             />
           </div>
           <div className="flex-1 pb-2 text-center md:text-left">
