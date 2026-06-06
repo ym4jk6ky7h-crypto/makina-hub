@@ -21,20 +21,22 @@ export function resolveSessionPlay(session: {
   youtubeHref: string | null;
   watchUrl: string | null;
   isSearch: boolean;
+  durationSeconds: number | null;
   durationMinutes: number | null;
 } {
+  const curatedWatch = CURATED_SESSION_WATCH_BY_SLUG[session.slug];
+  const curatedSeconds = CURATED_SESSION_DURATION_SEC_BY_SLUG[session.slug] ?? null;
+
   let href = sessionYoutubeHref(session.youtube_url);
   let videoId = youtubeVideoId(href);
-  let durationSeconds: number | null =
-    CURATED_SESSION_DURATION_SEC_BY_SLUG[session.slug] ?? null;
 
-  if (!videoId) {
-    const curated = CURATED_SESSION_WATCH_BY_SLUG[session.slug];
-    if (curated) {
-      href = curated;
-      videoId = youtubeVideoId(curated);
-    }
+  // Vídeo curado = fuente validada (≥15 min) con duración real de YouTube
+  if (curatedWatch) {
+    href = curatedWatch;
+    videoId = youtubeVideoId(curatedWatch);
   }
+
+  let durationSeconds: number | null = curatedSeconds;
 
   if (durationSeconds == null && session.duration != null && session.duration >= 15) {
     durationSeconds = session.duration * 60;
@@ -43,18 +45,18 @@ export function resolveSessionPlay(session: {
   if (videoId && durationSeconds != null && !isValidSessionDuration(durationSeconds)) {
     videoId = null;
     href = null;
+    durationSeconds = null;
   }
 
   const durationMinutes: number | null =
-    durationSeconds != null
-      ? secondsToMinutes(durationSeconds)
-      : (session.duration ?? null);
+    durationSeconds != null ? secondsToMinutes(durationSeconds) : null;
 
   return {
     videoId,
     youtubeHref: href,
     watchUrl: videoId ? youtubeWatchUrl(videoId) : href,
     isSearch: Boolean(href && !videoId),
+    durationSeconds,
     durationMinutes,
   };
 }

@@ -5,6 +5,7 @@ import { MakinaPlaceholder } from "@/components/ui/makina-placeholder";
 import { MediaCardShell } from "@/components/ui/media-card-shell";
 import type { SessionWithRelations } from "@/types/database";
 import { resolveSessionPlay } from "@/lib/session-play";
+import { formatYoutubeDuration } from "@/lib/format-duration";
 import { getSessionThumbnail } from "@/lib/session-thumbnail";
 import { cn } from "@/lib/utils";
 
@@ -13,7 +14,7 @@ type SessionCardProps = {
 };
 
 export function SessionCard({ session }: SessionCardProps) {
-  const { videoId, youtubeHref, isSearch, durationMinutes } = resolveSessionPlay(session);
+  const { videoId, youtubeHref, isSearch, durationSeconds } = resolveSessionPlay(session);
   const { url: thumb, fromYoutube } = getSessionThumbnail(session);
 
   const detailHref = `/sesiones/${session.slug}`;
@@ -54,10 +55,10 @@ export function SessionCard({ session }: SessionCardProps) {
         </Link>
 
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          {(durationMinutes ?? session.duration) != null && (
+          {durationSeconds != null && (
             <span className="flex items-center gap-1">
               <Clock className="h-3 w-3" />
-              {durationMinutes ?? session.duration} min
+              {formatYoutubeDuration(durationSeconds)}
             </span>
           )}
           {(videoId || youtubeHref) && (

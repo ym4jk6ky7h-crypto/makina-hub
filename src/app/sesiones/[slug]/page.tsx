@@ -8,6 +8,7 @@ import { PlayYoutubeButton } from "@/components/ui/play-youtube-button";
 import { favoriteFromSession } from "@/lib/favorites/build-item";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { resolveSessionPlay } from "@/lib/session-play";
+import { formatYoutubeDuration } from "@/lib/format-duration";
 import { getSessionThumbnail } from "@/lib/session-thumbnail";
 import { getSessionBySlug } from "@/services/sessions.service";
 import { formatDate } from "@/lib/utils";
@@ -30,7 +31,8 @@ export default async function SesionDetailPage({ params }: PageProps) {
   const session = await getSessionBySlug(slug);
   if (!session) notFound();
 
-  const { videoId, youtubeHref, watchUrl, isSearch } = resolveSessionPlay(session);
+  const { videoId, youtubeHref, watchUrl, isSearch, durationSeconds } =
+    resolveSessionPlay(session);
   const { url: thumb, fromYoutube } = getSessionThumbnail(session);
 
   return (
@@ -80,10 +82,10 @@ export default async function SesionDetailPage({ params }: PageProps) {
           )}
           <div className="mt-4 flex gap-4 text-sm text-muted-foreground">
             <span>{formatDate(session.created_at)}</span>
-            {session.duration != null && (
+            {durationSeconds != null && (
               <span className="flex items-center gap-1">
                 <Clock className="h-4 w-4" />
-                {session.duration} minutos
+                {formatYoutubeDuration(durationSeconds)} (YouTube)
               </span>
             )}
           </div>

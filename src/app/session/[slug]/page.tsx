@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Clock, ExternalLink, Headphones } from "lucide-react";
 import { buildMetadata } from "@/lib/seo/metadata";
+import { resolveSessionPlay } from "@/lib/session-play";
+import { formatYoutubeDuration } from "@/lib/format-duration";
 import { getSessionBySlug } from "@/services/sessions.service";
 import { formatDate } from "@/lib/utils";
 
@@ -22,6 +24,8 @@ export default async function SessionDetailPageEn({ params }: PageProps) {
   const session = await getSessionBySlug(slug);
   if (!session) notFound();
 
+  const { durationSeconds } = resolveSessionPlay(session);
+
   return (
     <article className="px-4 py-8 lg:px-8">
       <div className="mx-auto max-w-3xl">
@@ -38,10 +42,10 @@ export default async function SessionDetailPageEn({ params }: PageProps) {
           )}
           <div className="mt-4 flex gap-4 text-sm text-muted-foreground">
             <span>{formatDate(session.created_at)}</span>
-            {session.duration != null && (
+            {durationSeconds != null && (
               <span className="flex items-center gap-1">
                 <Clock className="h-4 w-4" />
-                {session.duration} min
+                {formatYoutubeDuration(durationSeconds)}
               </span>
             )}
           </div>

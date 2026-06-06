@@ -11,6 +11,7 @@ import {
 } from "../src/data/curated-session-youtube";
 import { createAdminClient, loadEnv } from "./lib/supabase-admin";
 import { fetchYouTubeForSession } from "./lib/youtube";
+import { secondsToMinutes } from "../src/lib/youtube-duration";
 
 loadEnv();
 
@@ -48,13 +49,13 @@ async function main() {
     const fetched = await fetchYouTubeForSession(seed.name, youtubeKey);
 
     const youtube_url =
-      fetched.videoUrl ??
       curatedUrl ??
+      fetched.videoUrl ??
       `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQ)}`;
 
-    const durationMinutes =
-      fetched.durationMinutes ??
-      (curatedDuration ? Math.round(curatedDuration / 60) : null);
+    const durationMinutes = curatedDuration
+      ? secondsToMinutes(curatedDuration)
+      : fetched.durationMinutes;
 
     const row = {
       slug,

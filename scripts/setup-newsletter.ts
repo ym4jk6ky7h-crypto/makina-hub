@@ -28,9 +28,14 @@ async function main() {
   console.log(`
 ❌ Falta la tabla newsletter_subscribers.
 
-En Supabase Dashboard → SQL Editor, pega y ejecuta:
+IMPORTANTE: no pegues la ruta del archivo en el SQL Editor.
+Copia SOLO el SQL de abajo (desde CREATE TABLE hasta el final):
 
-${sql}
+────────── copiar desde aquí ──────────
+${sql.trim()}
+────────── hasta aquí ──────────
+
+Supabase Dashboard → SQL Editor → New query → pegar → Run
 `);
 }
 
