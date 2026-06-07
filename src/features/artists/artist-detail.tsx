@@ -16,7 +16,7 @@ import { parseProductionsFromBio } from "@/lib/artists/artist-bio-utils";
 import { getArtistImageUrl } from "@/lib/artists/artist-image";
 import { resolveSessionPlay } from "@/lib/session-play";
 import { personJsonLd } from "@/lib/seo/json-ld";
-import type { ArtistWithRelations, TrackWithRelations } from "@/types/database";
+import type { Artist, ArtistWithRelations, TrackWithRelations } from "@/types/database";
 
 function pickPrimarySession(
   sessions: { title: string; slug: string; youtube_url: string | null; duration?: number | null }[]
@@ -45,12 +45,17 @@ export async function ArtistDetail({
     artistData.image_url,
     artistData.slug
   );
+  const artistRef = {
+    id: artistData.id,
+    slug: artistData.slug,
+    name: artistData.name,
+  } as Artist;
   const tracksWithArtist: TrackWithRelations[] = (artistData.tracks ?? []).map(
-    (track) => ({ ...track, artist: artistData })
+    (track) => ({ ...track, artist: artistRef })
   );
   const sessions = (artistData.sessions ?? []).map((session) => ({
     ...session,
-    artist: artistData,
+    artist: artistRef,
   }));
   const bioProductions = parseProductionsFromBio(artistData.biography ?? "");
   const primaryVideo = pickPrimarySession(sessions);
@@ -60,7 +65,9 @@ export async function ArtistDetail({
     <article>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
       />
 
       <section className="relative overflow-hidden border-b border-white/5">

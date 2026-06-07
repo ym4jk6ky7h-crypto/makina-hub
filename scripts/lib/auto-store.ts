@@ -12,7 +12,12 @@ export type AutoSyncMeta = {
 };
 
 export function ensureAutoDir() {
-  if (!fs.existsSync(AUTO_DIR)) fs.mkdirSync(AUTO_DIR, { recursive: true });
+  if (fs.existsSync(AUTO_DIR)) return;
+  try {
+    fs.mkdirSync(AUTO_DIR, { recursive: true });
+  } catch {
+    // En Vercel/serverless el FS puede ser de solo lectura; readJson usa fallback.
+  }
 }
 
 export function readJson<T>(filename: string, fallback: T): T {

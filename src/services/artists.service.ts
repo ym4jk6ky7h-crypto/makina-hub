@@ -1,10 +1,10 @@
-import {
-  ensureArtistSessions,
-  expectedTrackSlugsForArtist,
-  mergeArtistTracks,
-} from "@/lib/artists/artist-catalog";
+import { ensureArtistSessions } from "@/lib/artists/artist-catalog";
 import { createClient } from "@/lib/supabase/server";
 import type { Artist, ArtistWithRelations, Event, Session, Track } from "@/types/database";
+
+function sortTracksByYear(tracks: Track[]): Track[] {
+  return [...tracks].sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
+}
 
 export async function listArtists(options?: { limit?: number }): Promise<Artist[]> {
   const supabase = await createClient();
@@ -54,19 +54,7 @@ export async function getArtistWithRelations(
   if (tracksRes.error) throw new Error(`tracks: ${tracksRes.error.message}`);
   if (sessionsRes.error) throw new Error(`sessions: ${sessionsRes.error.message}`);
 
-  let tracks = (tracksRes.data ?? []) as Track[];
-  if (tracks.length === 0) {
-    const slugs = expectedTrackSlugsForArtist(slug);
-    if (slugs.length > 0) {
-      const { data: bySlug } = await supabase
-        .from("tracks")
-        .select("*")
-        .in("slug", slugs);
-      tracks = mergeArtistTracks(slug, tracks, (bySlug ?? []) as Track[]);
-    }
-  } else {
-    tracks = mergeArtistTracks(slug, tracks, []);
-  }
+  const tracks = sortTracksByYear((tracksRes.data ?? []) as Track[]);
 
   const sessions = ensureArtistSessions(
     artist,

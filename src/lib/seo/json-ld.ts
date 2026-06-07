@@ -68,12 +68,13 @@ export function personJsonLd(artist: {
   slug: string;
   image_url: string | null;
 }) {
+  const bio = artist.biography?.trim();
   return {
     "@context": "https://schema.org",
     "@type": "Person",
     name: artist.name,
-    description: artist.biography,
+    description: bio ? bio.slice(0, 500) : undefined,
     url: `${SITE_URL}/artistas/${artist.slug}`,
-    image: artist.image_url,
+    image: artist.image_url ?? undefined,
   };
 }
