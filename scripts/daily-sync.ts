@@ -32,7 +32,7 @@ async function main() {
   await run("fetch-auto.ts");
   await run("discover-events.ts");
   await run("discover-releases.ts");
-  await run("discover-sessions.ts");
+  await run("discover-sessions.ts", ["--recent-days=14", "--max=80"]);
 
   const sec = Math.round((Date.now() - started) / 1000);
   console.log(`\n✨ Daily sync OK (${sec}s). Recarga /novedades y /sesiones\n`);

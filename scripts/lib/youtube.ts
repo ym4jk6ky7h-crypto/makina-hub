@@ -23,7 +23,7 @@ export type TrackVideoResult = {
   searchUrl: string;
 };
 
-function artistNameMatches(artistName: string, ytTitle: string): boolean {
+export function artistNameMatches(artistName: string, ytTitle: string): boolean {
   const parts = artistName
     .toLowerCase()
     .normalize("NFD")
@@ -114,7 +114,215 @@ export type SessionCandidate = {
   title: string;
   publishedAt: string;
   durationMinutes: number;
+  channelTitle?: string | null;
 };
+
+export const GLOBAL_MAKINA_SESSION_QUERIES = [
+  "makina remember sesion DJ set",
+  "makina catalana sesion completa",
+  "remember catalunya DJ session",
+  "chasis session remember makina",
+  "makina legends session",
+  "love makina session",
+  "pont aeri session remember",
+  "bit music session remember",
+  "scorpia session remember",
+  "hardcore català session",
+  "sesion makina valencia",
+  "sesion makina barcelona",
+  "DJ set makina remember",
+  "old school makina session",
+  "revival makina session",
+  "terminal session remember",
+  "xque session remember",
+  "bluemoon session remember",
+];
+
+const SESSION_TITLE_KEYWORDS = [
+  "makina",
+  "mákina",
+  "remember",
+  "hardcore catal",
+  "chasis",
+  "pont aeri",
+  "bit music",
+  "scorpia",
+  "love makina",
+  "makina legends",
+  "terminal",
+  "sesion",
+  "sesión",
+  "session",
+  "dj set",
+  "live set",
+];
+
+const SESSION_TITLE_EXCLUDE = [
+  "reaction",
+  "react ",
+  "tutorial",
+  "unboxing",
+  "review ",
+  "interview",
+  "podcast",
+];
+
+function normalizeSearchText(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+export function isMakinaSessionTitle(title: string): boolean {
+  const t = normalizeSearchText(title);
+  if (SESSION_TITLE_EXCLUDE.some((word) => t.includes(word))) return false;
+  return SESSION_TITLE_KEYWORDS.some((keyword) =>
+    t.includes(normalizeSearchText(keyword))
+  );
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+type SearchSnippet = {
+  videoId: string;
+  title: string | null;
+  channelTitle: string | null;
+  publishedAt: string | null;
+};
+
+async function youtubeSearchVideos(
+  query: string,
+  apiKey: string,
+  publishedAfter?: string
+): Promise<SearchSnippet[]> {
+  const params = new URLSearchParams({
+    part: "snippet",
+    type: "video",
+    videoDuration: "long",
+    order: "date",
+    maxResults: "25",
+    q: query,
+    key: apiKey,
+    relevanceLanguage: "es",
+  });
+  if (publishedAfter) params.set("publishedAfter", publishedAfter);
+
+  const res = await fetch(
+    `https://www.googleapis.com/youtube/v3/search?${params.toString()}`
+  );
+  if (!res.ok) return [];
+
+  const data = (await res.json()) as {
+    items?: Array<{
+      id?: { videoId?: string };
+      snippet?: {
+        title?: string;
+        channelTitle?: string;
+        publishedAt?: string;
+      };
+    }>;
+  };
+
+  return (data.items ?? [])
+    .map((item) => ({
+      videoId: item.id?.videoId ?? "",
+      title: item.snippet?.title ?? null,
+      channelTitle: item.snippet?.channelTitle ?? null,
+      publishedAt: item.snippet?.publishedAt ?? null,
+    }))
+    .filter((item) => item.videoId.length === 11);
+}
+
+/** Busca sesiones mákina en todo YouTube (no limitado al roster de artistas). */
+export async function fetchGlobalMakinaSessions(
+  apiKey?: string,
+  options?: { maxTotal?: number; recentDays?: number }
+): Promise<SessionCandidate[]> {
+  const maxTotal = options?.maxTotal ?? 200;
+  const publishedAfter = options?.recentDays
+    ? new Date(Date.now() - options.recentDays * 86_400_000).toISOString()
+    : undefined;
+
+  const year = new Date().getFullYear();
+  const queries = [
+    ...GLOBAL_MAKINA_SESSION_QUERIES,
+    `sesion makina ${year}`,
+    `sesion makina ${year - 1}`,
+  ];
+
+  const snippets = new Map<string, SearchSnippet>();
+
+  if (apiKey) {
+    for (const query of queries) {
+      const found = await youtubeSearchVideos(query, apiKey, publishedAfter);
+      for (const item of found) snippets.set(item.videoId, item);
+      await sleep(180);
+    }
+
+    const ids = [...snippets.keys()];
+    const results: SessionCandidate[] = [];
+
+    for (let i = 0; i < ids.length && results.length < maxTotal; i += 50) {
+      const chunk = ids.slice(i, i + 50);
+      const durations = await fetchVideoDurationsApi(chunk, apiKey);
+
+      for (const id of chunk) {
+        const meta = durations.get(id);
+        const snippet = snippets.get(id);
+        const title = snippet?.title;
+        if (!title || !isMakinaSessionTitle(title)) continue;
+        const seconds = meta?.seconds ?? 0;
+        if (seconds < MIN_SESSION_SECONDS) continue;
+
+        results.push({
+          videoId: id,
+          videoUrl: `https://www.youtube.com/watch?v=${id}`,
+          title,
+          publishedAt:
+            meta?.publishedAt ?? snippet?.publishedAt ?? new Date(0).toISOString(),
+          durationMinutes: secondsToMinutes(seconds) ?? 0,
+          channelTitle: snippet?.channelTitle ?? null,
+        });
+      }
+      await sleep(120);
+    }
+
+    results.sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+    return results.slice(0, maxTotal);
+  }
+
+  const results: SessionCandidate[] = [];
+  const seen = new Set<string>();
+
+  for (const query of queries.slice(0, 10)) {
+    const ids = searchVideoIds(query, 18);
+    for (const id of ids) {
+      if (seen.has(id)) continue;
+      seen.add(id);
+      const meta = scrapeVideoMeta(id);
+      if (!meta.title || !isMakinaSessionTitle(meta.title)) continue;
+      if (meta.durationSeconds == null || meta.durationSeconds < MIN_SESSION_SECONDS) {
+        continue;
+      }
+      results.push({
+        videoId: id,
+        videoUrl: `https://www.youtube.com/watch?v=${id}`,
+        title: meta.title,
+        publishedAt: meta.publishedAt ?? new Date(0).toISOString(),
+        durationMinutes: secondsToMinutes(meta.durationSeconds) ?? 0,
+        channelTitle: null,
+      });
+      if (results.length >= maxTotal) break;
+    }
+    if (results.length >= maxTotal) break;
+  }
+
+  results.sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+  return results.slice(0, maxTotal);
+}
 
 /** Varios sets recientes por artista (≥15 min), ordenados por fecha YouTube. */
 export async function fetchRecentSessionsForArtist(

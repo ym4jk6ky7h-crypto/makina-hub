@@ -1,18 +1,16 @@
 /**
- * Sesiones mákina en YouTube — varios sets recientes por artista.
- * Orden en la web: youtube_published_at (fecha de subida a YouTube).
+ * Descubre sesiones mákina en YouTube (búsqueda global, no solo roster de artistas).
+ * Orden en la web: youtube_published_at.
  *
  * npm run db:discover-sessions
+ * npm run db:discover-sessions -- --recent-days=14   (solo novedades, para cron diario)
+ * npm run db:discover-sessions -- --max=300
  */
-import { MAKINA_ARTISTS } from "../data/makina-artists";
-import {
-  CURATED_SESSION_DURATION_SEC_BY_SLUG,
-  CURATED_SESSION_WATCH_BY_SLUG,
-} from "../src/data/curated-session-youtube";
-import { youtubeVideoId } from "../src/lib/youtube";
-import { secondsToMinutes } from "../src/lib/youtube-duration";
 import { createAdminClient, loadEnv } from "./lib/supabase-admin";
-import { fetchRecentSessionsForArtist } from "./lib/youtube";
+import {
+  artistNameMatches,
+  fetchGlobalMakinaSessions,
+} from "./lib/youtube";
 
 loadEnv();
 
@@ -20,111 +18,114 @@ const dryRun = process.argv.includes("--dry-run");
 const youtubeKey = process.env.YOUTUBE_API_KEY;
 const supabase = createAdminClient();
 
-const SESSIONS_PER_ARTIST = 3;
+const recentDaysArg = process.argv.find((a) => a.startsWith("--recent-days="));
+const recentDays = recentDaysArg
+  ? parseInt(recentDaysArg.split("=")[1], 10)
+  : undefined;
 
-async function upsertCuratedSessions(
-  artist: { id: string; slug: string; name: string }
-): Promise<number> {
-  let count = 0;
-  for (const [slug, url] of Object.entries(CURATED_SESSION_WATCH_BY_SLUG)) {
-    if (!slug.startsWith(`${artist.slug}-`) && slug !== `${artist.slug}-sesion-makina`) {
-      continue;
-    }
-    const videoId = youtubeVideoId(url);
-    if (!videoId) continue;
+const maxArg = process.argv.find((a) => a.startsWith("--max="));
+const maxTotal = maxArg ? parseInt(maxArg.split("=")[1], 10) : 200;
 
-    const durationMinutes = CURATED_SESSION_DURATION_SEC_BY_SLUG[slug]
-      ? secondsToMinutes(CURATED_SESSION_DURATION_SEC_BY_SLUG[slug])
-      : null;
+const FALLBACK_SLUG = "sesiones-makina-varios";
+const FALLBACK_NAME = "Sesiones mákina";
+
+async function ensureFallbackArtist(): Promise<string> {
+  const { data: existing } = await supabase
+    .from("artists")
+    .select("id")
+    .eq("slug", FALLBACK_SLUG)
+    .maybeSingle();
+  if (existing) return existing.id;
+
+  const { data: created, error } = await supabase
+    .from("artists")
+    .insert({
+      slug: FALLBACK_SLUG,
+      name: FALLBACK_NAME,
+      biography:
+        "Sesiones de la escena mákina y remember encontradas en YouTube (DJ no identificado en catálogo).",
+      country: "España",
+      city: "Catalunya",
+    })
+    .select("id")
+    .single();
+
+  if (error) throw error;
+  return created.id;
+}
+
+function matchArtistId(
+  title: string,
+  channelTitle: string | null | undefined,
+  artists: { id: string; name: string }[]
+): string | null {
+  const haystack = `${title} ${channelTitle ?? ""}`;
+  const sorted = [...artists].sort((a, b) => b.name.length - a.name.length);
+  for (const artist of sorted) {
+    if (artistNameMatches(artist.name, haystack)) return artist.id;
+  }
+  return null;
+}
+
+async function main() {
+  const { data: artists } = await supabase.from("artists").select("id, name, slug");
+  const fallbackArtistId = dryRun ? "dry-run" : await ensureFallbackArtist();
+
+  console.log(
+    `\n🎧 Makina Hub — sesiones YouTube globales (max ${maxTotal}${
+      recentDays ? `, últimos ${recentDays} días` : ", catálogo amplio"
+    })\n`
+  );
+  if (!youtubeKey) {
+    console.log("⚠️  Sin YOUTUBE_API_KEY: scraping limitado (menos resultados).\n");
+  }
+
+  const sessions = await fetchGlobalMakinaSessions(youtubeKey, {
+    maxTotal,
+    recentDays,
+  });
+
+  console.log(`Encontradas ${sessions.length} sesiones candidatas en YouTube.\n`);
+
+  let ok = 0;
+  let skipped = 0;
+
+  for (const session of sessions) {
+    const artistId =
+      matchArtistId(session.title, session.channelTitle, artists ?? []) ??
+      fallbackArtistId;
 
     const row = {
-      slug: `sesion-${videoId}`,
-      title: `${artist.name} — Sesión mákina`,
-      artist_id: artist.id,
-      duration: durationMinutes,
-      youtube_url: url,
-      youtube_video_id: videoId,
-      youtube_published_at: null as string | null,
-      tracklist: [`${artist.name} — Sesión mákina`],
+      slug: `sesion-${session.videoId}`,
+      title: session.title,
+      artist_id: artistId,
+      duration: session.durationMinutes,
+      youtube_url: session.videoUrl,
+      youtube_video_id: session.videoId,
+      youtube_published_at: session.publishedAt,
+      tracklist: [session.title],
     };
 
     if (dryRun) {
-      console.log(`· curado ${slug}`);
-      count++;
+      console.log(`· ${session.title.slice(0, 70)}`);
+      ok++;
       continue;
     }
 
     const { error } = await supabase.from("sessions").upsert(row, {
       onConflict: "slug",
     });
-    if (error) console.log(`✗ curado ${slug}: ${error.message}`);
-    else count++;
-  }
-  return count;
-}
 
-async function main() {
-  const { data: artists } = await supabase.from("artists").select("id, slug, name");
-  const bySlug = new Map((artists ?? []).map((a) => [a.slug, a]));
-
-  console.log(
-    `\n🎧 Makina Hub — sesiones YouTube (${MAKINA_ARTISTS.length} artistas, ${SESSIONS_PER_ARTIST} recientes c/u)\n`
-  );
-  if (!youtubeKey) {
-    console.log("⚠️  Sin YOUTUBE_API_KEY: scraping (más lento, menos resultados).\n");
-  }
-
-  let ok = 0;
-
-  for (const seed of MAKINA_ARTISTS) {
-    const artist = bySlug.get(seed.slug);
-    if (!artist) {
-      console.log(`⊘ ${seed.name}: no en BD`);
-      continue;
+    if (error) {
+      console.warn(`⚠ ${session.videoId}: ${error.message}`);
+      skipped++;
+    } else {
+      console.log(`✓ ${session.title.slice(0, 72)}`);
+      ok++;
     }
-
-    ok += await upsertCuratedSessions(artist);
-
-    const recent = await fetchRecentSessionsForArtist(
-      seed.name,
-      youtubeKey,
-      SESSIONS_PER_ARTIST
-    );
-
-    for (const session of recent) {
-      const row = {
-        slug: `sesion-${session.videoId}`,
-        title: session.title,
-        artist_id: artist.id,
-        duration: session.durationMinutes,
-        youtube_url: session.videoUrl,
-        youtube_video_id: session.videoId,
-        youtube_published_at: session.publishedAt,
-        tracklist: seed.classics?.slice(0, 5) ?? [session.title],
-      };
-
-      if (dryRun) {
-        console.log(`· ${seed.name} → ${session.title.slice(0, 50)}…`);
-        ok++;
-        continue;
-      }
-
-      const { error } = await supabase.from("sessions").upsert(row, {
-        onConflict: "slug",
-      });
-
-      if (error) {
-        console.log(`✗ ${seed.name}: ${error.message}`);
-      } else {
-        console.log(`✓ ${seed.name} — ${session.title.slice(0, 60)}`);
-        ok++;
-      }
-    }
-
-    await new Promise((r) => setTimeout(r, youtubeKey ? 350 : 100));
   }
 
-  console.log(`\n✅ ${ok} sesiones sincronizadas\n`);
+  console.log(`\n✅ ${ok} sesiones sincronizadas${skipped ? `, ${skipped} omitidas` : ""}.\n`);
 }
 
 main().catch((e) => {

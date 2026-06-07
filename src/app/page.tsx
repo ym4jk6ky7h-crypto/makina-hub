@@ -263,7 +263,7 @@ export default async function HomePage() {
           <section>
             <SectionHeader
               title="Últimas sesiones"
-              subtitle="Ordenadas por fecha de publicación en YouTube"
+              subtitle="Toda la escena mákina en YouTube — más recientes primero"
               href="/sesiones"
             />
             {sessions.length > 0 ? (
