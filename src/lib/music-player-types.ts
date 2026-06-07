@@ -3,9 +3,12 @@ export type MusicQueueItem = {
   slug: string;
   title: string;
   subtitle?: string;
-  audioUrl: string;
-  artworkUrl?: string | null;
   href: string;
+  artworkUrl?: string | null;
   downloadUrl?: string | null;
-  isPreview?: boolean;
+  /** MP3 alojado (tema completo) */
+  audioUrl?: string | null;
+  /** YouTube verificado mákina (tema completo) */
+  videoId?: string | null;
+  watchUrl?: string | null;
 };

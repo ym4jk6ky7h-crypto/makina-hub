@@ -9,7 +9,7 @@ import { SectionHeader } from "@/components/layout/section-header";
 import { HomeSectionEmpty } from "@/components/ui/home-section-empty";
 import {
   decadeLabel,
-  resolveTrackAudio,
+  isTrackPlayable,
   trackDecade,
   type MusicDecade,
 } from "@/lib/track-audio";
@@ -44,7 +44,7 @@ export function MusicCatalog({ tracks }: MusicCatalogProps) {
     });
   }, [tracks, decade, genre]);
 
-  const playable = filtered.filter((t) => resolveTrackAudio(t).audioUrl);
+  const playable = filtered.filter((t) => isTrackPlayable(t));
   const classics = filtered.filter((t) => (t.year ?? 9999) < 2000);
   const recent = filtered.filter((t) => (t.year ?? 0) >= 2010);
 
@@ -109,11 +109,7 @@ export function MusicCatalog({ tracks }: MusicCatalogProps) {
       {playable.length > 0 && (
         <p className="text-sm text-muted-foreground">
           <Music2 className="mr-1.5 inline h-4 w-4 text-makina-pink" />
-          {playable.length} tema{playable.length !== 1 ? "s" : ""} listo
-          {playable.length !== 1 ? "s" : ""} para escuchar en la app
-          {playable.some((t) => resolveTrackAudio(t).isPreview)
-            ? " (incluye previews)"
-            : ""}
+          {playable.length} tema{playable.length !== 1 ? "s" : ""} con audio completo verificado
         </p>
       )}
 

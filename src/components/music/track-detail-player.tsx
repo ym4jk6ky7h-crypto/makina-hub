@@ -12,7 +12,7 @@ type TrackDetailPlayerProps = {
   subtitle?: string;
   artworkUrl?: string | null;
   downloadUrl?: string | null;
-  isPreview?: boolean;
+  watchUrl?: string | null;
 };
 
 export function TrackDetailPlayer({
@@ -22,7 +22,7 @@ export function TrackDetailPlayer({
   subtitle,
   artworkUrl,
   downloadUrl,
-  isPreview,
+  watchUrl,
 }: TrackDetailPlayerProps) {
   const { playTrack, current } = useMusicPlayer();
 
@@ -34,11 +34,12 @@ export function TrackDetailPlayer({
 
   return (
     <NativeAudioPlayer
+      trackId={track.id}
       title={title}
       subtitle={subtitle}
-      artworkUrl={artworkUrl}
+      artworkUrl={artworkUrl ?? track.artworkUrl}
       downloadUrl={downloadUrl}
-      isPreview={isPreview}
+      watchUrl={watchUrl}
     />
   );
 }

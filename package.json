@@ -26,7 +26,8 @@
     "db:refresh-artist-bios": "tsx scripts/refresh-artist-bios.ts",
     "db:setup-newsletter": "tsx scripts/setup-newsletter.ts",
     "db:refresh-session-durations": "tsx scripts/refresh-session-durations.ts",
-    "db:sync-track-previews": "tsx scripts/sync-track-previews.ts"
+    "db:clear-track-previews": "tsx scripts/clear-track-previews.ts",
+    "db:sync-track-downloads": "tsx scripts/sync-track-previews.ts"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.3",

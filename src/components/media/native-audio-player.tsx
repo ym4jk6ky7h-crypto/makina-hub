@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useMusicPlayer } from "@/contexts/music-player-context";
 import { cn } from "@/lib/utils";
+import { youtubeWatchUrl } from "@/lib/youtube";
 
 function formatTime(seconds: number): string {
   if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
@@ -40,6 +41,9 @@ export function GlobalAudioBar() {
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
   const hasQueue = queue.length > 1;
+  const sourceHref =
+    current.watchUrl ??
+    (current.videoId ? youtubeWatchUrl(current.videoId) : null);
 
   return (
     <div
@@ -80,7 +84,6 @@ export function GlobalAudioBar() {
             {current.subtitle && (
               <p className="truncate text-xs text-muted-foreground">
                 {current.subtitle}
-                {current.isPreview ? " · Preview" : ""}
               </p>
             )}
           </div>
@@ -136,6 +139,18 @@ export function GlobalAudioBar() {
             </a>
           )}
 
+          {sourceHref && current.videoId && (
+            <a
+              href={sourceHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden rounded-lg p-2 text-muted-foreground hover:bg-white/5 sm:block"
+              aria-label="Abrir en YouTube"
+            >
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          )}
+
           <button
             type="button"
             onClick={clear}
@@ -174,18 +189,20 @@ export function GlobalAudioBar() {
 }
 
 export function NativeAudioPlayer({
+  trackId,
   title,
   subtitle,
   artworkUrl,
   downloadUrl,
-  isPreview,
+  watchUrl,
   anchorId = "reproductor-audio",
 }: {
+  trackId: string;
   title: string;
   subtitle?: string;
   artworkUrl?: string | null;
   downloadUrl?: string | null;
-  isPreview?: boolean;
+  watchUrl?: string | null;
   anchorId?: string;
 }) {
   const { current, playing, ready, currentTime, duration, toggle, seek } =
@@ -194,7 +211,7 @@ export function NativeAudioPlayer({
   if (!current) return null;
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
-  const isActive = current.title === title;
+  const isActive = current.id === trackId;
 
   return (
     <div
@@ -203,9 +220,9 @@ export function NativeAudioPlayer({
     >
       <div className="flex items-center gap-4">
         <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-secondary sm:h-20 sm:w-20">
-          {artworkUrl ? (
+          {(artworkUrl ?? current.artworkUrl) ? (
             <Image
-              src={artworkUrl}
+              src={(artworkUrl ?? current.artworkUrl)!}
               alt=""
               fill
               className="object-cover"
@@ -220,14 +237,7 @@ export function NativeAudioPlayer({
         </div>
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            {isPreview && (
-              <span className="rounded-full bg-makina-cyan/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-makina-cyan">
-                Preview
-              </span>
-            )}
-            <p className="truncate font-semibold">{title}</p>
-          </div>
+          <p className="truncate font-semibold">{title}</p>
           {subtitle && (
             <p className="truncate text-sm text-muted-foreground">{subtitle}</p>
           )}
@@ -274,17 +284,30 @@ export function NativeAudioPlayer({
         </span>
       </div>
 
-      {downloadUrl && (
-        <a
-          href={downloadUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-3 inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-makina-cyan"
-        >
-          <ExternalLink className="h-3.5 w-3.5" />
-          Descargar o comprar original
-        </a>
-      )}
+      <div className="mt-3 flex flex-wrap gap-3">
+        {downloadUrl && (
+          <a
+            href={downloadUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-makina-cyan"
+          >
+            <Download className="h-3.5 w-3.5" />
+            Descargar o comprar
+          </a>
+        )}
+        {watchUrl && (
+          <a
+            href={watchUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-makina-pink"
+          >
+            <ExternalLink className="h-3.5 w-3.5" />
+            Ver en YouTube
+          </a>
+        )}
+      </div>
     </div>
   );
 }

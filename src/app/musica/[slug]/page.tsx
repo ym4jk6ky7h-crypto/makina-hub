@@ -7,8 +7,7 @@ import { DetailSaveShare } from "@/components/favorites/detail-save-share";
 import { TrackDetailPlayer } from "@/components/music/track-detail-player";
 import { TrackPlayButton } from "@/components/music/track-play-button";
 import { favoriteFromTrack } from "@/lib/favorites/build-item";
-import { getTrackArtworkUrl } from "@/lib/track-artwork";
-import { resolveTrackAudio } from "@/lib/track-audio";
+import { resolveTrackPlayback } from "@/lib/track-audio";
 import { buildQueueFromTracks, trackToQueueItem } from "@/lib/track-queue";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { musicRecordingJsonLd } from "@/lib/seo/json-ld";
@@ -42,9 +41,8 @@ export default async function TrackDetailPage({ params }: PageProps) {
     artistName: track.artist?.name ?? "Desconocido",
   });
 
-  const audio = resolveTrackAudio(track);
-  const artwork =
-    (await getTrackArtworkUrl(track.artist?.name ?? "", track.title)) ?? null;
+  const playback = resolveTrackPlayback(track);
+  const artwork = playback.artworkUrl;
   const queueItem = trackToQueueItem(track);
   const similarPlayable = buildQueueFromTracks(track.similar ?? []);
   const queue = queueItem
@@ -68,8 +66,8 @@ export default async function TrackDetailPage({ params }: PageProps) {
               title={track.title}
               subtitle={track.artist?.name}
               artworkUrl={artwork}
-              downloadUrl={audio.downloadUrl}
-              isPreview={audio.isPreview}
+              downloadUrl={playback.downloadUrl}
+              watchUrl={playback.watchUrl}
             />
           ) : artwork ? (
             <div className="relative mb-6 aspect-square w-full max-w-sm overflow-hidden rounded-xl bg-secondary sm:aspect-video sm:max-w-md">
@@ -102,8 +100,8 @@ export default async function TrackDetailPage({ params }: PageProps) {
             <Badge variant="genre">{formatGenre(track.genre)}</Badge>
             {track.year && <Badge variant="secondary">{track.year}</Badge>}
             {track.bpm && <Badge variant="outline">{track.bpm} BPM</Badge>}
-            {audio.isPreview && (
-              <Badge className="bg-makina-cyan/20 text-makina-cyan">Preview</Badge>
+            {playback.source === "youtube" && (
+              <Badge className="bg-red-600/20 text-red-400">YouTube verificado</Badge>
             )}
           </div>
           {track.description && (
@@ -125,10 +123,10 @@ export default async function TrackDetailPage({ params }: PageProps) {
             {queueItem && (
               <TrackPlayButton track={queueItem} queue={queue} label="Reproducir" />
             )}
-            {audio.downloadUrl && (
+            {playback.downloadUrl && (
               <Button variant="outline" asChild className="gap-2">
                 <a
-                  href={audio.downloadUrl}
+                  href={playback.downloadUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -141,11 +139,9 @@ export default async function TrackDetailPage({ params }: PageProps) {
 
           {!queueItem && (
             <p className="mt-4 text-sm text-muted-foreground">
-              Audio en preparación. Ejecuta{" "}
-              <code className="rounded bg-white/5 px-1.5 py-0.5 text-xs">
-                npm run db:sync-track-previews
-              </code>{" "}
-              para vincular previews legales.
+              Este tema aún no tiene audio completo verificado en el catálogo. Solo
+              reproducimos temas mákina con fuente confirmada (YouTube curado o MP3
+              alojado).
             </p>
           )}
 

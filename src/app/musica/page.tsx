@@ -17,7 +17,7 @@ import { listTracks } from "@/services/tracks.service";
 export const metadata = buildMetadata({
   title: "Música",
   description:
-    "Escucha clásicos mákina y remember de los 90, revival y previews integrados en la app.",
+    "Escucha temas mákina completos verificados — clásicos de los 90, remember y revival.",
   path: "/musica",
 });
 
@@ -52,7 +52,7 @@ export default async function MusicaPage() {
       <>
         <PageHero
           title="Música"
-          subtitle="Catálogo para escuchar en la app — clásicos de los 90, remember y revival. Sin salir a YouTube."
+          subtitle="Temas completos verificados — clásicos de los 90, remember y revival."
           image={SITE_IMAGES.heroMusic}
           badge={`${tracks.length} temas`}
         />
@@ -65,10 +65,10 @@ export default async function MusicaPage() {
             <EmptyState
               icon={Headphones}
               title="Sin temas en el catálogo"
-              description="Sincroniza el catálogo y ejecuta npm run db:sync-track-previews para activar audio."
+              description="Sincroniza el catálogo y cura enlaces YouTube mákina con npm run db:curate-tracks-youtube."
               hint={
                 <code className="rounded bg-white/5 px-2 py-1 text-xs">
-                  npm run db:sync-track-previews
+                  npm run db:curate-tracks-youtube
                 </code>
               }
               compact
