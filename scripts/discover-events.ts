@@ -6,6 +6,7 @@
  */
 import { getMergedEventCatalog } from "../data/merge-events";
 import { todayEventDateISO } from "../data/catalan-makina-events";
+import { isAllowedImageUrl } from "../src/lib/images/safe-image-url";
 import { fetchOgImage } from "./lib/social-image";
 import { createAdminClient, loadEnv } from "./lib/supabase-admin";
 
@@ -19,11 +20,12 @@ function fallbackPoster(title: string) {
 }
 
 async function resolveEventImage(ev: ReturnType<typeof getMergedEventCatalog>[0]): Promise<string> {
+  if (ev.imageUrl && isAllowedImageUrl(ev.imageUrl)) return ev.imageUrl;
   if (ev.eventPageUrl) {
     const og = await fetchOgImage(ev.eventPageUrl);
-    if (og) return og;
+    if (og && isAllowedImageUrl(og)) return og;
   }
-  return ev.imageUrl ?? fallbackPoster(ev.title);
+  return fallbackPoster(ev.title);
 }
 
 async function pruneStaleEvents(validSlugs: Set<string>) {
@@ -55,7 +57,9 @@ async function main() {
 
   for (const ev of sorted) {
     const image_url = dryRun
-      ? ev.imageUrl ?? fallbackPoster(ev.title)
+      ? ev.imageUrl && isAllowedImageUrl(ev.imageUrl)
+        ? ev.imageUrl
+        : fallbackPoster(ev.title)
       : await resolveEventImage(ev);
 
     const row = {

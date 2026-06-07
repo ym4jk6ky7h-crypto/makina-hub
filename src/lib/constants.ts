@@ -29,42 +29,27 @@ export type NavItem = {
 };
 
 export const NAV_ITEMS: NavItem[] = [
-  { href: "/", label: "Inicio", icon: Home, group: "escena" },
-  {
-    href: "/eventos",
-    label: "Eventos",
-    icon: Calendar,
-    group: "escena",
-    primary: true,
-  },
-  {
-    href: "/artistas",
-    label: "Artistas",
-    icon: Mic2,
-    group: "escena",
-    primary: true,
-  },
-  {
-    href: "/novedades",
-    label: "Novedades",
-    icon: ShoppingBag,
-    group: "catalogo",
-    primary: true,
-  },
+  { href: "/", label: "Inicio", icon: Home, group: "escena", primary: true },
+  { href: "/eventos", label: "Eventos", icon: Calendar, group: "escena", primary: true },
+  { href: "/artistas", label: "Artistas", icon: Mic2, group: "escena", primary: true },
+  { href: "/novedades", label: "Novedades", icon: ShoppingBag, group: "catalogo", primary: true },
   { href: "/sesiones", label: "Sesiones", icon: Headphones, group: "catalogo", primary: true },
-  { href: "/sellos", label: "Sellos", icon: Tag, group: "catalogo" },
-  { href: "/favoritos", label: "Mis favoritos", icon: Heart, group: "tools" },
+  { href: "/sellos", label: "Sellos", icon: Tag, group: "catalogo", primary: true },
+  { href: "/favoritos", label: "Favoritos", icon: Heart, group: "tools", primary: true },
   {
     href: "/ask",
-    label: "Ask Makina AI",
+    label: "Ask AI",
     icon: Sparkles,
     group: "tools",
+    primary: true,
     highlight: true,
   },
 ];
 
-export const NAV_PRIMARY = NAV_ITEMS.filter((i) => i.primary);
-export const NAV_MORE = NAV_ITEMS.filter((i) => !i.primary && i.href !== "/");
+/** Todos los enlaces visibles en la barra (sin agrupar en «Más») */
+export const NAV_DESKTOP = NAV_ITEMS.filter((i) => i.href !== "/");
+export const NAV_PRIMARY = NAV_DESKTOP;
+export const NAV_MORE: NavItem[] = [];
 
 export const SEARCH_EXAMPLES = [
   { label: "Pastis & Buenri", q: "Pastis" },

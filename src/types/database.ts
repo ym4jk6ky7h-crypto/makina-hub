@@ -125,6 +125,11 @@ export type LabelWithRelations = Label & {
   tracks?: Track[];
   artists?: Artist[];
   vinyls?: Vinyl[];
+  releases?: NewReleaseWithRelations[];
+  history?: string;
+  city?: string;
+  classics?: string[];
+  website?: string;
 };
 
 export type VinylWithRelations = Vinyl & {

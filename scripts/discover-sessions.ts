@@ -113,6 +113,8 @@ function matchArtistId(
 }
 
 async function main() {
+  if (!dryRun) await assertSessionSchema();
+
   const { data: artists } = await supabase.from("artists").select("id, name, slug");
   const fallbackArtistId = dryRun ? "dry-run" : await ensureFallbackArtist();
 
@@ -142,7 +144,7 @@ async function main() {
 
     const row = {
       slug: `sesion-${session.videoId}`,
-      title: session.title,
+      title: decodeHtmlEntities(session.title),
       artist_id: artistId,
       duration: session.durationMinutes,
       youtube_url: session.videoUrl,
@@ -168,6 +170,12 @@ async function main() {
       console.log(`✓ ${session.title.slice(0, 72)}`);
       ok++;
     }
+  }
+
+  if (skipped > 0 && ok === 0) {
+    console.error(
+      "\n💡 Si todas fallaron, ejecuta la migración 006 en Supabase SQL Editor (ver mensaje al inicio del script).\n"
+    );
   }
 
   console.log(`\n✅ ${ok} sesiones sincronizadas${skipped ? `, ${skipped} omitidas` : ""}.\n`);

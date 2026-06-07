@@ -37,8 +37,13 @@ export function ReleaseCard({ release, variant = "grid" }: ReleaseCardProps) {
       ) : (
         <MakinaPlaceholder aspect="square" fill />
       )}
-      <div className="absolute left-3 top-3">
+      <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
         <Badge className="bg-makina-pink/90 text-white">Nuevo</Badge>
+      </div>
+      <div className="absolute bottom-3 right-3">
+        <Badge variant="secondary" className="border-white/10 bg-black/50 text-[10px] backdrop-blur-sm">
+          {release.store_name}
+        </Badge>
       </div>
     </div>
   );

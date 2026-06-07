@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { MakinaLogo } from "@/components/layout/makina-logo";
-import { NAV_ITEMS, NAV_MORE, NAV_PRIMARY } from "@/lib/constants";
+import { NAV_ITEMS } from "@/lib/constants";
 import { SITE_IMAGES } from "@/lib/site-images";
 import { cn } from "@/lib/utils";
 
@@ -47,18 +47,16 @@ function NavLink({
 
 export function Sidebar() {
   const pathname = usePathname();
-  const home = NAV_ITEMS.find((i) => i.href === "/")!;
 
   return (
     <aside className="hidden w-60 shrink-0 border-r border-white/5 bg-card/30 lg:block xl:w-64">
       <nav className="sticky top-[4.125rem] flex max-h-[calc(100vh-4.125rem)] flex-col gap-6 overflow-y-auto p-4">
         <div>
           <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-            Principal
+            Navegación
           </p>
           <div className="flex flex-col gap-0.5">
-            <NavLink item={home} pathname={pathname} />
-            {NAV_PRIMARY.map((item) => (
+            {NAV_ITEMS.map((item) => (
               <NavLink key={item.href} item={item} pathname={pathname} />
             ))}
             <Link
@@ -72,17 +70,6 @@ export function Sidebar() {
             >
               Buscar
             </Link>
-          </div>
-        </div>
-
-        <div>
-          <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-            Más
-          </p>
-          <div className="flex flex-col gap-0.5">
-            {NAV_MORE.map((item) => (
-              <NavLink key={item.href} item={item} pathname={pathname} />
-            ))}
           </div>
         </div>
 

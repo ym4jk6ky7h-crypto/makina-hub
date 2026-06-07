@@ -1,14 +1,39 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Artist, LabelWithRelations, Track, Vinyl } from "@/types/database";
+import { MAKINA_LABELS_BY_SLUG } from "../../data/makina-labels";
+import type { Artist, LabelWithRelations, NewReleaseWithRelations } from "@/types/database";
+
+const releaseSelect = `
+  *,
+  artist:artists(*),
+  label:labels(*)
+`;
+
+function labelLogoFallback(name: string): string {
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&size=256&background=1a1020&color=e8b84a&bold=true&format=png`;
+}
 
 export async function listLabels(): Promise<LabelWithRelations[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("labels")
-    .select("*")
-    .order("name");
+  const { data, error } = await supabase.from("labels").select("*").order("name");
   if (error) throw error;
-  return (data ?? []) as LabelWithRelations[];
+
+  const rows = (data ?? []).map((row) => {
+    const seed = MAKINA_LABELS_BY_SLUG.get(row.slug);
+    return {
+      ...(row as LabelWithRelations),
+      description: seed?.description ?? row.description,
+      logo_url: row.logo_url ?? labelLogoFallback(row.name),
+    };
+  });
+
+  rows.sort((a, b) => {
+    const aCurated = MAKINA_LABELS_BY_SLUG.has(a.slug) ? 0 : 1;
+    const bCurated = MAKINA_LABELS_BY_SLUG.has(b.slug) ? 0 : 1;
+    if (aCurated !== bCurated) return aCurated - bCurated;
+    return a.name.localeCompare(b.name, "es");
+  });
+
+  return rows;
 }
 
 export async function getLabelBySlug(slug: string): Promise<LabelWithRelations | null> {
@@ -21,38 +46,34 @@ export async function getLabelBySlug(slug: string): Promise<LabelWithRelations |
   if (error) throw error;
   if (!label) return null;
 
-  const [tracksRes, vinylsRes] = await Promise.all([
+  const seed = MAKINA_LABELS_BY_SLUG.get(slug);
+
+  const [releasesRes, artistsRes] = await Promise.all([
     supabase
-      .from("tracks")
-      .select("*, artist:artists(*)")
+      .from("new_releases")
+      .select(releaseSelect)
       .eq("label_id", label.id)
-      .order("year", { ascending: false }),
-    supabase
-      .from("vinyls")
-      .select("*, artist:artists(*)")
-      .eq("label_id", label.id),
+      .eq("featured", true)
+      .order("release_date", { ascending: false })
+      .limit(8),
+    seed?.artistSlugs?.length
+      ? supabase.from("artists").select("*").in("slug", seed.artistSlugs)
+      : Promise.resolve({ data: [] as Artist[], error: null }),
   ]);
 
-  if (tracksRes.error) throw tracksRes.error;
-  if (vinylsRes.error) throw vinylsRes.error;
-
-  const tracks = (tracksRes.data ?? []) as Track[];
-  const artistIds = [...new Set(tracks.map((t) => t.artist_id))];
-
-  let artists: Artist[] = [];
-  if (artistIds.length > 0) {
-    const { data: artistsData, error: aErr } = await supabase
-      .from("artists")
-      .select("*")
-      .in("id", artistIds);
-    if (aErr) throw aErr;
-    artists = (artistsData ?? []) as Artist[];
-  }
+  if (releasesRes.error) throw releasesRes.error;
+  if (artistsRes.error) throw artistsRes.error;
 
   return {
     ...(label as LabelWithRelations),
-    tracks,
-    vinyls: (vinylsRes.data ?? []) as Vinyl[],
-    artists,
+    description: seed?.description ?? label.description,
+    releases: (releasesRes.data ?? []) as NewReleaseWithRelations[],
+    artists: (artistsRes.data ?? []) as Artist[],
+    history: seed?.history,
+    city: seed?.city,
+    classics: seed?.classics,
+    website: seed?.website,
   };
 }
+
+export type LabelDetail = NonNullable<Awaited<ReturnType<typeof getLabelBySlug>>>;

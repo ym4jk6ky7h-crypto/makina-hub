@@ -1,6 +1,7 @@
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, Sparkles } from "lucide-react";
 import { ReleaseCard } from "@/components/cards/release-card";
 import { PageHero } from "@/components/layout/page-hero";
+import { NovedadesCatalog } from "@/components/novedades/novedades-catalog";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SetupRequired } from "@/components/setup/setup-required";
 import { buildMetadata } from "@/lib/seo/metadata";
@@ -28,21 +29,27 @@ export default async function NovedadesPage() {
 
   try {
     const releases = await listNewReleases({ limit: LATEST_RELEASES_LIMIT });
+    const [featured, ...rest] = releases;
+    const storeCount = new Set(releases.map((r) => r.store_name)).size;
 
     return (
       <>
         <PageHero
           title="Novedades"
-          subtitle="Últimos lanzamientos con enlace de compra en Beatport, Juno, Bandcamp y más."
+          subtitle="Lanzamientos recientes con enlace de compra en Beatport, Juno, Bandcamp y más."
           image={SITE_IMAGES.heroNovedades}
-          badge={releases.length > 0 ? `${releases.length} recientes` : "Comprar"}
+          badge={
+            releases.length > 0
+              ? `${releases.length} con enlace · ${storeCount} tiendas`
+              : "Comprar"
+          }
         />
         <div className="mx-auto max-w-7xl px-4 py-10 lg:px-8">
           {releases.length === 0 ? (
             <EmptyState
               icon={ShoppingBag}
               title="Sin novedades con enlace de compra"
-              description="Sincroniza lanzamientos curados con tienda digital."
+              description="Sincroniza el catálogo curado con tiendas digitales."
               hint={
                 <span className="block space-y-1 text-xs">
                   <span className="block">1. SQL: 003_new_releases.sql</span>
@@ -51,10 +58,33 @@ export default async function NovedadesPage() {
               }
             />
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {releases.map((release) => (
-                <ReleaseCard key={release.id} release={release} />
-              ))}
+            <div className="space-y-10">
+              {featured && (
+                <section aria-labelledby="featured-release">
+                  <div className="mb-4 flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-makina-pink" />
+                    <h2
+                      id="featured-release"
+                      className="font-display text-lg font-bold tracking-tight"
+                    >
+                      Último lanzamiento
+                    </h2>
+                  </div>
+                  <ReleaseCard release={featured} variant="featured" />
+                </section>
+              )}
+
+              {rest.length > 0 && (
+                <section aria-labelledby="all-releases">
+                  <h2
+                    id="all-releases"
+                    className="mb-4 font-display text-lg font-bold tracking-tight"
+                  >
+                    Catálogo reciente
+                  </h2>
+                  <NovedadesCatalog releases={rest} />
+                </section>
+              )}
             </div>
           )}
         </div>

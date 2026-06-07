@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Mic2 } from "lucide-react";
 import { getArtistImageUrl } from "@/lib/artists/artist-image";
+import { preferUnoptimizedImage } from "@/lib/images/external-image-props";
 import { MediaCardShell } from "@/components/ui/media-card-shell";
 import type { Artist } from "@/types/database";
 import { cn } from "@/lib/utils";
@@ -30,7 +31,7 @@ export function ArtistCard({ artist, variant = "grid" }: ArtistCardProps) {
             fill
             className="object-cover"
             sizes="64px"
-            unoptimized={!artist.image_url}
+            unoptimized={preferUnoptimizedImage(photoUrl)}
           />
         </div>
         <div className="min-w-0 flex-1">
@@ -56,7 +57,7 @@ export function ArtistCard({ artist, variant = "grid" }: ArtistCardProps) {
           fill
           className="object-cover transition-transform group-hover:scale-105"
           sizes="(max-width: 640px) 50vw, 240px"
-          unoptimized={!artist.image_url}
+          unoptimized={preferUnoptimizedImage(photoUrl)}
         />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-4">

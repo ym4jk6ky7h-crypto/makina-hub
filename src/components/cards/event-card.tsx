@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Calendar, MapPin } from "lucide-react";
 import { eventPosterUrl } from "@/lib/events/event-poster";
+import { preferUnoptimizedImage } from "@/lib/images/external-image-props";
 import { MediaCardShell } from "@/components/ui/media-card-shell";
 import type { Event } from "@/types/database";
 import { formatDate, cn } from "@/lib/utils";
@@ -28,6 +29,7 @@ export function EventCard({ event, variant = "grid" }: EventCardProps) {
             fill
             className="object-cover transition-transform group-hover:scale-105"
             sizes="144px"
+            unoptimized={preferUnoptimizedImage(poster)}
           />
         </div>
         <div className="flex min-w-0 flex-1 flex-col justify-center">
@@ -58,6 +60,7 @@ export function EventCard({ event, variant = "grid" }: EventCardProps) {
           fill
           className="object-cover transition-transform group-hover:scale-105"
           sizes="(max-width: 640px) 50vw, 320px"
+          unoptimized={preferUnoptimizedImage(poster)}
         />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-4">
