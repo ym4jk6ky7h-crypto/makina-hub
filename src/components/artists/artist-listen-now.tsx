@@ -1,61 +1,19 @@
-import Image from "next/image";
+"use client";
+
 import Link from "next/link";
-import { Headphones, Music2, Play } from "lucide-react";
-import { PlayYoutubeButton } from "@/components/ui/play-youtube-button";
+import { Headphones, Music2 } from "lucide-react";
+import { TrackPlayButton } from "@/components/music/track-play-button";
 import { cn } from "@/lib/utils";
+import { buildQueueFromTracks } from "@/lib/track-queue";
 import { resolveSessionPlay } from "@/lib/session-play";
-import { resolveTrackPlay } from "@/lib/track-play";
-import { youtubeThumbnail } from "@/lib/youtube";
 import type { Session, Track, TrackWithRelations } from "@/types/database";
 
 type ArtistListenNowProps = {
   artistName: string;
   tracks: Track[] | TrackWithRelations[];
   sessions: Session[];
-  /** Si hay reproductor en la misma página, el play lleva a #reproductor */
   inlinePlayer?: boolean;
 };
-
-type ListenItem =
-  | { kind: "track"; track: Track | TrackWithRelations }
-  | { kind: "session"; session: Session };
-
-function pickListenItems(
-  tracks: Track[] | TrackWithRelations[],
-  sessions: Session[]
-): ListenItem[] {
-  const withPlay = tracks.filter((t) => resolveTrackPlay(t).videoId);
-  const rest = tracks.filter((t) => !resolveTrackPlay(t).videoId);
-  const picked: ListenItem[] = [
-    ...withPlay.slice(0, 3).map((track) => ({ kind: "track" as const, track })),
-    ...rest.slice(0, Math.max(0, 3 - withPlay.length)).map((track) => ({
-      kind: "track" as const,
-      track,
-    })),
-  ].slice(0, 3);
-
-  if (picked.length < 3) {
-    const session = sessions.find((s) => resolveSessionPlay(s).videoId);
-    if (session) picked.push({ kind: "session", session });
-  }
-
-  return picked.slice(0, 3);
-}
-
-function InlinePlayButton({ anchor = "#reproductor-audio" }: { anchor?: string }) {
-  return (
-    <Link
-      href={anchor}
-      className={cn(
-        "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-600",
-        "text-white shadow-lg shadow-red-900/30 transition-transform hover:scale-105"
-      )}
-      aria-label="Reproducir"
-    >
-      <Play className="h-5 w-5 fill-white" />
-    </Link>
-  );
-}
 
 export function ArtistListenNow({
   artistName,
@@ -63,113 +21,64 @@ export function ArtistListenNow({
   sessions,
   inlinePlayer = false,
 }: ArtistListenNowProps) {
-  const items = pickListenItems(tracks, sessions);
-  if (items.length === 0) return null;
+  const queue = buildQueueFromTracks(tracks as TrackWithRelations[]);
+  const playable = queue.slice(0, 3);
+
+  const session = sessions.find((s) => resolveSessionPlay(s).videoId);
+
+  if (playable.length === 0 && !session) return null;
 
   return (
     <section className="mt-8 rounded-2xl border border-makina-pink/20 bg-gradient-to-br from-makina-pink/10 via-transparent to-makina-purple/10 p-5">
       <h2 className="mb-4 text-lg font-bold">Escuchar ahora</h2>
       <ul className="space-y-3">
-        {items.map((item) => {
-          if (item.kind === "track") {
-            const { track } = item;
-            const { videoId, watchUrl } = resolveTrackPlay(track);
-            const thumb =
-              youtubeThumbnail(watchUrl) ??
-              (videoId
-                ? youtubeThumbnail(`https://www.youtube.com/watch?v=${videoId}`)
-                : null);
-            return (
-              <li
-                key={`track-${track.id}`}
-                className="flex items-center gap-3 rounded-xl bg-black/25 p-3"
+        {playable.map((item) => (
+          <li
+            key={item.id}
+            className="flex items-center gap-3 rounded-xl bg-black/25 p-3"
+          >
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-makina-pink/30 to-makina-purple/30">
+              <Music2 className="h-6 w-6 text-makina-pink" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <Link
+                href={item.href}
+                className="font-semibold hover:text-makina-pink"
               >
-                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-secondary">
-                  {thumb ? (
-                    <Image src={thumb} alt="" fill className="object-cover" sizes="56px" />
-                  ) : (
-                    <div className="flex h-full items-center justify-center">
-                      <Music2 className="h-6 w-6 text-makina-pink" />
-                    </div>
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <Link
-                    href={`/musica/${track.slug}`}
-                    className="font-semibold hover:text-makina-pink"
-                  >
-                    {track.title}
-                  </Link>
-                  <p className="text-xs text-muted-foreground">{artistName}</p>
-                </div>
-                {videoId ? (
-                  <Link
-                    href={`/musica/${track.slug}#reproductor-audio`}
-                    className={cn(
-                      "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-makina-pink",
-                      "text-white shadow-lg shadow-makina-pink/30 transition-transform hover:scale-105 motion-reduce:hover:scale-100"
-                    )}
-                    aria-label="Escuchar tema"
-                  >
-                    <Play className="h-5 w-5 fill-white" />
-                  </Link>
-                ) : (
-                  <Link
-                    href={`/musica/${track.slug}`}
-                    className="text-xs text-makina-pink hover:underline"
-                  >
-                    Ver tema
-                  </Link>
-                )}
-              </li>
-            );
-          }
+                {item.title}
+              </Link>
+              <p className="text-xs text-muted-foreground">{artistName}</p>
+            </div>
+            <TrackPlayButton track={item} queue={queue} variant="icon" />
+          </li>
+        ))}
 
-          const { session } = item;
-          const { videoId, watchUrl } = resolveSessionPlay(session);
-          const thumb = youtubeThumbnail(watchUrl);
-          return (
-            <li
-              key={`session-${session.id}`}
-              className="flex items-center gap-3 rounded-xl bg-black/25 p-3"
-            >
-              <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-secondary">
-                {thumb ? (
-                  <Image src={thumb} alt="" fill className="object-cover" sizes="56px" />
-                ) : (
-                  <div className="flex h-full items-center justify-center">
-                    <Headphones className="h-6 w-6 text-makina-purple" />
-                  </div>
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <Link
-                  href={`/sesiones/${session.slug}`}
-                  className="font-semibold hover:text-makina-pink"
-                >
-                  {session.title}
-                </Link>
-                <p className="text-xs text-muted-foreground">Sesión</p>
-              </div>
-              {videoId && inlinePlayer ? (
-                <InlinePlayButton anchor="#reproductor" />
-              ) : videoId ? (
-                <Link
-                  href={`/sesiones/${session.slug}#reproductor`}
-                  className={cn(
-                    "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-600",
-                    "text-white shadow-lg shadow-red-900/30 transition-transform hover:scale-105 motion-reduce:hover:scale-100"
-                  )}
-                  aria-label="Ver sesión"
-                >
-                  <Play className="h-5 w-5 fill-white" />
-                </Link>
-              ) : (
-                watchUrl && <PlayYoutubeButton href={watchUrl} size="sm" label="" />
+        {session && (
+          <li className="flex items-center gap-3 rounded-xl bg-black/25 p-3">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-makina-purple/30 to-red-900/30">
+              <Headphones className="h-6 w-6 text-makina-purple" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <Link
+                href={`/sesiones/${session.slug}${inlinePlayer ? "#reproductor" : ""}`}
+                className="font-semibold hover:text-makina-pink"
+              >
+                {session.title}
+              </Link>
+              <p className="text-xs text-muted-foreground">Sesión (vídeo)</p>
+            </div>
+            <Link
+              href={`/sesiones/${session.slug}#reproductor`}
+              className={cn(
+                "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-600",
+                "text-white shadow-lg shadow-red-900/30 transition-transform hover:scale-105"
               )}
-            </li>
-          );
-        })}
+              aria-label="Ver sesión"
+            >
+              <Headphones className="h-5 w-5" />
+            </Link>
+          </li>
+        )}
       </ul>
     </section>
   );

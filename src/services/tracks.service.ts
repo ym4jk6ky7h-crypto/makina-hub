@@ -12,8 +12,9 @@ export async function listTracks(options?: {
   genre?: Genre;
 }): Promise<TrackWithRelations[]> {
   const supabase = await createClient();
-  let query = supabase.from("tracks").select(trackSelect).order("created_at", {
+  let query = supabase.from("tracks").select(trackSelect).order("year", {
     ascending: false,
+    nullsFirst: false,
   });
   if (options?.genre) query = query.eq("genre", options.genre);
   if (options?.limit) query = query.limit(options.limit);

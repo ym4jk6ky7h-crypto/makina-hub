@@ -1,47 +1,73 @@
-import Image from "next/image";
 import Link from "next/link";
-import { Clock, Music2, Play } from "lucide-react";
+import { Clock, Download, Disc3, Music2 } from "lucide-react";
+import { TrackPlayButton } from "@/components/music/track-play-button";
 import { MakinaPlaceholder } from "@/components/ui/makina-placeholder";
 import { MediaCardShell } from "@/components/ui/media-card-shell";
+import type { MusicQueueItem } from "@/lib/music-player-types";
+import { resolveTrackAudio } from "@/lib/track-audio";
+import { trackToQueueItem } from "@/lib/track-queue";
 import type { TrackWithRelations } from "@/types/database";
-import { resolveTrackPlay } from "@/lib/track-play";
-import { getTrackThumbnailSync } from "@/lib/track-thumb";
 import { Badge } from "@/components/ui/badge";
 import { formatGenre, cn } from "@/lib/utils";
 
 type TrackCardProps = {
   track: TrackWithRelations;
+  queue?: MusicQueueItem[];
+  variant?: "grid" | "vinyl";
 };
 
-export function TrackCard({ track }: TrackCardProps) {
-  const { videoId, youtubeHref, isSearch } = resolveTrackPlay(track);
-  const thumb = getTrackThumbnailSync(track);
-
+export function TrackCard({ track, queue, variant = "vinyl" }: TrackCardProps) {
+  const audio = resolveTrackAudio(track);
+  const queueItem = trackToQueueItem(track);
+  const playQueue = queue ?? (queueItem ? [queueItem] : []);
   const detailHref = `/musica/${track.slug}`;
-  const listenHref = videoId ? `${detailHref}#reproductor-audio` : detailHref;
+  const decade = track.year != null && track.year < 2000 ? "classic" : "modern";
 
   return (
-    <MediaCardShell>
+    <MediaCardShell
+      className={cn(
+        variant === "vinyl" && decade === "classic" && "ring-1 ring-white/5"
+      )}
+    >
       <Link
-        href={listenHref}
-        className="relative block aspect-square w-full overflow-hidden bg-gradient-to-br from-makina-purple/30 to-makina-pink/20 sm:aspect-video"
-      >
-        {thumb ? (
-          <Image
-            src={thumb}
-            alt=""
-            fill
-            className="object-cover transition-transform group-hover:scale-105 motion-reduce:transform-none"
-            sizes="(max-width: 640px) 100vw, 320px"
-          />
-        ) : (
-          <MakinaPlaceholder aspect="square" fill className="sm:aspect-video" />
+        href={detailHref}
+        className={cn(
+          "relative block w-full overflow-hidden bg-gradient-to-br from-makina-purple/30 to-makina-pink/20",
+          variant === "vinyl" ? "aspect-square" : "aspect-square sm:aspect-video"
         )}
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/30">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-makina-pink shadow-lg">
-            <Play className="h-6 w-6 fill-white text-white" />
-          </div>
+      >
+        <MakinaPlaceholder
+          aspect="square"
+          fill
+          className={cn(
+            "bg-gradient-to-br",
+            decade === "classic"
+              ? "from-makina-pink/25 via-black/40 to-makina-purple/30"
+              : "from-makina-cyan/20 via-black/40 to-makina-purple/25"
+          )}
+        />
+        {variant === "vinyl" && (
+          <div className="pointer-events-none absolute inset-4 rounded-full border border-white/10 bg-black/20 shadow-inner" />
+        )}
+        <div className="absolute inset-0 flex items-center justify-center bg-black/25">
+          {queueItem ? (
+            <TrackPlayButton
+              track={queueItem}
+              queue={playQueue}
+              variant="icon"
+              className="pointer-events-auto relative z-10"
+            />
+          ) : (
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10">
+              <Disc3 className="h-6 w-6 text-muted-foreground" />
+            </div>
+          )}
         </div>
+        {audio.isPreview && (
+          <span className="absolute left-3 top-3 rounded-full bg-makina-cyan/90 px-2 py-0.5 text-[10px] font-bold uppercase text-black">
+            Preview
+          </span>
+        )}
       </Link>
 
       <div className="flex flex-col gap-2 p-4">
@@ -65,30 +91,41 @@ export function TrackCard({ track }: TrackCardProps) {
             </span>
           )}
           {track.year != null && <span>{track.year}</span>}
-          {videoId && (
+          {queueItem && (
             <span className="flex items-center gap-1 text-makina-pink">
               <Music2 className="h-3 w-3" />
               Audio
             </span>
           )}
-          {!videoId && youtubeHref && isSearch && (
-            <span className="text-muted-foreground">Buscar</span>
-          )}
         </div>
 
-        <Link
-          href={listenHref}
-          className={cn(
-            "mt-1 inline-flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold",
-            "transition-colors sm:w-auto",
-            videoId
-              ? "bg-makina-pink text-white hover:bg-makina-pink/90"
-              : "border border-white/15 text-foreground hover:bg-white/5"
+        <div className="mt-1 flex flex-wrap gap-2">
+          {queueItem ? (
+            <TrackPlayButton
+              track={queueItem}
+              queue={playQueue}
+              variant="card"
+            />
+          ) : (
+            <Link
+              href={detailHref}
+              className="inline-flex w-full items-center justify-center rounded-lg border border-white/15 px-3 py-2.5 text-sm font-medium hover:bg-white/5 sm:w-auto"
+            >
+              Ver tema
+            </Link>
           )}
-        >
-          <Play className={cn("h-4 w-4", videoId && "fill-white")} />
-          {videoId ? "Escuchar" : "Ver tema"}
-        </Link>
+          {audio.downloadUrl && (
+            <a
+              href={audio.downloadUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-makina-cyan/30 px-3 py-2.5 text-sm font-medium text-makina-cyan hover:bg-makina-cyan/10"
+            >
+              <Download className="h-4 w-4" />
+              Descargar
+            </a>
+          )}
+        </div>
       </div>
     </MediaCardShell>
   );

@@ -1,10 +1,9 @@
-import { Music2 } from "lucide-react";
-import { ReleaseCard } from "@/components/cards/release-card";
-import { TrackCard } from "@/components/cards/track-card";
+import Link from "next/link";
+import { Suspense } from "react";
+import { Headphones } from "lucide-react";
+import { MusicCatalog } from "@/components/music/music-catalog";
 import { PageHero } from "@/components/layout/page-hero";
-import { SectionHeader } from "@/components/layout/section-header";
 import { EmptyState } from "@/components/ui/empty-state";
-import { HomeSectionEmpty } from "@/components/ui/home-section-empty";
 import { SetupRequired } from "@/components/setup/setup-required";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { SITE_IMAGES } from "@/lib/site-images";
@@ -13,15 +12,31 @@ import {
   isSupabaseConfigured,
   SupabaseConfigError,
 } from "@/lib/supabase/config";
-import { listNewReleases } from "@/services/releases.service";
 import { listTracks } from "@/services/tracks.service";
 
 export const metadata = buildMetadata({
   title: "Música",
   description:
-    "Nuevas producciones y catálogo de temas mákina con portada, BPM y enlaces de compra.",
+    "Escucha clásicos mákina y remember de los 90, revival y previews integrados en la app.",
   path: "/musica",
 });
+
+function CatalogSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap gap-2">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="h-8 w-16 animate-pulse rounded-full bg-white/10" />
+        ))}
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="aspect-square animate-pulse rounded-xl bg-white/10" />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default async function MusicaPage() {
   if (!isSupabaseConfigured()) {
@@ -31,66 +46,40 @@ export default async function MusicaPage() {
   }
 
   try {
-    const [tracks, releases] = await Promise.all([
-      listTracks(),
-      listNewReleases({ limit: 12 }),
-    ]);
+    const tracks = await listTracks();
 
     return (
       <>
         <PageHero
           title="Música"
-          subtitle="Novedades con enlace de compra y catálogo de clásicos mákina."
+          subtitle="Catálogo para escuchar en la app — clásicos de los 90, remember y revival. Sin salir a YouTube."
           image={SITE_IMAGES.heroMusic}
-          badge="Producciones"
+          badge={`${tracks.length} temas`}
         />
-        <div className="page-accent-music mx-auto max-w-7xl space-y-14 rounded-2xl border px-4 py-10 lg:px-8">
-          <section>
-            <SectionHeader
-              title="Nuevas producciones"
-              href="/novedades"
-              linkLabel="Ver todas"
+        <div className="page-accent-music mx-auto max-w-7xl rounded-2xl border px-4 py-10 lg:px-8">
+          {tracks.length > 0 ? (
+            <Suspense fallback={<CatalogSkeleton />}>
+              <MusicCatalog tracks={tracks} />
+            </Suspense>
+          ) : (
+            <EmptyState
+              icon={Headphones}
+              title="Sin temas en el catálogo"
+              description="Sincroniza el catálogo y ejecuta npm run db:sync-track-previews para activar audio."
+              hint={
+                <code className="rounded bg-white/5 px-2 py-1 text-xs">
+                  npm run db:sync-track-previews
+                </code>
+              }
+              compact
             />
-            {releases.length > 0 ? (
-              <div className="mt-6 grid gap-4 lg:grid-cols-2">
-                {releases.map((release) => (
-                  <ReleaseCard key={release.id} release={release} />
-                ))}
-              </div>
-            ) : (
-              <HomeSectionEmpty
-                className="mt-6"
-                message="Sin novedades publicadas aún."
-                actionLabel="Cómo añadirlas"
-                actionHref="/novedades"
-              />
-            )}
-          </section>
-
-          <section>
-            <SectionHeader title="Catálogo de temas" />
-            {tracks.length > 0 ? (
-              <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {tracks.map((track) => (
-                  <TrackCard key={track.id} track={track} />
-                ))}
-              </div>
-            ) : (
-              <div className="mt-6">
-                <EmptyState
-                  icon={Music2}
-                  title="Sin temas en el catálogo"
-                  description="Sincroniza clásicos y novedades mákina desde tu Mac."
-                  hint={
-                    <code className="rounded bg-white/5 px-2 py-1 text-xs">
-                      npm run db:sync-all -- --skip-mb
-                    </code>
-                  }
-                  compact
-                />
-              </div>
-            )}
-          </section>
+          )}
+          <p className="mt-10 text-center text-sm text-muted-foreground">
+            ¿Buscas comprar lanzamientos nuevos?{" "}
+            <Link href="/novedades" className="text-makina-cyan hover:underline">
+              Ver novedades en tienda →
+            </Link>
+          </p>
         </div>
       </>
     );

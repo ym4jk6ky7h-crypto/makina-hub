@@ -33,6 +33,12 @@ export interface Label {
   created_at?: string;
 }
 
+export type TrackSourceType =
+  | "hosted"
+  | "itunes_preview"
+  | "bandcamp"
+  | "external";
+
 export interface Track {
   id: string;
   slug: string;
@@ -43,6 +49,10 @@ export interface Track {
   label_id: string | null;
   genre: Genre;
   youtube_url: string | null;
+  audio_url: string | null;
+  preview_url: string | null;
+  download_url: string | null;
+  source_type: TrackSourceType | null;
   description: string | null;
   created_at: string;
 }

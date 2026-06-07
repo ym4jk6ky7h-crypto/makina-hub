@@ -1,20 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Music2 } from "lucide-react";
+import { Download, Music2 } from "lucide-react";
 import { TrackCard } from "@/components/cards/track-card";
 import { DetailSaveShare } from "@/components/favorites/detail-save-share";
-import { TrackPlayerSection } from "@/components/media/track-player-section";
+import { TrackDetailPlayer } from "@/components/music/track-detail-player";
+import { TrackPlayButton } from "@/components/music/track-play-button";
 import { favoriteFromTrack } from "@/lib/favorites/build-item";
-import { PlayYoutubeButton } from "@/components/ui/play-youtube-button";
 import { getTrackArtworkUrl } from "@/lib/track-artwork";
-import { resolveTrackPlay } from "@/lib/track-play";
+import { resolveTrackAudio } from "@/lib/track-audio";
+import { buildQueueFromTracks, trackToQueueItem } from "@/lib/track-queue";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { musicRecordingJsonLd } from "@/lib/seo/json-ld";
 import { getTrackBySlug } from "@/services/tracks.service";
 import { formatGenre } from "@/lib/utils";
-import { youtubeThumbnail } from "@/lib/youtube";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -41,49 +42,45 @@ export default async function TrackDetailPage({ params }: PageProps) {
     artistName: track.artist?.name ?? "Desconocido",
   });
 
-  const { videoId, youtubeHref, watchUrl, isSearch } = resolveTrackPlay(track);
+  const audio = resolveTrackAudio(track);
   const artwork =
     (await getTrackArtworkUrl(track.artist?.name ?? "", track.title)) ?? null;
-  const thumb =
-    youtubeThumbnail(watchUrl) ??
-    youtubeThumbnail(track.youtube_url) ??
-    artwork;
+  const queueItem = trackToQueueItem(track);
+  const similarPlayable = buildQueueFromTracks(track.similar ?? []);
+  const queue = queueItem
+    ? [queueItem, ...similarPlayable.filter((t) => t.id !== track.id)]
+    : [];
 
   return (
     <article className="px-4 py-8 lg:px-8">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
       />
       <div className="mx-auto max-w-3xl">
         <div className="glass-card p-8">
-          {videoId ? (
-            <TrackPlayerSection
-              videoId={videoId}
+          {queueItem ? (
+            <TrackDetailPlayer
+              track={queueItem}
+              queue={queue}
               title={track.title}
-              watchUrl={watchUrl ?? youtubeHref}
               subtitle={track.artist?.name}
-              artworkUrl={artwork ?? thumb}
+              artworkUrl={artwork}
+              downloadUrl={audio.downloadUrl}
+              isPreview={audio.isPreview}
             />
-          ) : thumb ? (
+          ) : artwork ? (
             <div className="relative mb-6 aspect-square w-full max-w-sm overflow-hidden rounded-xl bg-secondary sm:aspect-video sm:max-w-md">
-              {youtubeHref ? (
-                <a
-                  href={youtubeHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="absolute inset-0 z-10"
-                  aria-label="Abrir en YouTube"
-                />
-              ) : null}
               <Image
-                src={thumb}
+                src={artwork}
                 alt={track.title}
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 400px"
                 priority
-                unoptimized={Boolean(artwork && !youtubeThumbnail(watchUrl))}
+                unoptimized
               />
             </div>
           ) : (
@@ -91,7 +88,8 @@ export default async function TrackDetailPage({ params }: PageProps) {
               <Music2 className="h-10 w-10 text-makina-pink" />
             </div>
           )}
-          <h1 className="text-3xl font-bold">{track.title}</h1>
+
+          <h1 className="mt-6 text-3xl font-bold">{track.title}</h1>
           {track.artist && (
             <Link
               href={`/artistas/${track.artist.slug}`}
@@ -104,6 +102,9 @@ export default async function TrackDetailPage({ params }: PageProps) {
             <Badge variant="genre">{formatGenre(track.genre)}</Badge>
             {track.year && <Badge variant="secondary">{track.year}</Badge>}
             {track.bpm && <Badge variant="outline">{track.bpm} BPM</Badge>}
+            {audio.isPreview && (
+              <Badge className="bg-makina-cyan/20 text-makina-cyan">Preview</Badge>
+            )}
           </div>
           {track.description && (
             <p className="mt-4 text-sm text-muted-foreground">{track.description}</p>
@@ -119,15 +120,35 @@ export default async function TrackDetailPage({ params }: PageProps) {
               </Link>
             </p>
           )}
-          {!videoId && youtubeHref ? (
-            <div className="mt-6">
-              <PlayYoutubeButton
-                href={youtubeHref}
-                size="lg"
-                label={isSearch ? "Buscar en YouTube" : "Escuchar en YouTube"}
-              />
-            </div>
-          ) : null}
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            {queueItem && (
+              <TrackPlayButton track={queueItem} queue={queue} label="Reproducir" />
+            )}
+            {audio.downloadUrl && (
+              <Button variant="outline" asChild className="gap-2">
+                <a
+                  href={audio.downloadUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Download className="h-4 w-4" />
+                  Descargar / comprar
+                </a>
+              </Button>
+            )}
+          </div>
+
+          {!queueItem && (
+            <p className="mt-4 text-sm text-muted-foreground">
+              Audio en preparación. Ejecuta{" "}
+              <code className="rounded bg-white/5 px-1.5 py-0.5 text-xs">
+                npm run db:sync-track-previews
+              </code>{" "}
+              para vincular previews legales.
+            </p>
+          )}
+
           <DetailSaveShare
             item={favoriteFromTrack(track)}
             shareTitle={`${track.title}${track.artist ? ` — ${track.artist.name}` : ""}`}
@@ -140,7 +161,7 @@ export default async function TrackDetailPage({ params }: PageProps) {
             <h2 className="mb-6 text-xl font-bold">Canciones similares</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               {track.similar.map((t) => (
-                <TrackCard key={t.id} track={t} />
+                <TrackCard key={t.id} track={t} queue={queue} />
               ))}
             </div>
           </section>

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ExternalLink, Music2, ShoppingBag } from "lucide-react";
 import { DetailSaveShare } from "@/components/favorites/detail-save-share";
-import { TrackPlayerSection } from "@/components/media/track-player-section";
+import { ReleasePreviewSection } from "@/components/media/release-preview-section";
 import { favoriteFromRelease } from "@/lib/favorites/build-item";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -47,7 +47,7 @@ export default async function ReleaseDetailPage({ params }: PageProps) {
         <div className="glass-card overflow-hidden">
           {videoId && (
             <div className="border-b border-white/10 p-4 sm:p-6">
-              <TrackPlayerSection
+              <ReleasePreviewSection
                 videoId={videoId}
                 title={release.title}
                 subtitle={release.artist?.name ?? "Preview"}
