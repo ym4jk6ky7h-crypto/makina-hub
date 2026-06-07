@@ -1,11 +1,13 @@
 import { Suspense } from "react";
 import { Calendar } from "lucide-react";
 import { EventsAgenda } from "@/components/events/events-agenda";
+import { EventsWeekendStrip } from "@/components/events/events-weekend-strip";
 import { EmptyState } from "@/components/ui/empty-state";
 import { EventFilters } from "@/components/events/event-filters";
 import { PageHero } from "@/components/layout/page-hero";
 import { SetupRequired } from "@/components/setup/setup-required";
 import { buildMetadata } from "@/lib/seo/metadata";
+import { getEventTimingBadge } from "@/lib/event-timing";
 import { SITE_IMAGES } from "@/lib/site-images";
 import {
   formatSupabaseError,
@@ -44,6 +46,10 @@ export default async function EventosPage({ searchParams }: PageProps) {
       includePast: showAll,
     });
 
+    const weekendEvents = showAll
+      ? []
+      : events.filter((e) => getEventTimingBadge(e.event_date) !== null);
+
     return (
       <>
         <PageHero
@@ -62,6 +68,9 @@ export default async function EventosPage({ searchParams }: PageProps) {
         </Suspense>
 
         <div className="page-accent-events mx-auto max-w-7xl rounded-2xl border px-4 py-8 pb-6 lg:px-8 lg:py-10">
+          {!showAll && weekendEvents.length > 0 && (
+            <EventsWeekendStrip events={weekendEvents} />
+          )}
           <EventsAgenda events={events} view={view} />
 
           {events.length === 0 && (

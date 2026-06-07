@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import type { MakinaArtistSeed } from "../../data/makina-artists";
+import { discogsSearchQuery } from "../../data/artist-discogs-queries";
 import { formatArtistBiography } from "../../src/lib/artists/format-artist-biography";
 import type { AiArtistEnrichment } from "./openai-artist";
 import { fetchCommonsImageBest } from "./commons-image";
@@ -13,6 +14,7 @@ import {
 import { CURATED_SESSION_WATCH_BY_SLUG } from "../../src/data/curated-session-youtube";
 import { avatarFallback, fetchWikipediaArtistBest, upscaleWikiThumb } from "./wikipedia";
 import { fetchYouTubeForArtist } from "./youtube";
+import { curatedSessionPortrait } from "./artist-portrait";
 
 function curatedSessionThumb(slug: string): string | null {
   const watch = CURATED_SESSION_WATCH_BY_SLUG[`${slug}-sesion-makina`];
@@ -98,6 +100,12 @@ async function pickImage(
 ): Promise<{ url: string; sources: string[] }> {
   const imgSources: string[] = [];
 
+  const curatedPortrait = curatedSessionPortrait(seed.slug);
+  if (curatedPortrait) {
+    imgSources.push("youtube-curated");
+    return { url: curatedPortrait, sources: imgSources };
+  }
+
   if (discogsImg && !discogsImg.includes("spacer.gif")) {
     imgSources.push("discogs");
     return { url: discogsImg, sources: imgSources };
@@ -166,7 +174,11 @@ export async function enrichArtistFull(
     if (mb.mbid) sources.push("musicbrainz");
   }
 
-  const discogs = await fetchDiscogsArtist(seed.name, opts.discogsToken);
+  const discogs = await fetchDiscogsArtist(
+    discogsSearchQuery(seed.slug, seed.name),
+    seed.name,
+    opts.discogsToken
+  );
   if (discogs.id) sources.push("discogs");
 
   const yt = await fetchYouTubeForArtist(seed.name, opts.youtubeApiKey);
@@ -189,7 +201,7 @@ export async function enrichArtistFull(
 
   return {
     slug: seed.slug,
-    name: discogs.name ?? seed.name,
+    name: seed.name,
     real_name,
     biography,
     country: seed.country ?? "España",
@@ -214,7 +226,11 @@ export async function enrichArtistBioOnly(
   const wiki = await fetchWikipediaArtistBest(wikiSearchTerms(seed, ai));
   if (wiki.found) sources.push("wikipedia");
 
-  const discogs = await fetchDiscogsArtist(seed.name, opts.discogsToken);
+  const discogs = await fetchDiscogsArtist(
+    discogsSearchQuery(seed.slug, seed.name),
+    seed.name,
+    opts.discogsToken
+  );
   if (discogs.id) sources.push("discogs");
 
   const biography = mergeBiography(seed, wiki, discogs, ai);

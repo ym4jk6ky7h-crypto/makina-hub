@@ -346,7 +346,7 @@ export const CATALAN_MAKINA_EVENTS_CATALOG: CatalanMakinaEventSeed[] = [
     city: "Tarragona",
     venue: "Sala Paradís",
     imageUrl: P.club,
-    artistSlugs: ["javi-level", "toni-costa", "dj-ruly"],
+    artistSlugs: ["javi-level", "konik", "dj-ruly"],
   },
   {
     title: "Cambrils — Verano Mákina",
@@ -442,7 +442,7 @@ export const CATALAN_MAKINA_EVENTS_CATALOG: CatalanMakinaEventSeed[] = [
     city: "Igualada",
     venue: "Sala L'Enclave",
     imageUrl: P.club,
-    artistSlugs: ["requena", "borr-x", "dj-nervio"],
+    artistSlugs: ["gerard-requena", "borr-x", "dj-nervio"],
   },
   {
     title: "Berga — Festa Major Remember",
@@ -518,7 +518,7 @@ export const CATALAN_MAKINA_EVENTS_CATALOG: CatalanMakinaEventSeed[] = [
     city: "Terrassa",
     venue: "Sala La Nòria",
     imageUrl: P.club,
-    artistSlugs: ["skudero", "marc-escudero", "javi-boss"],
+    artistSlugs: ["skudero", "javi-boss"],
   },
   {
     title: "Sabadell — Remember a La Mimosa",
@@ -635,7 +635,7 @@ export const CATALAN_MAKINA_EVENTS_CATALOG: CatalanMakinaEventSeed[] = [
     city: "Sabadell",
     venue: "Casal de Joves (sessió macro)",
     imageUrl: P.tribute,
-    artistSlugs: ["skudero", "marc-escudero", "xavi-metralla", "mike-platinas"],
+    artistSlugs: ["skudero", "xavi-metralla", "mike-platinas"],
   },
   {
     title: "Bit Music Night — Barcelona",
@@ -725,7 +725,7 @@ export const CATALAN_MAKINA_EVENTS_CATALOG: CatalanMakinaEventSeed[] = [
     city: "Reus",
     venue: "Casal Jove",
     imageUrl: P.club,
-    artistSlugs: ["javi-level", "ogalla", "toni-costa"],
+    artistSlugs: ["javi-level", "ogalla", "konik"],
   },
   {
     title: "Tarragona — Makina a l'Eixample",

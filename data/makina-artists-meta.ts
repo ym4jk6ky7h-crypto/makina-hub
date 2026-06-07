@@ -1,4 +1,4 @@
-/** Metadatos del roster curado (84 artistas). Biografías en makina-artist-bios.ts */
+/** Roster curado de la escena mákina / remember (81 artistas). */
 export type ArtistMeta = {
   name: string;
   slug: string;
@@ -41,7 +41,7 @@ export const MAKINA_ARTISTS_META: ArtistMeta[] = [
   { name: "DVRK ØKTOPUS", slug: "dvrk-oktopus", wikipediaSearch: "DVRK OKTOPUS DJ", city: "Barcelona", activeFrom: 2015, venues: ["Makina Legends"] },
   { name: "Raúl Lokura", slug: "raul-lokura", wikipediaSearch: "Raul Lokura DJ", city: "Barcelona", activeFrom: 1999, venues: ["Terminal"] },
   { name: "PJ Makina", slug: "pj-makina", wikipediaSearch: "PJ Makina DJ", city: "Barcelona", activeFrom: 1998, venues: ["Makina Legends"] },
-  { name: "Konik", slug: "konik", wikipediaSearch: "DJ Konik", city: "Barcelona", activeFrom: 1995, venues: ["Chasis"], classics: ["Konik Power"] },
+  { name: "Konik", slug: "konik", wikipediaSearch: "DJ Konik Tony Costa", city: "Barcelona", activeFrom: 1995, venues: ["Chasis"], classics: ["Konik Power"] },
   { name: "Richard", slug: "richard", wikipediaSearch: "Richard DJ mákina Barcelona", city: "Barcelona", activeFrom: 1998, venues: ["Bit Music"] },
   { name: "Johnny Bass", slug: "johnny-bass", wikipediaSearch: "Johnny Bass DJ", city: "Barcelona", activeFrom: 1997 },
   { name: "T-TY", slug: "t-ty", wikipediaSearch: "T-TY DJ mákina", city: "Barcelona", activeFrom: 1997, classics: ["T-TY Bounce"] },
@@ -65,7 +65,6 @@ export const MAKINA_ARTISTS_META: ArtistMeta[] = [
   { name: "Neil", slug: "neil", wikipediaSearch: "Neil DJ mákina", city: "Barcelona", activeFrom: 1997 },
   { name: "Da Terror", slug: "da-terror", wikipediaSearch: "Da Terror DJ hardcore", city: "Barcelona", activeFrom: 1998 },
   { name: "Peret", slug: "peret", wikipediaSearch: "Peret DJ mákina", city: "Barcelona", activeFrom: 1996 },
-  { name: "Requena", slug: "requena", wikipediaSearch: "Requena DJ mákina", city: "Barcelona", activeFrom: 1995, venues: ["Bit Music"] },
   { name: "Borr-X", slug: "borr-x", wikipediaSearch: "Borr-X DJ", city: "Barcelona", activeFrom: 1998 },
   { name: "Pucho", slug: "pucho", wikipediaSearch: "DJ Pucho mákina", city: "Barcelona", activeFrom: 1997 },
   { name: "Markos13", slug: "markos13", wikipediaSearch: "Markos13 DJ", city: "Barcelona", activeFrom: 1999 },
@@ -84,9 +83,7 @@ export const MAKINA_ARTISTS_META: ArtistMeta[] = [
   { name: "Toni Peret", slug: "toni-peret", wikipediaSearch: "Toni Peret DJ", city: "Barcelona", activeFrom: 1995, venues: ["Xque"] },
   { name: "José María Castells", slug: "jose-maria-castells", wikipediaSearch: "José María Castells DJ", city: "Barcelona", activeFrom: 1994, venues: ["Pont Aeri"] },
   { name: "Quique Tejada", slug: "quique-tejada", wikipediaSearch: "Quique Tejada DJ", city: "Barcelona", activeFrom: 1996 },
-  { name: "Marc Escudero", slug: "marc-escudero", wikipediaSearch: "Marc Escudero Skudero", city: "Terrassa", activeFrom: 1994, venues: ["Pont Aeri", "Chasis"], classics: ["Flying Free", "Elements"] },
   { name: "David Olea", slug: "david-olea", wikipediaSearch: "David Olea DJ mákina", city: "Barcelona", activeFrom: 1997 },
-  { name: "Toni Costa", slug: "toni-costa", wikipediaSearch: "Toni Costa DJ mákina", city: "Barcelona", activeFrom: 1996 },
   { name: "Nando Dixkontrol", slug: "nando-dixkontrol", wikipediaSearch: "Nando Dixkontrol DJ", city: "Barcelona", activeFrom: 1998, venues: ["Makina Legends", "Terminal"] },
   { name: "Paco Pil", slug: "paco-pil", wikipediaSearch: "Paco Pil productor mákina", city: "Barcelona", activeFrom: 1995, classics: ["Pildo"] },
   { name: "Mike Platinas", slug: "mike-platinas", wikipediaSearch: "Mike Platinas DJ", city: "Barcelona", activeFrom: 1993, venues: ["Pont Aeri", "Max Music"], classics: ["Màquina Total"] },

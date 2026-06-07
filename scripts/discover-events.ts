@@ -20,11 +20,11 @@ function fallbackPoster(title: string) {
 }
 
 async function resolveEventImage(ev: ReturnType<typeof getMergedEventCatalog>[0]): Promise<string> {
-  if (ev.imageUrl && isAllowedImageUrl(ev.imageUrl)) return ev.imageUrl;
   if (ev.eventPageUrl) {
     const og = await fetchOgImage(ev.eventPageUrl);
     if (og && isAllowedImageUrl(og)) return og;
   }
+  if (ev.imageUrl && isAllowedImageUrl(ev.imageUrl)) return ev.imageUrl;
   return fallbackPoster(ev.title);
 }
 

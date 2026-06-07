@@ -14,7 +14,8 @@ function sleep(ms: number) {
 }
 
 export async function fetchDiscogsArtist(
-  artistName: string,
+  searchQuery: string,
+  expectedName: string,
   token?: string
 ): Promise<DiscogsResult> {
   const empty: DiscogsResult = {
@@ -29,7 +30,7 @@ export async function fetchDiscogsArtist(
   if (!token) return empty;
 
   try {
-    const q = encodeURIComponent(`${artistName} makina`);
+    const q = encodeURIComponent(searchQuery);
     const res = await fetch(
       `${DISCOGS_API}/database/search?q=${q}&type=artist&per_page=3`,
       {
@@ -44,8 +45,9 @@ export async function fetchDiscogsArtist(
     const data = (await res.json()) as {
       results?: Array<{ id: number; title: string; thumb?: string }>;
     };
-    const hit = data.results?.[0];
+    const hit = data.results?.find((r) => discogsNameMatches(expectedName, r.title)) ?? data.results?.[0];
     if (!hit) return empty;
+    if (!discogsNameMatches(expectedName, hit.title)) return empty;
 
     await sleep(1100);
 
@@ -91,4 +93,24 @@ export async function fetchDiscogsArtist(
   } catch {
     return empty;
   }
+}
+
+function normalizeDiscogsName(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "");
+}
+
+function discogsNameMatches(expected: string, found: string): boolean {
+  const e = normalizeDiscogsName(expected.replace(/^dj\s+/i, ""));
+  const f = normalizeDiscogsName(found.replace(/^dj\s+/i, ""));
+  if (!e || !f) return false;
+  if (f.includes(e) || e.includes(f)) return true;
+  const eParts = expected
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((p) => p.length > 2);
+  return eParts.some((p) => f.includes(normalizeDiscogsName(p)));
 }

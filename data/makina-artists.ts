@@ -1,5 +1,5 @@
 /**
- * Roster curado de la escena mákina / remember (84 artistas).
+ * Roster curado de la escena mákina / remember (81 artistas).
  * npm run db:discover-artists
  */
 import { MAKINA_ARTIST_BIOS } from "./makina-artist-bios";

@@ -4,6 +4,7 @@ import { Calendar, MapPin } from "lucide-react";
 import { EventActions } from "@/components/events/event-actions";
 import { EventTimingBadge } from "@/components/events/event-timing-badge";
 import { eventPosterUrl } from "@/lib/events/event-poster";
+import { preferUnoptimizedImage } from "@/lib/images/external-image-props";
 import type { Event } from "@/types/database";
 import { formatDate } from "@/lib/utils";
 
@@ -34,6 +35,7 @@ export function EventListRow({ event, showDateColumn = true }: EventListRowProps
               fill
               className="object-cover transition-transform group-hover:scale-105"
               sizes="208px"
+              unoptimized={preferUnoptimizedImage(poster)}
             />
           </div>
           <div className="flex min-w-0 flex-1 flex-col justify-center py-1">
