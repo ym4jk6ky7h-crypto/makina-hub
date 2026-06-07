@@ -3,6 +3,7 @@ import {
   CURATED_SESSION_DURATION_SEC_BY_SLUG,
   CURATED_SESSION_WATCH_BY_SLUG,
 } from "@/data/curated-session-youtube";
+import { youtubeVideoId } from "@/lib/youtube";
 import type { Artist, Session, Track } from "@/types/database";
 
 /** Sesión del roster aunque no esté aún en Supabase. */
@@ -18,6 +19,8 @@ export function ensureArtistSessions(
   const durationSec =
     CURATED_SESSION_DURATION_SEC_BY_SLUG[`${artist.slug}-sesion-makina`];
 
+  const videoId = youtubeVideoId(youtube_url);
+
   return [
     {
       id: `curated-${artist.slug}-session`,
@@ -26,6 +29,8 @@ export function ensureArtistSessions(
       artist_id: artist.id,
       duration: durationSec ? Math.round(durationSec / 60) : null,
       youtube_url,
+      youtube_video_id: videoId,
+      youtube_published_at: null,
       tracklist: [],
       created_at: new Date(0).toISOString(),
     },

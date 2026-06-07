@@ -4,7 +4,6 @@ import { SearchX } from "lucide-react";
 import { ArtistCard } from "@/components/cards/artist-card";
 import { HomeSectionEmpty } from "@/components/ui/home-section-empty";
 import { EventCard } from "@/components/cards/event-card";
-import { TrackCard } from "@/components/cards/track-card";
 import { SessionCard } from "@/components/cards/session-card";
 import { LabelCard } from "@/components/cards/label-card";
 import { SearchBar } from "@/components/search/search-bar";
@@ -17,7 +16,7 @@ import { globalSearch } from "@/services/search.service";
 export const metadata = buildMetadata({
   title: "Buscar",
   description:
-    "Búsqueda global en artistas, temas, eventos, sesiones y sellos.",
+    "Búsqueda global en artistas, eventos, sesiones y sellos.",
   path: "/buscar",
 });
 
@@ -29,7 +28,7 @@ const VALID_TABS = new Set([
   "todos",
   "artistas",
   "eventos",
-  "musica",
+  "novedades",
   "sesiones",
   "sellos",
   "vinilos",
@@ -53,7 +52,6 @@ async function SearchResults({
   const sections: { key: SearchTab; count: number }[] = [
     { key: "artistas", count: results.artists.length },
     { key: "eventos", count: results.events.length },
-    { key: "musica", count: results.tracks.length },
     { key: "sesiones", count: results.sessions.length },
     { key: "sellos", count: results.labels.length },
   ];
@@ -85,18 +83,6 @@ async function SearchResults({
           <div className="grid gap-3 sm:grid-cols-2">
             {results.artists.map((a) => (
               <ArtistCard key={a.id} artist={a} variant="row" />
-            ))}
-          </div>
-        </section>
-      )}
-      {show("musica") && results.tracks.length > 0 && (
-        <section>
-          <h2 className="mb-4 text-lg font-semibold">
-            Canciones ({results.tracks.length})
-          </h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {results.tracks.map((t) => (
-              <TrackCard key={t.id} track={t} />
             ))}
           </div>
         </section>
@@ -150,7 +136,7 @@ export default async function BuscarPage({ searchParams }: PageProps) {
     <div className="px-4 py-8 lg:px-8">
       <h1 className="text-3xl font-bold tracking-tight">Buscar</h1>
       <p className="mt-2 text-muted-foreground">
-        Artistas, canciones, eventos, sesiones y sellos
+        Artistas, eventos, sesiones y sellos
       </p>
       <div className="mt-6 max-w-xl">
         <SearchBar

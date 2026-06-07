@@ -76,6 +76,8 @@ export interface Session {
   artist_id: string;
   duration: number | null;
   youtube_url: string | null;
+  youtube_video_id: string | null;
+  youtube_published_at: string | null;
   tracklist: string[];
   created_at: string;
 }

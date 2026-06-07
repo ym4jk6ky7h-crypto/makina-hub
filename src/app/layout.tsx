@@ -5,7 +5,6 @@ import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Footer } from "@/components/layout/footer";
 import { InstallAppBanner } from "@/components/pwa/install-app-banner";
-import { MusicPlayerShell } from "@/components/music/music-player-shell";
 import { PwaRegister } from "@/components/pwa/pwa-register";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { organizationJsonLd } from "@/lib/seo/json-ld";
@@ -58,18 +57,16 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <PwaRegister />
-        <MusicPlayerShell>
-          <div className="flex min-h-screen flex-col">
-            <Navbar />
-            <div className="flex min-h-0 w-full flex-1">
-              <Sidebar />
-              <main className="min-w-0 flex-1 pb-20 lg:pb-0">{children}</main>
-            </div>
-            <Footer />
-            <MobileBottomNav />
-            <InstallAppBanner />
+        <div className="flex min-h-screen flex-col">
+          <Navbar />
+          <div className="flex min-h-0 w-full flex-1">
+            <Sidebar />
+            <main className="min-w-0 flex-1 pb-20 lg:pb-0">{children}</main>
           </div>
-        </MusicPlayerShell>
+          <Footer />
+          <MobileBottomNav />
+          <InstallAppBanner />
+        </div>
       </body>
     </html>
   );

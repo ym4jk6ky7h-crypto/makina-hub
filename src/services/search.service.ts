@@ -42,6 +42,7 @@ export async function globalSearch(query: string): Promise<GlobalSearchResults> 
       .from("sessions")
       .select(sessionSelect)
       .ilike("title", pattern)
+      .order("youtube_published_at", { ascending: false, nullsFirst: false })
       .limit(12),
     supabase
       .from("labels")

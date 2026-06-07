@@ -13,6 +13,7 @@ export async function listSessions(options?: {
   let query = supabase
     .from("sessions")
     .select(sessionSelect)
+    .order("youtube_published_at", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false });
   if (options?.limit) query = query.limit(options.limit);
   const { data, error } = await query;

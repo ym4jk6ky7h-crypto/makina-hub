@@ -2,28 +2,21 @@ import { cn } from "@/lib/utils";
 
 type ArtistSectionNavProps = {
   hasPlayer: boolean;
-  trackCount: number;
   sessionCount: number;
 };
 
-const links = (
-  hasPlayer: boolean,
-  trackCount: number,
-  sessionCount: number
-) =>
+const links = (hasPlayer: boolean, sessionCount: number) =>
   [
     hasPlayer && { href: "#reproductor", label: "Escuchar" },
-    { href: "#canciones", label: `Canciones${trackCount ? ` (${trackCount})` : ""}` },
     { href: "#sesiones", label: `Sesiones${sessionCount ? ` (${sessionCount})` : ""}` },
     { href: "#bio", label: "Biografía" },
   ].filter(Boolean) as { href: string; label: string }[];
 
 export function ArtistSectionNav({
   hasPlayer,
-  trackCount,
   sessionCount,
 }: ArtistSectionNavProps) {
-  const items = links(hasPlayer, trackCount, sessionCount);
+  const items = links(hasPlayer, sessionCount);
 
   return (
     <nav

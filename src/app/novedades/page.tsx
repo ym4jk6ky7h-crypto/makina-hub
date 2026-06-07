@@ -10,12 +10,12 @@ import {
   isSupabaseConfigured,
   SupabaseConfigError,
 } from "@/lib/supabase/config";
-import { listNewReleases } from "@/services/releases.service";
+import { LATEST_RELEASES_LIMIT, listNewReleases } from "@/services/releases.service";
 
 export const metadata = buildMetadata({
-  title: "Nuevas producciones",
+  title: "Novedades",
   description:
-    "Lanzamientos recientes de mákina y remember catalana. Compra en Beatport, Juno Download y más.",
+    "Últimos lanzamientos de mákina y remember con enlace directo de compra.",
   path: "/novedades",
 });
 
@@ -27,24 +27,22 @@ export default async function NovedadesPage() {
   }
 
   try {
-    const releases = await listNewReleases();
-    const curated = releases.filter((r) => !r.slug.startsWith("auto-discogs-"));
-    const discogs = releases.filter((r) => r.slug.startsWith("auto-discogs-"));
+    const releases = await listNewReleases({ limit: LATEST_RELEASES_LIMIT });
 
     return (
       <>
         <PageHero
-          title="Nuevas producciones"
-          subtitle="Lanzamientos curados con enlace a Beatport, Juno o Bandcamp. Abajo, detecciones recientes en Discogs (vinilos y digitales de la escena)."
+          title="Novedades"
+          subtitle="Últimos lanzamientos con enlace de compra en Beatport, Juno, Bandcamp y más."
           image={SITE_IMAGES.heroNovedades}
-          badge={curated.length > 0 ? `${curated.length} curadas` : "Comprar"}
+          badge={releases.length > 0 ? `${releases.length} recientes` : "Comprar"}
         />
-        <div className="mx-auto max-w-7xl space-y-12 px-4 py-10 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 py-10 lg:px-8">
           {releases.length === 0 ? (
             <EmptyState
               icon={ShoppingBag}
-              title="Sin novedades todavía"
-              description="Crea la tabla en Supabase y sincroniza lanzamientos con enlace de compra."
+              title="Sin novedades con enlace de compra"
+              description="Sincroniza lanzamientos curados con tienda digital."
               hint={
                 <span className="block space-y-1 text-xs">
                   <span className="block">1. SQL: 003_new_releases.sql</span>
@@ -53,36 +51,11 @@ export default async function NovedadesPage() {
               }
             />
           ) : (
-            <>
-              {curated.length > 0 && (
-                <section>
-                  <h2 className="mb-2 text-xl font-bold">Lanzamientos curados</h2>
-                  <p className="mb-6 text-sm text-muted-foreground">
-                    Producciones mákina con enlace directo a tienda digital.
-                  </p>
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {curated.map((release) => (
-                      <ReleaseCard key={release.id} release={release} />
-                    ))}
-                  </div>
-                </section>
-              )}
-
-              {discogs.length > 0 && (
-                <section>
-                  <h2 className="mb-2 text-xl font-bold">Detectado en Discogs</h2>
-                  <p className="mb-6 text-sm text-muted-foreground">
-                    Publicaciones recientes del artista en Discogs (pueden ser EPs,
-                    compilaciones o reediciones — no siempre son «último single»).
-                  </p>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    {discogs.slice(0, 24).map((release) => (
-                      <ReleaseCard key={release.id} release={release} />
-                    ))}
-                  </div>
-                </section>
-              )}
-            </>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {releases.map((release) => (
+                <ReleaseCard key={release.id} release={release} />
+              ))}
+            </div>
           )}
         </div>
       </>

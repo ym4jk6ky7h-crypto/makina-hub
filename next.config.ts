@@ -37,7 +37,17 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/track/:slug",
-        destination: "/musica/:slug",
+        destination: "/novedades",
+        permanent: true,
+      },
+      {
+        source: "/musica",
+        destination: "/novedades",
+        permanent: true,
+      },
+      {
+        source: "/musica/:slug",
+        destination: "/novedades",
         permanent: true,
       },
       {

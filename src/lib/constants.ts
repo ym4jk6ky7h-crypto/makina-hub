@@ -5,7 +5,6 @@ import {
   Heart,
   Home,
   Mic2,
-  Music2,
   Search,
   ShoppingBag,
   Sparkles,
@@ -46,20 +45,13 @@ export const NAV_ITEMS: NavItem[] = [
     primary: true,
   },
   {
-    href: "/musica",
-    label: "Música",
-    icon: Music2,
-    group: "catalogo",
-    primary: true,
-  },
-  {
     href: "/novedades",
     label: "Novedades",
     icon: ShoppingBag,
     group: "catalogo",
     primary: true,
   },
-  { href: "/sesiones", label: "Sesiones", icon: Headphones, group: "catalogo" },
+  { href: "/sesiones", label: "Sesiones", icon: Headphones, group: "catalogo", primary: true },
   { href: "/sellos", label: "Sellos", icon: Tag, group: "catalogo" },
   { href: "/favoritos", label: "Mis favoritos", icon: Heart, group: "tools" },
   {
@@ -85,7 +77,7 @@ export type SearchTab =
   | "todos"
   | "artistas"
   | "eventos"
-  | "musica"
+  | "novedades"
   | "sesiones"
   | "sellos";
 
@@ -93,7 +85,7 @@ export const SEARCH_TABS: { id: SearchTab; label: string }[] = [
   { id: "todos", label: "Todo" },
   { id: "artistas", label: "Artistas" },
   { id: "eventos", label: "Eventos" },
-  { id: "musica", label: "Música" },
+  { id: "novedades", label: "Novedades" },
   { id: "sesiones", label: "Sesiones" },
   { id: "sellos", label: "Sellos" },
 ];
@@ -109,7 +101,7 @@ export const MOBILE_TAB_NAV = [
   { href: "/", label: "Inicio", icon: Home },
   { href: "/eventos", label: "Eventos", icon: Calendar },
   { href: "/artistas", label: "Artistas", icon: Mic2 },
-  { href: "/musica", label: "Música", icon: Music2 },
+  { href: "/novedades", label: "Novedades", icon: ShoppingBag },
   { href: "/buscar", label: "Buscar", icon: Search },
 ] as const;
 

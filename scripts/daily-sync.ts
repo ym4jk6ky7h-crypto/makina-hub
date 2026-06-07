@@ -1,11 +1,10 @@
 /**
- * Sincronización diaria: fetch web + Supabase
+ * Sincronización diaria: eventos, novedades y sesiones YouTube.
  *
  * npm run db:daily-sync
- * npm run db:daily-sync -- --quick
+ * npm run db:daily-sync -- --quick   (fetch Discogs reducido; sesiones siempre se actualizan)
  *
- * En producción: Vercel Cron → /api/cron/daily-sync
- * O GitHub Actions → .github/workflows/daily-sync.yml
+ * En producción: Vercel Cron → /api/cron/daily-sync (6:00 UTC)
  */
 import { spawn } from "child_process";
 import * as path from "path";
@@ -33,11 +32,10 @@ async function main() {
   await run("fetch-auto.ts");
   await run("discover-events.ts");
   await run("discover-releases.ts");
-  await run("discover-tracks.ts");
-  if (!quick) await run("discover-sessions.ts");
+  await run("discover-sessions.ts");
 
   const sec = Math.round((Date.now() - started) / 1000);
-  console.log(`\n✨ Daily sync OK (${sec}s). Recarga /eventos, /musica, /novedades\n`);
+  console.log(`\n✨ Daily sync OK (${sec}s). Recarga /novedades y /sesiones\n`);
 }
 
 main().catch((e) => {

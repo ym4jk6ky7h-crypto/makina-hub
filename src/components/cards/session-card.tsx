@@ -61,6 +61,15 @@ export function SessionCard({ session }: SessionCardProps) {
               {formatYoutubeDuration(durationSeconds)}
             </span>
           )}
+          {session.youtube_published_at && (
+            <span>
+              {new Date(session.youtube_published_at).toLocaleDateString("es-ES", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })}
+            </span>
+          )}
           {(videoId || youtubeHref) && (
             <span className="flex items-center gap-1 text-red-400">
               <Youtube className="h-3 w-3" />

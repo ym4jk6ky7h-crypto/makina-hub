@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Headphones, Instagram, Music2, Youtube } from "lucide-react";
+import { Headphones, Instagram, Youtube } from "lucide-react";
 import { DetailSaveShare } from "@/components/favorites/detail-save-share";
 import { favoriteFromArtist } from "@/lib/favorites/build-item";
 import { ArtistBio } from "@/components/artists/artist-bio";
@@ -8,15 +8,13 @@ import { ArtistMetaChips } from "@/components/artists/artist-meta-chips";
 import { ArtistSectionNav } from "@/components/artists/artist-section-nav";
 import { EventCard } from "@/components/cards/event-card";
 import { SessionCard } from "@/components/cards/session-card";
-import { TrackCard } from "@/components/cards/track-card";
 import { DetailPlayerSection } from "@/components/media/detail-player-section";
 import { SectionHeader } from "@/components/layout/section-header";
 import { HomeSectionEmpty } from "@/components/ui/home-section-empty";
-import { parseProductionsFromBio } from "@/lib/artists/artist-bio-utils";
 import { getArtistImageUrl } from "@/lib/artists/artist-image";
 import { resolveSessionPlay } from "@/lib/session-play";
 import { personJsonLd } from "@/lib/seo/json-ld";
-import type { Artist, ArtistWithRelations, TrackWithRelations } from "@/types/database";
+import type { Artist, ArtistWithRelations } from "@/types/database";
 
 function pickPrimarySession(
   sessions: { title: string; slug: string; youtube_url: string | null; duration?: number | null }[]
@@ -50,14 +48,10 @@ export async function ArtistDetail({
     slug: artistData.slug,
     name: artistData.name,
   } as Artist;
-  const tracksWithArtist: TrackWithRelations[] = (artistData.tracks ?? []).map(
-    (track) => ({ ...track, artist: artistRef })
-  );
   const sessions = (artistData.sessions ?? []).map((session) => ({
     ...session,
     artist: artistRef,
   }));
-  const bioProductions = parseProductionsFromBio(artistData.biography ?? "");
   const primaryVideo = pickPrimarySession(sessions);
   const jsonLd = personJsonLd(artistData);
 
@@ -98,7 +92,7 @@ export async function ArtistDetail({
             <ArtistMetaChips
               city={artistData.city}
               country={artistData.country}
-              tracks={tracksWithArtist}
+              tracks={[]}
             />
             <div className="mt-5 flex flex-wrap justify-center gap-3 md:justify-start">
               {artistData.instagram_url && (
@@ -146,7 +140,6 @@ export async function ArtistDetail({
       <div className="mx-auto max-w-5xl px-4 py-10 lg:px-8">
         <ArtistSectionNav
           hasPlayer={Boolean(primaryVideo)}
-          trackCount={tracksWithArtist.length}
           sessionCount={sessions.length}
         />
 
@@ -164,48 +157,11 @@ export async function ArtistDetail({
 
         <ArtistListenNow
           artistName={artistData.name}
-          tracks={tracksWithArtist}
           sessions={sessions}
           inlinePlayer={Boolean(primaryVideo)}
         />
 
-        <section id="canciones" className="scroll-mt-28">
-          <SectionHeader
-            title="Canciones"
-            badge={
-              tracksWithArtist.length > 0
-                ? String(tracksWithArtist.length)
-                : undefined
-            }
-          />
-          {tracksWithArtist.length > 0 ? (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {tracksWithArtist.map((track) => (
-                <TrackCard key={track.id} track={track} />
-              ))}
-            </div>
-          ) : bioProductions.length > 0 ? (
-            <ul className="grid gap-3 sm:grid-cols-2">
-              {bioProductions.map((title) => (
-                <li
-                  key={title}
-                  className="glass-card flex items-center gap-3 px-4 py-3"
-                >
-                  <Music2 className="h-4 w-4 shrink-0 text-makina-pink" />
-                  <span>{title}</span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <HomeSectionEmpty
-              message="Aún no hay temas vinculados a este artista."
-              actionLabel="Explorar música"
-              actionHref="/musica"
-            />
-          )}
-        </section>
-
-        <section id="sesiones" className="mt-12 scroll-mt-28">
+        <section id="sesiones" className="scroll-mt-28">
           <SectionHeader
             title="Sesiones"
             badge={sessions.length > 0 ? String(sessions.length) : undefined}

@@ -4,7 +4,6 @@ import { ArrowRight, Calendar, Sparkles, Zap } from "lucide-react";
 import { EventCard } from "@/components/cards/event-card";
 import { ArtistCard } from "@/components/cards/artist-card";
 import { ReleaseCard } from "@/components/cards/release-card";
-import { TrackCard } from "@/components/cards/track-card";
 import { SessionCard } from "@/components/cards/session-card";
 import { HomeStatsBar } from "@/components/home/home-stats-bar";
 import { HomeFeatured } from "@/components/home/home-featured";
@@ -34,7 +33,6 @@ import {
   listEvents,
   listNewReleases,
   listSessions,
-  listTracks,
 } from "@/services";
 
 export default async function HomePage() {
@@ -45,12 +43,11 @@ export default async function HomePage() {
   }
 
   try {
-    const [events, artists, tracks, sessions, releases, stats] = await Promise.all([
+    const [events, artists, sessions, releases, stats] = await Promise.all([
       listEvents(),
       listArtists({ limit: 12 }),
-      listTracks({ limit: 6 }),
       listSessions({ limit: 4 }),
-      listNewReleases({ limit: 4 }).catch((): NewReleaseWithRelations[] => []),
+      listNewReleases({ limit: 6 }).catch((): NewReleaseWithRelations[] => []),
       getHomeStats(),
     ]);
 
@@ -100,7 +97,7 @@ export default async function HomePage() {
               </h1>
               <p className="mt-5 max-w-xl text-lg text-white/75">
                 {stats.artists} artistas · {stats.eventsUpcoming} fiestas próximas ·
-                temas, sesiones y sellos de la cultura mákina catalana.
+                sesiones y novedades de la cultura mákina catalana.
               </p>
               <div className="mt-8 max-w-lg">
                 <SearchBar placeholder="Buscar Skudero, Flying Free, eventos…" />
@@ -123,12 +120,6 @@ export default async function HomePage() {
                     className="text-muted-foreground transition-colors hover:text-makina-pink"
                   >
                     Artistas
-                  </Link>
-                  <Link
-                    href="/musica"
-                    className="text-muted-foreground transition-colors hover:text-makina-pink"
-                  >
-                    Música
                   </Link>
                   <Link
                     href="/novedades"
@@ -255,12 +246,8 @@ export default async function HomePage() {
           {releases.length > 0 && (
             <section className="rounded-2xl border border-makina-pink/10 bg-makina-mesh p-6 sm:p-8">
               <SectionHeader
-                title="Nuevas producciones"
-                subtitle={
-                  stats.releases > 0
-                    ? `${stats.releases} lanzamientos en catálogo`
-                    : "Lanzamientos recientes"
-                }
+                title="Últimas novedades"
+                subtitle="Lanzamientos recientes con enlace de compra"
                 href="/novedades"
               />
               <ResponsiveCardRow desktopGrid="lg:grid lg:grid-cols-4 lg:gap-4">
@@ -273,37 +260,10 @@ export default async function HomePage() {
             </section>
           )}
 
-          <section className="rounded-2xl border border-white/5 bg-card/30 p-6 sm:p-8">
-            <SectionHeader
-              title="Temas destacados"
-              subtitle={`${stats.tracks} temas en el catálogo`}
-              href="/musica"
-            />
-            {tracks.length > 0 ? (
-              <ResponsiveCardRow desktopGrid="lg:grid lg:grid-cols-3 lg:gap-4">
-                {tracks.map((track) => (
-                  <CarouselItem
-                    key={track.id}
-                    className="w-[min(88vw,340px)] lg:w-auto"
-                  >
-                    <TrackCard track={track} />
-                  </CarouselItem>
-                ))}
-              </ResponsiveCardRow>
-            ) : (
-              <HomeSectionEmpty
-                className="mt-6"
-                message="Aún no hay temas en el catálogo."
-                actionLabel="Ir a Música"
-                actionHref="/musica"
-              />
-            )}
-          </section>
-
           <section>
             <SectionHeader
               title="Últimas sesiones"
-              subtitle={`${stats.sessions} sets en YouTube`}
+              subtitle="Ordenadas por fecha de publicación en YouTube"
               href="/sesiones"
             />
             {sessions.length > 0 ? (

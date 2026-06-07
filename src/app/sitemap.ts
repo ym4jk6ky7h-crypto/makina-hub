@@ -7,7 +7,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "",
     "/eventos",
     "/artistas",
-    "/musica",
     "/novedades",
     "/sesiones",
     "/sellos",
@@ -24,10 +23,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   try {
     const supabase = await createClient();
-    const [artists, tracks, events, sessions, labels, releases] =
-      await Promise.all([
+    const [artists, events, sessions, labels, releases] = await Promise.all([
         supabase.from("artists").select("slug"),
-        supabase.from("tracks").select("slug"),
         supabase.from("events").select("slug"),
         supabase.from("sessions").select("slug"),
         supabase.from("labels").select("slug"),
@@ -37,12 +34,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const dynamicRoutes: MetadataRoute.Sitemap = [
       ...(artists.data ?? []).map((a) => ({
         url: `${SITE_URL}/artistas/${a.slug}`,
-        lastModified: new Date(),
-        changeFrequency: "monthly" as const,
-        priority: 0.6,
-      })),
-      ...(tracks.data ?? []).map((t) => ({
-        url: `${SITE_URL}/musica/${t.slug}`,
         lastModified: new Date(),
         changeFrequency: "monthly" as const,
         priority: 0.6,

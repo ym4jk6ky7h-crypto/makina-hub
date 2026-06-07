@@ -44,6 +44,7 @@ export async function getArtistWithRelations(
       .from("sessions")
       .select("*")
       .eq("artist_id", artist.id)
+      .order("youtube_published_at", { ascending: false, nullsFirst: false })
       .order("created_at", { ascending: false }),
     supabase
       .from("event_artists")

@@ -36,7 +36,7 @@ export default async function SesionesPage() {
       <>
         <PageHero
           title="Sesiones"
-          subtitle="Sets de la escena mákina catalana en YouTube — clic para ver el vídeo."
+          subtitle="Sets de la escena mákina en YouTube — más recientes primero (fecha de publicación)."
           image={SITE_IMAGES.heroSessions}
           badge={`${sessions.length} sesiones`}
         />
