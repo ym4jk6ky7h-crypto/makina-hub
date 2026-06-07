@@ -44,7 +44,7 @@ export function FavoritesPanel() {
     return (
       <HomeSectionEmpty
         icon={Heart}
-        message="Aún no has guardado nada. Pulsa el corazón en artistas, eventos, canciones o sesiones."
+        message="Aún no has guardado nada. Pulsa el corazón en artistas, eventos, sesiones o novedades."
         actionLabel="Explorar artistas"
         actionHref="/artistas"
       />
@@ -70,7 +70,7 @@ export function FavoritesPanel() {
               >
                 <div className="min-w-0 flex-1">
                   <Link
-                    href={item.href}
+                    href={item.href.startsWith("/musica") ? "/novedades" : item.href}
                     className="block font-semibold hover:text-makina-pink"
                   >
                     {item.title}

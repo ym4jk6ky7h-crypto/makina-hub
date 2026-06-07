@@ -5,9 +5,9 @@ import {
   ExternalLink,
   Headphones,
   Mail,
-  Music2,
   RefreshCw,
   Shield,
+  ShoppingBag,
   Sparkles,
   Heart,
 } from "lucide-react";
@@ -36,7 +36,7 @@ const DATA_SOURCES: SourceItem[] = [
   {
     icon: Database,
     title: "Supabase",
-    body: "Base de datos central con artistas, temas, eventos, sesiones, sellos y novedades. La web lee en tiempo real vía API.",
+    body: "Base de datos central con artistas, eventos, sesiones, sellos y novedades con enlace de compra. La web lee en tiempo real vía API.",
   },
   {
     icon: Calendar,
@@ -55,10 +55,10 @@ const DATA_SOURCES: SourceItem[] = [
     link: { href: EXTERNAL_LINKS.youtube, label: "YouTube", external: true },
   },
   {
-    icon: Music2,
-    title: "Música y novedades",
-    body: "Temas clásicos curados manualmente; novedades con portadas y enlaces de compra desde Discogs cuando hay token configurado.",
-    link: { href: EXTERNAL_LINKS.discogs, label: "Discogs", external: true },
+    icon: ShoppingBag,
+    title: "Novedades",
+    body: "Lanzamientos curados con enlace de compra en Beatport, Juno y otras tiendas. Catálogo manual fusionado con detecciones de Discogs cuando hay token configurado.",
+    link: { href: "/novedades", label: "Ver novedades" },
   },
   {
     icon: RefreshCw,
@@ -74,7 +74,7 @@ const DATA_SOURCES: SourceItem[] = [
   {
     icon: Heart,
     title: "Mis favoritos",
-    body: "Guarda artistas, fiestas, temas y sesiones en tu navegador para volver a ellos desde /favoritos.",
+    body: "Guarda artistas, fiestas, sesiones y novedades en tu navegador para volver a ellos desde /favoritos.",
     link: { href: "/favoritos", label: "Ver mis favoritos" },
   },
 ];
@@ -94,7 +94,7 @@ export default function SobrePage() {
           <SectionHeader title="Qué es" />
           <p className="leading-relaxed text-muted-foreground">
             Makina Hub es la enciclopedia de la mákina catalana: artistas, agenda de fiestas,
-            canciones, sesiones en vídeo y nuevas producciones con enlace de compra. No gestionamos
+            sesiones en vídeo, sellos discográficos y novedades con enlace de compra. No gestionamos
             entradas ni pagos; te llevamos a las fuentes oficiales cuando hace falta.
           </p>
         </section>

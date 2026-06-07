@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 
 export type SearchSuggestionItem = {
-  type: "artist" | "track" | "event" | "session";
+  type: "artist" | "release" | "event" | "session";
   label: string;
   sublabel?: string;
   href: string;
@@ -18,15 +18,16 @@ export async function searchSuggest(
   const pattern = `%${q}%`;
   const perType = Math.max(2, Math.ceil(limit / 4));
 
-  const [artists, tracks, events, sessions] = await Promise.all([
+  const [artists, releases, events, sessions] = await Promise.all([
     supabase
       .from("artists")
       .select("name, slug")
       .ilike("name", pattern)
       .limit(perType),
     supabase
-      .from("tracks")
+      .from("new_releases")
       .select("title, slug, artist:artists(name)")
+      .eq("featured", true)
       .ilike("title", pattern)
       .limit(perType),
     supabase
@@ -51,14 +52,14 @@ export async function searchSuggest(
     });
   }
 
-  for (const t of tracks.data ?? []) {
-    const raw = t.artist as { name: string } | { name: string }[] | null;
+  for (const r of releases.data ?? []) {
+    const raw = r.artist as { name: string } | { name: string }[] | null;
     const artist = Array.isArray(raw) ? raw[0] : raw;
     items.push({
-      type: "track",
-      label: t.title,
+      type: "release",
+      label: r.title,
       sublabel: artist?.name,
-      href: `/musica/${t.slug}`,
+      href: `/novedades/${r.slug}`,
     });
   }
 

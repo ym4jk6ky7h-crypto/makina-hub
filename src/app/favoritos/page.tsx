@@ -5,7 +5,7 @@ import { SITE_IMAGES } from "@/lib/site-images";
 
 export const metadata = buildMetadata({
   title: "Mis favoritos",
-  description: "Tus artistas, eventos, canciones y sesiones guardados en Makina Hub.",
+  description: "Tus artistas, eventos, sesiones y novedades guardados en Makina Hub.",
   path: "/favoritos",
 });
 
@@ -14,7 +14,7 @@ export default function FavoritosPage() {
     <>
       <PageHero
         title="Mis favoritos"
-        subtitle="Guarda DJs, fiestas, temas y sesiones para volver a ellos cuando quieras."
+        subtitle="Guarda DJs, fiestas, sesiones y novedades para volver a ellos cuando quieras."
         image={SITE_IMAGES.heroHome}
         badge="Tu escena"
       />

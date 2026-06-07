@@ -1,5 +1,5 @@
 import type { FavoriteInput } from "@/lib/favorites/types";
-import type { Artist, Event, NewRelease, Session, Track } from "@/types/database";
+import type { Artist, Event, NewRelease, Session } from "@/types/database";
 
 export function favoriteFromArtist(artist: Pick<Artist, "id" | "slug" | "name">): FavoriteInput {
   return {
@@ -19,19 +19,6 @@ export function favoriteFromEvent(event: Pick<Event, "id" | "slug" | "title" | "
     title: event.title,
     subtitle: event.city,
     href: `/eventos/${event.slug}`,
-  };
-}
-
-export function favoriteFromTrack(
-  track: Pick<Track, "id" | "slug" | "title"> & { artist?: { name: string } | null }
-): FavoriteInput {
-  return {
-    kind: "track",
-    id: track.id,
-    slug: track.slug,
-    title: track.title,
-    subtitle: track.artist?.name,
-    href: `/musica/${track.slug}`,
   };
 }
 

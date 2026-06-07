@@ -1,4 +1,4 @@
-import { Calendar, Headphones, Mic2, Music2 } from "lucide-react";
+import { Calendar, Headphones, Mic2, ShoppingBag } from "lucide-react";
 import type { HomeStats } from "@/services/stats.service";
 
 type HomeStatsBarProps = {
@@ -14,7 +14,7 @@ export function HomeStatsBar({ stats }: HomeStatsBarProps) {
       icon: Calendar,
     },
     { value: stats.eventsUpcoming, label: "Próximos", icon: Calendar },
-    { value: stats.tracks, label: "Temas", icon: Music2 },
+    { value: stats.releases, label: "Novedades", icon: ShoppingBag },
     { value: stats.sessions, label: "Sesiones", icon: Headphones },
   ];
 

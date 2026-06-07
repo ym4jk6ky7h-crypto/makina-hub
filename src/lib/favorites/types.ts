@@ -15,7 +15,7 @@ export type FavoriteInput = Omit<FavoriteItem, "addedAt">;
 export const FAVORITE_KIND_LABELS: Record<FavoriteKind, string> = {
   artist: "Artistas",
   event: "Eventos",
-  track: "Canciones",
+  track: "Archivo",
   session: "Sesiones",
   release: "Novedades",
 };

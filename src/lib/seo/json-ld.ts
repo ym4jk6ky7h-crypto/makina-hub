@@ -53,7 +53,7 @@ export function musicRecordingJsonLd(track: {
     "@context": "https://schema.org",
     "@type": "MusicRecording",
     name: track.title,
-    url: `${SITE_URL}/musica/${track.slug}`,
+    url: `${SITE_URL}/novedades/${track.slug}`,
     datePublished: track.year?.toString(),
     byArtist: {
       "@type": "MusicGroup",

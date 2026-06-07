@@ -7,8 +7,8 @@ import {
   Headphones,
   Loader2,
   Mic2,
-  Music2,
   Search,
+  ShoppingBag,
 } from "lucide-react";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
@@ -23,21 +23,21 @@ type SearchBarProps = {
 
 const TYPE_ICONS = {
   artist: Mic2,
-  track: Music2,
+  release: ShoppingBag,
   event: Calendar,
   session: Headphones,
 } as const;
 
 const TYPE_LABELS = {
   artist: "Artista",
-  track: "Tema",
+  release: "Novedad",
   event: "Evento",
   session: "Sesión",
 } as const;
 
 export function SearchBar({
   compact = false,
-  placeholder = "Buscar artistas, temas, eventos…",
+  placeholder = "Buscar artistas, eventos, sesiones…",
   defaultQuery = "",
 }: SearchBarProps) {
   const router = useRouter();
