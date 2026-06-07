@@ -29,6 +29,51 @@ const maxTotal = maxArg ? parseInt(maxArg.split("=")[1], 10) : 200;
 const FALLBACK_SLUG = "sesiones-makina-varios";
 const FALLBACK_NAME = "Sesiones mákina";
 
+const MIGRATION_006_SQL = `-- Copiar en Supabase SQL Editor (NO el nombre del archivo)
+ALTER TABLE sessions
+  ADD COLUMN IF NOT EXISTS youtube_published_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS youtube_video_id TEXT;
+
+CREATE UNIQUE INDEX IF NOT EXISTS sessions_youtube_video_id_key
+  ON sessions (youtube_video_id)
+  WHERE youtube_video_id IS NOT NULL;`;
+
+async function assertSessionSchema(): Promise<void> {
+  const { error } = await supabase
+    .from("sessions")
+    .select("youtube_published_at, youtube_video_id")
+    .limit(1);
+
+  if (!error) return;
+
+  if (error.message.includes("youtube_published_at") || error.message.includes("youtube_video_id")) {
+    console.error(`
+❌ Falta la migración 006 en Supabase.
+
+NO pegues el nombre del archivo en el SQL Editor.
+Copia y ejecuta SOLO esto:
+
+────────── copiar desde aquí ──────────
+${MIGRATION_006_SQL.trim()}
+────────── hasta aquí ──────────
+
+Luego vuelve a ejecutar: npm run db:discover-sessions
+`);
+    process.exit(1);
+  }
+
+  throw error;
+}
+
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">");
+}
+
 async function ensureFallbackArtist(): Promise<string> {
   const { data: existing } = await supabase
     .from("artists")
