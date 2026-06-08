@@ -5,6 +5,7 @@ import { EventCard } from "@/components/cards/event-card";
 import { ArtistCard } from "@/components/cards/artist-card";
 import { ReleaseCard } from "@/components/cards/release-card";
 import { SessionCard } from "@/components/cards/session-card";
+import { HomeAnalyzrShowcase } from "@/components/home/home-analyzr-showcase";
 import { HomeWeekendHero } from "@/components/home/home-weekend-hero";
 import { HomeStatsBar } from "@/components/home/home-stats-bar";
 import { HomeNewsletter } from "@/components/home/home-newsletter";
@@ -140,6 +141,12 @@ export default async function HomePage() {
                     Sesiones
                   </Link>
                   <Link
+                    href="/analyzr"
+                    className="inline-flex items-center gap-1 font-semibold text-makina-cyan hover:underline"
+                  >
+                    Analyzr App
+                  </Link>
+                  <Link
                     href="/ask"
                     className="inline-flex items-center gap-1 text-makina-cyan hover:underline"
                   >
@@ -151,6 +158,8 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+
+        <HomeAnalyzrShowcase />
 
         <HomeWeekendHero
           weekendEvents={weekendEvents}

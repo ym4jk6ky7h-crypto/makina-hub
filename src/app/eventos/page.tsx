@@ -57,6 +57,7 @@ export default async function EventosPage({ searchParams }: PageProps) {
           subtitle="Agenda en Catalunya: grandes festivales, Makina Legends, Xque!, Love Makina, Chasis y fiestas en locales pequeños."
           image={SITE_IMAGES.heroEvents}
           badge={`${events.length} próximos`}
+          accent="events"
         />
 
         <Suspense

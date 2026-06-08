@@ -39,8 +39,9 @@ export default async function SesionesPage() {
           subtitle="Toda la escena mákina en YouTube — más recientes primero (fecha de publicación)."
           image={SITE_IMAGES.heroSessions}
           badge={`${sessions.length} sesiones`}
+          accent="sessions"
         />
-        <div className="mx-auto max-w-7xl px-4 py-10 lg:px-8">
+        <div className="page-accent-sessions mx-auto max-w-7xl rounded-2xl border px-4 py-10 lg:px-8">
           {sessions.length > 0 && withEmbed === 0 && (
             <p className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100/90">
               Las sesiones abren <strong>YouTube</strong> (búsqueda del DJ). Si tu clave de YouTube
@@ -64,7 +65,7 @@ export default async function SesionesPage() {
               actions={[{ label: "Ver artistas", href: "/artistas", variant: "outline" }]}
             />
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {sessions.map((session) => (
                 <SessionCard key={session.id} session={session} />
               ))}

@@ -11,7 +11,7 @@
 import { MAKINA_NEW_RELEASES } from "../data/makina-new-releases";
 import { getMergedReleases } from "../data/merge-releases";
 import { normalizePurchaseUrl } from "../src/lib/normalize-purchase-url";
-import { fetchReleaseCoverUrl } from "./lib/release-cover";
+import { fetchBestReleaseCoverUrl } from "./lib/release-cover";
 import { artistDisplayName, resolveArtistId } from "./lib/resolve-artist-id";
 import { createAdminClient, loadEnv } from "./lib/supabase-admin";
 
@@ -58,9 +58,13 @@ async function main() {
     let coverUrl = r.coverUrl ?? null;
     if (!coverUrl && !skipCovers && !isAutoDiscogs) {
       const artistName = artistDisplayName(r.artistSlug);
-      coverUrl = await fetchReleaseCoverUrl(artistName, r.title);
-      if (coverUrl) console.log(`  🖼 portada iTunes: ${r.title}`);
-      await sleep(350);
+      coverUrl = await fetchBestReleaseCoverUrl(
+        artistName,
+        r.title,
+        process.env.DISCOGS_TOKEN
+      );
+      if (coverUrl) console.log(`  🖼 portada: ${r.title}`);
+      await sleep(400);
     }
 
     const row = {

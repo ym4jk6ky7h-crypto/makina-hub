@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import {
+  AudioWaveform,
   Calendar,
   Headphones,
   Heart,
@@ -35,6 +36,14 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/novedades", label: "Novedades", icon: ShoppingBag, group: "catalogo", primary: true },
   { href: "/sesiones", label: "Sesiones", icon: Headphones, group: "catalogo", primary: true },
   { href: "/sellos", label: "Sellos", icon: Tag, group: "catalogo", primary: true },
+  {
+    href: "/analyzr",
+    label: "Analyzr",
+    icon: AudioWaveform,
+    group: "tools",
+    primary: true,
+    highlight: true,
+  },
   { href: "/favoritos", label: "Favoritos", icon: Heart, group: "tools", primary: true },
   {
     href: "/ask",

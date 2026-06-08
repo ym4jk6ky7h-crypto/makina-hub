@@ -74,6 +74,23 @@ export function Sidebar() {
         </div>
 
         <Link
+          href="/analyzr"
+          className="group relative overflow-hidden rounded-xl border border-makina-cyan/30 bg-gradient-to-br from-makina-cyan/10 to-makina-purple/10 p-4"
+        >
+          <p className="text-[10px] font-bold uppercase tracking-widest text-makina-cyan">
+            App iOS
+          </p>
+          <p className="mt-1 font-display text-base font-bold leading-tight">Analyzr</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            BPM, KEY y estructura DJ offline en tu iPhone.
+          </p>
+          <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-makina-cyan">
+            Gratis y Pro
+            <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+          </span>
+        </Link>
+
+        <Link
           href="/eventos"
           className="group relative mt-2 overflow-hidden rounded-xl border border-white/10"
         >

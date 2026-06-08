@@ -1,18 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Calendar, MapPin } from "lucide-react";
 import { ArtistCard } from "@/components/cards/artist-card";
-import { FavoriteButton } from "@/components/favorites/favorite-button";
-import { EventActions } from "@/components/events/event-actions";
-import { EventTimingBadge } from "@/components/events/event-timing-badge";
-import { favoriteFromEvent } from "@/lib/favorites/build-item";
+import { EventDetailHero } from "@/components/events/event-detail-hero";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { musicEventJsonLd } from "@/lib/seo/json-ld";
-import { eventPosterUrl } from "@/lib/events/event-poster";
-import { preferUnoptimizedImage } from "@/lib/images/external-image-props";
 import { getEventBySlug } from "@/services/events.service";
-import { formatDate } from "@/lib/utils";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -34,54 +27,26 @@ export default async function EventoDetailPage({ params }: PageProps) {
   if (!event) notFound();
 
   const jsonLd = musicEventJsonLd(event);
-  const poster = eventPosterUrl(event.title, event.image_url);
 
   return (
-    <article className="px-4 py-8 lg:px-8">
+    <article>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="mx-auto max-w-5xl">
-        <div className="grid gap-8 lg:grid-cols-2">
-          <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-secondary">
-            <Image
-              src={poster}
-              alt={event.title}
-              fill
-              className="object-cover"
-              priority
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              unoptimized={preferUnoptimizedImage(poster)}
-            />
-          </div>
-          <div>
-            <EventTimingBadge eventDate={event.event_date} />
-            <h1 className="text-3xl font-bold lg:text-4xl">{event.title}</h1>
-            <div className="mt-4 space-y-2 text-muted-foreground">
-              <p className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                {formatDate(event.event_date)}
-              </p>
-              <p className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                {event.venue} · {event.city}
-              </p>
-            </div>
-            <p className="mt-6 leading-relaxed text-muted-foreground">
-              {event.description}
-            </p>
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              <FavoriteButton item={favoriteFromEvent(event)} showLabel />
-            </div>
-            <EventActions event={event} />
-          </div>
-        </div>
+
+      <EventDetailHero event={event} />
+
+      <div className="mx-auto max-w-3xl px-4 py-10 lg:px-8">
+        <section className="glass-card p-6 sm:p-8">
+          <h2 className="font-display text-lg font-bold text-makina-cyan">Sobre la fiesta</h2>
+          <p className="mt-4 leading-relaxed text-muted-foreground">{event.description}</p>
+        </section>
 
         {event.artists && event.artists.length > 0 && (
           <section className="mt-12">
-            <h2 className="mb-6 text-xl font-bold">DJs participantes</h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <h2 className="mb-6 font-display text-xl font-bold">DJs participantes</h2>
+            <div className="grid gap-4 sm:grid-cols-2">
               {event.artists.map((artist) => (
                 <ArtistCard key={artist.id} artist={artist} variant="row" />
               ))}
@@ -91,7 +56,7 @@ export default async function EventoDetailPage({ params }: PageProps) {
 
         <Link
           href="/eventos"
-          className="mt-8 inline-block text-sm text-makina-pink hover:underline"
+          className="mt-10 inline-block text-sm font-medium text-makina-cyan hover:underline"
         >
           ← Volver a eventos
         </Link>

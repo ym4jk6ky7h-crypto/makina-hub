@@ -7,6 +7,15 @@ type PageHeroProps = {
   image: string;
   badge?: string;
   children?: ReactNode;
+  accent?: "default" | "events" | "artists" | "sessions" | "releases";
+};
+
+const badgeAccent: Record<NonNullable<PageHeroProps["accent"]>, string> = {
+  default: "border-makina-pink/40 bg-makina-pink/10 text-makina-pink",
+  events: "border-makina-cyan/40 bg-makina-cyan/10 text-makina-cyan",
+  artists: "border-makina-pink/40 bg-makina-pink/10 text-makina-pink",
+  sessions: "border-makina-purple/40 bg-makina-purple/10 text-makina-purple",
+  releases: "border-makina-gold/40 bg-makina-gold/10 text-makina-gold",
 };
 
 export function PageHero({
@@ -15,6 +24,7 @@ export function PageHero({
   image,
   badge,
   children,
+  accent = "default",
 }: PageHeroProps) {
   return (
     <section className="relative overflow-hidden border-b border-white/5">
@@ -34,7 +44,9 @@ export function PageHero({
       <div className="noise-overlay pointer-events-none absolute inset-0 opacity-30" />
       <div className="relative mx-auto max-w-7xl px-4 py-12 lg:px-8 lg:py-16">
         {badge && (
-          <span className="mb-4 inline-flex items-center rounded-full border border-makina-pink/40 bg-makina-pink/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-makina-pink">
+          <span
+            className={`mb-4 inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wider ${badgeAccent[accent]}`}
+          >
             {badge}
           </span>
         )}

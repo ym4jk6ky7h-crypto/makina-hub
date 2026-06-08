@@ -6,6 +6,10 @@
  */
 import { getMergedEventCatalog } from "../data/merge-events";
 import { todayEventDateISO } from "../data/catalan-makina-events";
+import {
+  isGenericStockImage,
+  isMakinaLegendsEventPage,
+} from "../src/lib/images/stock-image";
 import { isAllowedImageUrl } from "../src/lib/images/safe-image-url";
 import { fetchOgImage } from "./lib/social-image";
 import { createAdminClient, loadEnv } from "./lib/supabase-admin";
@@ -19,12 +23,24 @@ function fallbackPoster(title: string) {
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(title.slice(0, 12))}&size=800&background=1a1a2e&color=e94560&bold=true&format=png`;
 }
 
-async function resolveEventImage(ev: ReturnType<typeof getMergedEventCatalog>[0]): Promise<string> {
-  if (ev.eventPageUrl) {
-    const og = await fetchOgImage(ev.eventPageUrl);
+async function resolveEventImage(
+  ev: ReturnType<typeof getMergedEventCatalog>[0]
+): Promise<string> {
+  const pageUrl = ev.eventPageUrl?.trim();
+
+  if (pageUrl) {
+    const og = await fetchOgImage(pageUrl);
     if (og && isAllowedImageUrl(og)) return og;
   }
-  if (ev.imageUrl && isAllowedImageUrl(ev.imageUrl)) return ev.imageUrl;
+
+  if (ev.imageUrl && isAllowedImageUrl(ev.imageUrl) && !isGenericStockImage(ev.imageUrl)) {
+    return ev.imageUrl;
+  }
+
+  if (pageUrl && isMakinaLegendsEventPage(pageUrl)) {
+    return fallbackPoster(ev.title);
+  }
+
   return fallbackPoster(ev.title);
 }
 

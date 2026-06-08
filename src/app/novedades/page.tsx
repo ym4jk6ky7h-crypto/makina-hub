@@ -43,8 +43,9 @@ export default async function NovedadesPage() {
               ? `${releases.length} con enlace · ${storeCount} tiendas`
               : "Comprar"
           }
+          accent="releases"
         />
-        <div className="mx-auto max-w-7xl px-4 py-10 lg:px-8">
+        <div className="page-accent-releases mx-auto max-w-7xl rounded-2xl border px-4 py-10 lg:px-8">
           {releases.length === 0 ? (
             <EmptyState
               icon={ShoppingBag}

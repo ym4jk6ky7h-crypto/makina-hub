@@ -106,6 +106,14 @@ export function Footer() {
               </li>
               <li>
                 <Link
+                  href="/analyzr"
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-makina-cyan transition-colors hover:underline focus-visible:rounded-sm"
+                >
+                  Analyzr App
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/sobre"
                   className="text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:rounded-sm"
                 >

@@ -64,26 +64,37 @@ export async function ArtistDetail({
         }}
       />
 
-      <section className="relative overflow-hidden border-b border-white/5">
-        <div className="absolute inset-0 bg-gradient-to-br from-makina-pink/15 via-background to-makina-purple/10" />
+      <section className="detail-hero-glow relative overflow-hidden border-b border-makina-pink/20">
+        <div className="absolute inset-0">
+          <Image
+            src={photoUrl}
+            alt=""
+            fill
+            className="scale-110 object-cover opacity-20 blur-3xl"
+            sizes="100vw"
+            priority
+            unoptimized
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-makina-pink/15 via-background/95 to-makina-purple/10" />
+        </div>
         <div className="noise-overlay pointer-events-none absolute inset-0 opacity-20" />
-        <div className="relative mx-auto flex max-w-5xl flex-col items-center gap-8 px-4 py-10 md:flex-row md:items-end md:py-14 lg:px-8">
-          <div className="relative h-56 w-56 shrink-0 overflow-hidden rounded-2xl ring-4 ring-makina-pink/30 shadow-2xl shadow-makina-pink/20 md:h-64 md:w-64">
+        <div className="relative mx-auto flex max-w-5xl flex-col items-center gap-8 px-4 py-12 md:flex-row md:items-end md:py-16 lg:px-8">
+          <div className="relative h-52 w-52 shrink-0 overflow-hidden rounded-full ring-4 ring-makina-pink/40 shadow-2xl shadow-makina-pink/30 md:h-60 md:w-60">
             <Image
               src={photoUrl}
               alt={`Foto de ${artistData.name}`}
               fill
               className="object-cover"
-              sizes="256px"
+              sizes="240px"
               priority
               unoptimized
             />
           </div>
           <div className="flex-1 pb-2 text-center md:text-left">
-            <p className="text-xs font-semibold uppercase tracking-wider text-makina-pink">
-              Artista
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-makina-pink">
+              Artista mákina
             </p>
-            <h1 className="font-display text-4xl font-bold tracking-tight lg:text-5xl">
+            <h1 className="font-display text-4xl font-extrabold tracking-tight lg:text-6xl">
               {artistData.name}
             </h1>
             {artistData.real_name && (

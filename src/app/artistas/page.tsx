@@ -36,6 +36,7 @@ export default async function ArtistasPage() {
           subtitle="Roster curado de la mákina y el remember — biografías, fotos y producciones."
           image={SITE_IMAGES.heroArtists}
           badge={`${artists.length} artistas`}
+          accent="artists"
         />
         <div className="page-accent-artists mx-auto max-w-7xl rounded-2xl border px-4 py-10 lg:px-8">
           {artists.length === 0 ? (
@@ -50,7 +51,7 @@ export default async function ArtistasPage() {
               }
             />
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {artists.map((artist) => (
                 <ArtistCard key={artist.id} artist={artist} />
               ))}

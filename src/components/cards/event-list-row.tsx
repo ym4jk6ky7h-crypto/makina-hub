@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Calendar, MapPin } from "lucide-react";
 import { EventActions } from "@/components/events/event-actions";
+import { EventCountdown } from "@/components/events/event-countdown";
 import { EventTimingBadge } from "@/components/events/event-timing-badge";
 import { eventPosterUrl } from "@/lib/events/event-poster";
 import { preferUnoptimizedImage } from "@/lib/images/external-image-props";
@@ -15,35 +16,39 @@ type EventListRowProps = {
 
 export function EventListRow({ event, showDateColumn = true }: EventListRowProps) {
   const poster = eventPosterUrl(event.title, event.image_url);
+  const detailHref = `/eventos/${event.slug}`;
 
   return (
-    <div className="glass-card-hover grid gap-4 rounded-2xl p-4 sm:grid-cols-[180px_1fr] lg:grid-cols-[220px_1fr]">
+    <div className="card-lift glass-card-hover grid gap-4 rounded-2xl border border-makina-cyan/10 p-4 sm:grid-cols-[180px_1fr] lg:grid-cols-[220px_1fr]">
       {showDateColumn && (
-        <div className="hidden text-sm font-semibold text-makina-cyan sm:block sm:pt-2">
+        <div className="hidden font-mono text-xs uppercase tracking-wider text-makina-cyan sm:block sm:pt-2">
           {formatDate(event.event_date)}
         </div>
       )}
       <div className="min-w-0">
         <Link
-          href={`/eventos/${event.slug}`}
+          href={detailHref}
           className="group flex flex-col gap-4 sm:flex-row sm:items-stretch"
         >
-          <div className="relative aspect-[3/4] w-full shrink-0 overflow-hidden rounded-xl bg-secondary sm:aspect-[4/5] sm:w-44 lg:w-52">
+          <div className="relative aspect-[3/4] w-full shrink-0 overflow-hidden rounded-xl bg-secondary ring-1 ring-makina-cyan/20 sm:aspect-[4/5] sm:w-44 lg:w-52">
             <Image
               src={poster}
               alt={`Cartel: ${event.title}`}
               fill
-              className="object-cover transition-transform group-hover:scale-105"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
               sizes="208px"
               unoptimized={preferUnoptimizedImage(poster)}
             />
           </div>
           <div className="flex min-w-0 flex-1 flex-col justify-center py-1">
-            <EventTimingBadge eventDate={event.event_date} />
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <EventTimingBadge eventDate={event.event_date} />
+              <EventCountdown eventDate={event.event_date} size="sm" />
+            </div>
             <p className="text-sm font-medium text-makina-cyan sm:hidden">
               {formatDate(event.event_date)}
             </p>
-            <h3 className="text-lg font-semibold leading-tight group-hover:text-makina-pink">
+            <h3 className="text-lg font-semibold leading-tight group-hover:text-makina-cyan">
               {event.title}
             </h3>
             <div className="mt-2 flex flex-col gap-1 text-sm text-muted-foreground">

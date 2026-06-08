@@ -39,6 +39,28 @@ export function filterEventsThisWeekend<T extends { event_date: string }>(
   return items.filter((e) => getEventTimingBadge(e.event_date) !== null);
 }
 
+/** Días hasta el evento (0 = hoy). null si ya pasó. */
+export function getEventDaysUntil(eventDate: string): number | null {
+  const day = eventDateISO(eventDate);
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: TZ });
+  if (day < today) return null;
+
+  const eventMs = new Date(`${day}T12:00:00`).getTime();
+  const todayMs = new Date(`${today}T12:00:00`).getTime();
+  return Math.round((eventMs - todayMs) / 86_400_000);
+}
+
+export function formatEventCountdown(daysUntil: number): string {
+  if (daysUntil === 0) return "Hoy";
+  if (daysUntil === 1) return "Mañana";
+  if (daysUntil < 7) return `En ${daysUntil} días`;
+  if (daysUntil < 30) {
+    const weeks = Math.floor(daysUntil / 7);
+    return weeks === 1 ? "En 1 semana" : `En ${weeks} semanas`;
+  }
+  return `En ${daysUntil} días`;
+}
+
 /** Etiqueta del sábado–domingo actual (Europe/Madrid), p. ej. «sáb, 7 jun — dom, 8 jun». */
 export function getCurrentWeekendRangeLabel(): string {
   const now = new Date(

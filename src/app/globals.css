@@ -92,6 +92,22 @@
   .page-accent-music {
     @apply border-makina-purple/20 bg-makina-purple/[0.03];
   }
+  .page-accent-sessions {
+    @apply border-makina-purple/20 bg-makina-purple/[0.03];
+  }
+  .page-accent-releases {
+    @apply border-makina-gold/20 bg-makina-gold/[0.03];
+  }
+  .card-lift {
+    @apply transition-all duration-300 hover:-translate-y-0.5;
+  }
+  .detail-hero-glow {
+    @apply relative overflow-hidden;
+  }
+  .detail-hero-glow::before {
+    content: "";
+    @apply pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(255,45,106,0.15),transparent)];
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
