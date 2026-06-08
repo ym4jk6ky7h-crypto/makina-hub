@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Calendar, Headphones, MapPin } from "lucide-react";
 import { eventPosterUrl } from "@/lib/events/event-poster";
+import { preferUnoptimizedImage } from "@/lib/images/external-image-props";
 import { formatYoutubeDuration } from "@/lib/format-duration";
 import { resolveSessionPlay } from "@/lib/session-play";
 import { getSessionThumbnail } from "@/lib/session-thumbnail";
@@ -42,6 +43,7 @@ export function HomeFeatured({ nextEvent, featuredSession }: HomeFeaturedProps) 
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                   sizes="(max-width: 1024px) 100vw, 50vw"
+                  unoptimized={preferUnoptimizedImage(eventPoster)}
                 />
               ) : (
                 <div className="absolute inset-0 bg-gradient-to-br from-makina-pink/30 to-makina-purple/20" />

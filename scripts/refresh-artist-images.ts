@@ -1,11 +1,15 @@
 /**
- * Actualiza image_url solo para artistas con avatar genérico o URL no usable.
+ * Sincroniza image_url con el catálogo curado (data/artist-portraits.ts).
  *
  * npm run db:refresh-artist-images
  * npm run db:refresh-artist-images -- --dry-run
  */
 import { MAKINA_ARTISTS } from "../data/makina-artists";
-import { enrichArtistFull } from "./lib/enrich-artist";
+import { resolveCuratedPortraitUrl } from "../src/data/artist-portraits";
+import {
+  artistAvatarUrl,
+  isTrustedArtistPhoto,
+} from "../src/lib/artists/artist-image";
 import { createAdminClient, loadEnv } from "./lib/supabase-admin";
 
 loadEnv();
@@ -13,47 +17,37 @@ loadEnv();
 const dryRun = process.argv.includes("--dry-run");
 const supabase = createAdminClient();
 
-function isGenericAvatar(url: string | null | undefined): boolean {
-  return !url || url.includes("ui-avatars.com");
-}
-
 async function main() {
   const { data: rows } = await supabase.from("artists").select("slug, name, image_url");
   const bySlug = new Map((rows ?? []).map((r) => [r.slug, r]));
+
   const targets = MAKINA_ARTISTS.filter((seed) => {
     const row = bySlug.get(seed.slug);
-    return !row || isGenericAvatar(row.image_url);
+    if (!row) return true;
+    if (resolveCuratedPortraitUrl(seed.slug)) return row.image_url !== resolveCuratedPortraitUrl(seed.slug);
+    return !isTrustedArtistPhoto(seed.slug, row.image_url);
   });
 
-  console.log(`\n🖼  Refresco de fotos — ${targets.length} artistas sin foto real\n`);
+  console.log(`\n🖼  Refresco de fotos — ${targets.length} artistas a actualizar\n`);
 
   let ok = 0;
   for (const seed of targets) {
-    process.stdout.write(`${seed.name}… `);
-    const row = await enrichArtistFull(seed, {
-      discogsToken: process.env.DISCOGS_TOKEN,
-      youtubeApiKey: process.env.YOUTUBE_API_KEY,
-      skipMusicBrainz: true,
-    });
-
-    if (isGenericAvatar(row.image_url)) {
-      console.log("sin foto");
-      continue;
-    }
+    const portrait = resolveCuratedPortraitUrl(seed.slug);
+    const image_url = portrait ?? artistAvatarUrl(seed.name);
 
     if (dryRun) {
-      console.log(row.image_url.slice(0, 60));
+      console.log(`${seed.name} → ${portrait ? "curado" : "avatar"}`);
       ok++;
       continue;
     }
 
     const { error } = await supabase
       .from("artists")
-      .update({ image_url: row.image_url })
+      .update({ image_url })
       .eq("slug", seed.slug);
-    if (error) console.log(`ERROR ${error.message}`);
+    if (error) console.log(`ERROR ${seed.slug}: ${error.message}`);
     else {
-      console.log(row.sources.filter((s) => s !== "curated").join("+") || "ok");
+      console.log(`${seed.name} → ${portrait ? "curado" : "avatar"}`);
       ok++;
     }
   }

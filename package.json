@@ -10,6 +10,7 @@
     "db:generate-seed": "tsx scripts/generate-seed-sql.ts",
     "db:seed": "tsx scripts/seed.ts",
     "db:fix-artists": "tsx scripts/fix-artists-roster.ts",
+    "db:apply-portraits": "tsx scripts/apply-curated-portraits.ts",
     "db:discover-artists": "tsx scripts/discover-artists.ts",
     "db:discover-labels": "tsx scripts/discover-labels.ts",
     "db:discover-events": "tsx scripts/discover-events.ts",

@@ -9,6 +9,9 @@ export function preferUnoptimizedImage(url: string | null | undefined): boolean 
     if (host === "ui-avatars.com" || host === "www.ui-avatars.com") return true;
     if (host.includes("wikimedia.org")) return true;
     if (host.includes("cdninstagram.com") || host.endsWith(".fbcdn.net")) return true;
+    if (host.includes("makinalegends.com")) return true;
+    if (host.includes("barcelonarememberfestival.com")) return true;
+    if (host.includes("wp-content/uploads")) return true;
     return false;
   } catch {
     return true;

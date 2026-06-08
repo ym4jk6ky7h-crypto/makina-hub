@@ -4,24 +4,14 @@ import type { MakinaArtistSeed } from "../../data/makina-artists";
 import { discogsSearchQuery } from "../../data/artist-discogs-queries";
 import { formatArtistBiography } from "../../src/lib/artists/format-artist-biography";
 import type { AiArtistEnrichment } from "./openai-artist";
-import { fetchCommonsImageBest } from "./commons-image";
 import { fetchDiscogsArtist, type DiscogsResult } from "./discogs";
 import { fetchMusicBrainzArtist, type MusicBrainzResult } from "./musicbrainz";
 import {
   fetchSocialImages,
-  youtubeThumbnailFromUrl,
 } from "./social-image";
-import { CURATED_SESSION_WATCH_BY_SLUG } from "../../src/data/curated-session-youtube";
-import { avatarFallback, fetchWikipediaArtistBest, upscaleWikiThumb } from "./wikipedia";
+import { resolveCuratedPortraitUrl } from "../../src/data/artist-portraits";
+import { avatarFallback, fetchWikipediaArtistBest } from "./wikipedia";
 import { fetchYouTubeForArtist } from "./youtube";
-import { curatedSessionPortrait } from "./artist-portrait";
-
-function curatedSessionThumb(slug: string): string | null {
-  const watch = CURATED_SESSION_WATCH_BY_SLUG[`${slug}-sesion-makina`];
-  if (!watch) return null;
-  const m = watch.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-  return m ? `https://i.ytimg.com/vi/${m[1]}/hqdefault.jpg` : null;
-}
 
 export type EnrichedArtist = {
   slug: string;
@@ -93,32 +83,16 @@ function wikiSearchTerms(seed: MakinaArtistSeed, ai: AiArtistEnrichment | null):
 
 async function pickImage(
   seed: MakinaArtistSeed,
-  wikiThumb: string | null,
-  discogsImg: string | null,
-  youtubeUrl: string | null,
+  _wikiThumb: string | null,
+  _discogsImg: string | null,
+  _youtubeUrl: string | null,
   ai: AiArtistEnrichment | null
 ): Promise<{ url: string; sources: string[] }> {
   const imgSources: string[] = [];
-
-  const curatedPortrait = curatedSessionPortrait(seed.slug);
-  if (curatedPortrait) {
-    imgSources.push("youtube-curated");
-    return { url: curatedPortrait, sources: imgSources };
-  }
-
-  if (discogsImg && !discogsImg.includes("spacer.gif")) {
-    imgSources.push("discogs");
-    return { url: discogsImg, sources: imgSources };
-  }
-  if (wikiThumb) {
-    imgSources.push("wikipedia");
-    return { url: wikiThumb, sources: imgSources };
-  }
-
-  const commons = await fetchCommonsImageBest(wikiSearchTerms(seed, ai));
-  if (commons) {
-    imgSources.push("commons");
-    return { url: commons, sources: imgSources };
+  const curated = resolveCuratedPortraitUrl(seed.slug);
+  if (curated) {
+    imgSources.push("curated");
+    return { url: curated, sources: imgSources };
   }
 
   const socialImg = await fetchSocialImages([
@@ -128,18 +102,6 @@ async function pickImage(
   if (socialImg) {
     imgSources.push("social");
     return { url: socialImg, sources: imgSources };
-  }
-
-  const ytThumb = youtubeThumbnailFromUrl(youtubeUrl);
-  if (ytThumb) {
-    imgSources.push("youtube");
-    return { url: ytThumb, sources: imgSources };
-  }
-
-  const curatedThumb = curatedSessionThumb(seed.slug);
-  if (curatedThumb) {
-    imgSources.push("youtube-curated");
-    return { url: curatedThumb, sources: imgSources };
   }
 
   imgSources.push("avatar");
@@ -188,8 +150,8 @@ export async function enrichArtistFull(
   const biography = mergeBiography(seed, wiki, discogs, ai);
   const { url: image_url, sources: imgSources } = await pickImage(
     seed,
-    upscaleWikiThumb(wiki.thumbnailUrl),
-    discogs.imageUrl,
+    null,
+    null,
     youtube_url,
     ai
   );

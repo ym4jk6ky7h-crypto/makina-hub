@@ -10,6 +10,7 @@ import { favoriteFromEvent } from "@/lib/favorites/build-item";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { musicEventJsonLd } from "@/lib/seo/json-ld";
 import { eventPosterUrl } from "@/lib/events/event-poster";
+import { preferUnoptimizedImage } from "@/lib/images/external-image-props";
 import { getEventBySlug } from "@/services/events.service";
 import { formatDate } from "@/lib/utils";
 
@@ -51,6 +52,7 @@ export default async function EventoDetailPage({ params }: PageProps) {
               className="object-cover"
               priority
               sizes="(max-width: 1024px) 100vw, 50vw"
+              unoptimized={preferUnoptimizedImage(poster)}
             />
           </div>
           <div>

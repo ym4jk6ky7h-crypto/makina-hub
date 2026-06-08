@@ -400,6 +400,66 @@ Vercel detecta el push y despliega solo (1–3 min). Puedes ver el progreso en *
 
 ---
 
+## PASO 10 — Newsletter y sincronización automática
+
+### 10a — Tabla newsletter en Supabase
+
+En **Supabase → SQL Editor**, pega y ejecuta el contenido de `004_newsletter_subscribers.sql`:
+
+```sql
+CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email TEXT NOT NULL,
+  source TEXT,
+  subscribed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  unsubscribed_at TIMESTAMPTZ,
+  CONSTRAINT newsletter_subscribers_email_unique UNIQUE (email)
+);
+CREATE INDEX IF NOT EXISTS idx_newsletter_subscribers_email
+  ON newsletter_subscribers (lower(email));
+ALTER TABLE newsletter_subscribers ENABLE ROW LEVEL SECURITY;
+```
+
+Comprueba en Mac:
+
+```bash
+npm run db:setup-newsletter
+```
+
+Debe mostrar `✅ Tabla newsletter_subscribers lista.`
+
+Prueba el formulario en `/`, footer o `/sobre`.
+
+### 10b — Cron diario en Vercel
+
+1. **Settings → Environment Variables** → añade:
+   - **Name:** `CRON_SECRET`
+   - **Value:** una cadena larga aleatoria (ej. generada con `openssl rand -hex 32`)
+   - **Environments:** Production (y Preview si quieres probar)
+
+2. **Redeploy** tras añadir la variable.
+
+3. El archivo `vercel.json` ya programa el cron a las **6:00 UTC** (`0 6 * * *`) → `/api/cron/daily-sync`.
+
+4. Comprueba estado:
+
+| URL | Qué deberías ver |
+|-----|------------------|
+| `/api/health` | `{ "ok": true, "checks": { "supabase": "ok", "cronSecret": "ok" } }` |
+
+5. Prueba manual del cron (sustituye `TU_SECRETO` y tu dominio):
+
+```bash
+curl -s -H "Authorization: Bearer TU_SECRETO" \
+  "https://makina-hub.vercel.app/api/cron/daily-sync" | head
+```
+
+Respuesta esperada: `"ok": true` y `"exitCode": 0`.
+
+El cron actualiza eventos, novedades y sesiones YouTube recientes sin intervención manual.
+
+---
+
 ## Checklist final
 
 - [ ] Variables 1 y 2 en Vercel  
@@ -407,6 +467,8 @@ Vercel detecta el push y despliega solo (1–3 min). Puedes ver el progreso en *
 - [ ] `NEXT_PUBLIC_SITE_URL` = URL real + Redeploy  
 - [ ] `/eventos` muestra fiestas  
 - [ ] (Opcional) `npm run db:sync-all` hecho en Mac  
+- [ ] Migración `004_newsletter_subscribers` aplicada en Supabase  
+- [ ] `CRON_SECRET` en Vercel + `/api/health` con `cronSecret: ok`  
 
 ---
 

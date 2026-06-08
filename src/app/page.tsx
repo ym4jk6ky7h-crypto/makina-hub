@@ -7,6 +7,7 @@ import { ReleaseCard } from "@/components/cards/release-card";
 import { SessionCard } from "@/components/cards/session-card";
 import { HomeStatsBar } from "@/components/home/home-stats-bar";
 import { HomeFeatured } from "@/components/home/home-featured";
+import { HomeNewsletter } from "@/components/home/home-newsletter";
 import { HomeQuickDiscover } from "@/components/home/home-quick-discover";
 import {
   CarouselItem,
@@ -284,6 +285,7 @@ export default async function HomePage() {
             )}
           </section>
         </div>
+        <HomeNewsletter />
       </div>
     );
   } catch (error) {

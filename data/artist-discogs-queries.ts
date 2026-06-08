@@ -14,6 +14,16 @@ export const ARTIST_DISCOGS_QUERIES: Record<string, string> = {
   markos13: "Markos13 DJ makina",
   "alberto-tapia": "Alberto Tapia DJ",
   richard: "Richard DJ makina Barcelona",
+  "frank-trax": "Frank T.R.A.X. makina",
+  chumi: "Chumi DJ makina",
+  "julio-navas": "Julio Navas DJ",
+  "dj-buffon": "Buffon DJ makina",
+  "toni-peret": "Toni Peret DJ",
+  "nando-dixkontrol": "Nando Dixkontrol DJ",
+  gollum: "DJ Gollum hardcore",
+  "scott-brown": "Scott Brown musician hardcore",
+  "darren-styles": "Darren Styles hardcore",
+  "ricardo-f": "Ricardo F DJ makina",
 };
 
 export function discogsSearchQuery(slug: string, displayName: string): string {

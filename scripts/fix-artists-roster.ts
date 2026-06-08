@@ -1,10 +1,11 @@
 /**
- * Fusiona duplicados, restaura nombres del roster y aplica fotos de sesión YouTube curadas.
+ * Fusiona duplicados, restaura nombres del roster y aplica retratos curados.
  *
  * npm run db:fix-artists
  */
 import { MAKINA_ARTISTS } from "../data/makina-artists";
-import { curatedSessionPortrait } from "./lib/artist-portrait";
+import { resolveCuratedPortraitUrl } from "../src/data/artist-portraits";
+import { artistAvatarUrl } from "../src/lib/artists/artist-image";
 import { createAdminClient, loadEnv } from "./lib/supabase-admin";
 
 loadEnv();
@@ -59,18 +60,20 @@ async function main() {
 
   let fixed = 0;
   for (const seed of MAKINA_ARTISTS) {
-    const portrait = curatedSessionPortrait(seed.slug);
+    const portrait = resolveCuratedPortraitUrl(seed.slug);
+    const image_url = portrait ?? artistAvatarUrl(seed.name);
+
     const { error } = await supabase
       .from("artists")
       .update({
         name: seed.name,
-        ...(portrait ? { image_url: portrait } : {}),
+        image_url,
       })
       .eq("slug", seed.slug);
 
     if (error) console.log(`✗ ${seed.slug}: ${error.message}`);
     else {
-      console.log(`✓ ${seed.name}${portrait ? " + foto sesión" : ""}`);
+      console.log(`✓ ${seed.name}${portrait ? " + foto curada" : ""}`);
       fixed++;
     }
   }
