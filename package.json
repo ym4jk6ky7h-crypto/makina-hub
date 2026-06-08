@@ -27,6 +27,7 @@
     "db:refresh-artist-images": "tsx scripts/refresh-artist-images.ts",
     "db:refresh-artist-bios": "tsx scripts/refresh-artist-bios.ts",
     "db:setup-newsletter": "tsx scripts/setup-newsletter.ts",
+    "db:send-newsletter": "tsx scripts/send-newsletter-digest.ts",
     "db:refresh-session-durations": "tsx scripts/refresh-session-durations.ts",
     "db:clear-track-previews": "tsx scripts/clear-track-previews.ts",
     "db:sync-track-downloads": "tsx scripts/sync-track-previews.ts"

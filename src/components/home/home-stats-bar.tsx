@@ -19,7 +19,7 @@ export function HomeStatsBar({ stats }: HomeStatsBarProps) {
   ];
 
   return (
-    <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 sm:gap-4">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 sm:gap-4">
       {items.map(({ value, label, icon: Icon }) => (
         <div
           key={label}

@@ -458,6 +458,50 @@ Respuesta esperada: `"ok": true` y `"exitCode": 0`.
 
 El cron actualiza eventos, novedades y sesiones YouTube recientes sin intervención manual.
 
+### 10c — Envío del digest semanal (Resend)
+
+1. Crea cuenta en [resend.com](https://resend.com) → **API Keys** → genera una clave.
+
+2. En Vercel → **Environment Variables**, añade:
+
+| Key | Value |
+|-----|--------|
+| `RESEND_API_KEY` | `re_...` (la clave de Resend) |
+| `NEWSLETTER_FROM_EMAIL` | `Makina Hub <newsletter@tudominio.com>` (dominio verificado en Resend) |
+
+Para pruebas puedes omitir `NEWSLETTER_FROM_EMAIL`; se usará `onboarding@resend.dev` (solo a tu email de cuenta Resend).
+
+3. En Supabase SQL Editor ejecuta `007_newsletter_unsubscribe_token.sql`:
+
+```sql
+ALTER TABLE newsletter_subscribers
+  ADD COLUMN IF NOT EXISTS unsubscribe_token TEXT;
+
+CREATE UNIQUE INDEX IF NOT EXISTS newsletter_subscribers_unsubscribe_token_key
+  ON newsletter_subscribers (unsubscribe_token)
+  WHERE unsubscribe_token IS NOT NULL;
+```
+
+4. Comprueba en Mac:
+
+```bash
+npm run db:setup-newsletter
+npm run db:send-newsletter -- --dry-run
+```
+
+5. El cron semanal está en `vercel.json`: **viernes 8:00 UTC** → `/api/cron/newsletter-digest`.
+
+6. Prueba manual del digest:
+
+```bash
+curl -s -H "Authorization: Bearer TU_CRON_SECRET" \
+  "https://makina-hub.vercel.app/api/cron/newsletter-digest"
+```
+
+7. Desuscripción: cada email incluye enlace a `/desuscribir?token=...`.
+
+8. `/api/health` debe mostrar `resendApiKey: ok` cuando la clave esté en Vercel.
+
 ---
 
 ## Checklist final
@@ -468,7 +512,9 @@ El cron actualiza eventos, novedades y sesiones YouTube recientes sin intervenci
 - [ ] `/eventos` muestra fiestas  
 - [ ] (Opcional) `npm run db:sync-all` hecho en Mac  
 - [ ] Migración `004_newsletter_subscribers` aplicada en Supabase  
+- [ ] Migración `007_newsletter_unsubscribe_token` aplicada en Supabase  
 - [ ] `CRON_SECRET` en Vercel + `/api/health` con `cronSecret: ok`  
+- [ ] (Opcional digest) `RESEND_API_KEY` + `NEWSLETTER_FROM_EMAIL` en Vercel  
 
 ---
 

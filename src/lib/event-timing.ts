@@ -33,6 +33,35 @@ export function getEventTimingBadge(eventDate: string): EventTimingBadge | null 
   return null;
 }
 
+export function filterEventsThisWeekend<T extends { event_date: string }>(
+  items: T[]
+): T[] {
+  return items.filter((e) => getEventTimingBadge(e.event_date) !== null);
+}
+
+/** Etiqueta del sábado–domingo actual (Europe/Madrid), p. ej. «sáb, 7 jun — dom, 8 jun». */
+export function getCurrentWeekendRangeLabel(): string {
+  const now = new Date(
+    new Date().toLocaleString("en-US", { timeZone: TZ })
+  );
+  now.setHours(0, 0, 0, 0);
+  const dow = now.getDay();
+  const daysToSaturday = dow === 6 ? 0 : dow === 0 ? -1 : 6 - dow;
+  const saturday = new Date(now);
+  saturday.setDate(now.getDate() + daysToSaturday);
+  const sunday = new Date(saturday);
+  sunday.setDate(saturday.getDate() + 1);
+
+  const fmt = (d: Date) =>
+    d.toLocaleDateString("es-ES", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+    });
+
+  return `${fmt(saturday)} — ${fmt(sunday)}`;
+}
+
 export function monthKeyFromISO(iso: string): string {
   return eventDateISO(iso).slice(0, 7);
 }

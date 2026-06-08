@@ -5,8 +5,8 @@ import { EventCard } from "@/components/cards/event-card";
 import { ArtistCard } from "@/components/cards/artist-card";
 import { ReleaseCard } from "@/components/cards/release-card";
 import { SessionCard } from "@/components/cards/session-card";
+import { HomeWeekendHero } from "@/components/home/home-weekend-hero";
 import { HomeStatsBar } from "@/components/home/home-stats-bar";
-import { HomeFeatured } from "@/components/home/home-featured";
 import { HomeNewsletter } from "@/components/home/home-newsletter";
 import { HomeQuickDiscover } from "@/components/home/home-quick-discover";
 import {
@@ -20,6 +20,7 @@ import { SetupRequired } from "@/components/setup/setup-required";
 import { EmptyDatabase } from "@/components/setup/empty-database";
 import { Button } from "@/components/ui/button";
 import { getArtistImageUrl } from "@/lib/artists/artist-image";
+import { filterEventsThisWeekend, getEventTimingBadge } from "@/lib/event-timing";
 import { SITE_IMAGES } from "@/lib/site-images";
 import {
   formatSupabaseError,
@@ -66,12 +67,16 @@ export default async function HomePage() {
     });
 
     const nextEvent = events[0] ?? null;
+    const weekendEvents = filterEventsThisWeekend(events);
+    const laterEvents = events
+      .filter((e) => !getEventTimingBadge(e.event_date))
+      .slice(0, 4);
     const featuredSession =
       sessions.find((s) => resolveSessionPlay(s).videoId) ?? sessions[0] ?? null;
 
     return (
       <div>
-        <section className="relative min-h-[520px] overflow-hidden border-b border-white/5 lg:min-h-[580px]">
+        <section className="relative min-h-[440px] overflow-hidden border-b border-white/5 lg:min-h-[480px]">
           <Image
             src={SITE_IMAGES.heroHome}
             alt="Multitud en festival de música electrónica"
@@ -85,7 +90,7 @@ export default async function HomePage() {
           <div className="absolute inset-0 bg-hero-gradient opacity-70" />
           <div className="noise-overlay pointer-events-none absolute inset-0 opacity-20" />
 
-          <div className="relative mx-auto flex min-h-[520px] max-w-7xl flex-col justify-center px-4 py-16 lg:min-h-[580px] lg:px-8 lg:py-20">
+          <div className="relative mx-auto flex min-h-[440px] max-w-7xl flex-col justify-center px-4 py-14 lg:min-h-[480px] lg:px-8 lg:py-16">
             <div className="max-w-3xl">
               <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-makina-pink/40 bg-black/40 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-makina-pink backdrop-blur-sm">
                 <Zap className="h-3.5 w-3.5" />
@@ -144,12 +149,21 @@ export default async function HomePage() {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
 
+        <HomeWeekendHero
+          weekendEvents={weekendEvents}
+          fallbackEvent={nextEvent}
+          featuredSession={featuredSession}
+        />
+
+        <section className="border-b border-white/5 bg-card/30 py-8">
+          <div className="mx-auto max-w-7xl px-4 lg:px-8">
             <HomeStatsBar stats={stats} />
           </div>
         </section>
 
-        <HomeFeatured nextEvent={nextEvent} featuredSession={featuredSession} />
         <HomeQuickDiscover />
 
         <section className="border-b border-white/5 bg-card/40 py-6">
@@ -192,6 +206,25 @@ export default async function HomePage() {
         </section>
 
         <div className="mx-auto max-w-7xl space-y-16 px-4 py-16 lg:px-8">
+          {laterEvents.length > 0 && (
+          <section className="rounded-2xl border border-white/5 bg-makina-mesh p-6 sm:p-8">
+            <SectionHeader
+              title="Más en agenda"
+              subtitle="Próximas fechas después de este fin de semana"
+              href="/eventos"
+              linkLabel="Ver agenda"
+            />
+            <ResponsiveCardRow desktopGrid="lg:grid lg:grid-cols-4 lg:gap-4">
+                {laterEvents.map((event) => (
+                  <CarouselItem key={event.id}>
+                    <EventCard event={event} />
+                  </CarouselItem>
+                ))}
+              </ResponsiveCardRow>
+          </section>
+          )}
+
+          {laterEvents.length === 0 && events.length > 0 && weekendEvents.length === 0 && (
           <section className="rounded-2xl border border-white/5 bg-makina-mesh p-6 sm:p-8">
             <SectionHeader
               title="Próximos eventos"
@@ -199,23 +232,32 @@ export default async function HomePage() {
               href="/eventos"
               linkLabel="Ver agenda"
             />
-            {events.length > 0 ? (
-              <ResponsiveCardRow desktopGrid="lg:grid lg:grid-cols-4 lg:gap-4">
+            <ResponsiveCardRow desktopGrid="lg:grid lg:grid-cols-4 lg:gap-4">
                 {events.slice(0, 4).map((event) => (
                   <CarouselItem key={event.id}>
                     <EventCard event={event} />
                   </CarouselItem>
                 ))}
               </ResponsiveCardRow>
-            ) : (
+          </section>
+          )}
+
+          {events.length === 0 && (
+          <section className="rounded-2xl border border-white/5 bg-makina-mesh p-6 sm:p-8">
+            <SectionHeader
+              title="Próximos eventos"
+              subtitle={`${stats.eventsUpcoming} en agenda · desliza en móvil`}
+              href="/eventos"
+              linkLabel="Ver agenda"
+            />
               <HomeSectionEmpty
                 className="mt-6"
                 message="No hay eventos próximos en la agenda."
                 actionLabel="Ver agenda completa"
                 actionHref="/eventos?fecha=all"
               />
-            )}
           </section>
+          )}
 
           <section>
             <SectionHeader

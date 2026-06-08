@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createUnsubscribeToken } from "@/lib/newsletter/unsubscribe-token";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -23,12 +24,22 @@ export async function POST(request: Request) {
       );
     }
 
+    const { data: existing } = await supabase
+      .from("newsletter_subscribers")
+      .select("unsubscribe_token")
+      .eq("email", email)
+      .maybeSingle();
+
+    const unsubscribe_token =
+      existing?.unsubscribe_token ?? createUnsubscribeToken();
+
     const { error } = await supabase.from("newsletter_subscribers").upsert(
       {
         email,
         source,
         subscribed_at: new Date().toISOString(),
         unsubscribed_at: null,
+        unsubscribe_token,
       },
       { onConflict: "email" }
     );
