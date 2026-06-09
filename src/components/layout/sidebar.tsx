@@ -74,15 +74,15 @@ export function Sidebar() {
         </div>
 
         <Link
-          href="/analyzr"
-          className="group relative overflow-hidden rounded-xl border border-makina-cyan/30 bg-gradient-to-br from-makina-cyan/10 to-makina-purple/10 p-4"
+          href="/analyzr-vinyl"
+          className="group relative overflow-hidden rounded-xl border border-makina-gold/30 bg-gradient-to-br from-makina-gold/10 to-makina-pink/5 p-4"
         >
-          <p className="text-[10px] font-bold uppercase tracking-widest text-makina-cyan">
-            App iOS
+          <p className="text-[10px] font-bold uppercase tracking-widest text-makina-gold">
+            Vinilo
           </p>
-          <p className="mt-1 font-display text-base font-bold leading-tight">Analyzr</p>
+          <p className="mt-1 font-display text-base font-bold leading-tight">Analyzr Vinyl</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            BPM, KEY y estructura DJ offline en tu iPhone.
+            Tu colección mákina catalogada — Gratis y Pro.
           </p>
           <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-makina-cyan">
             Gratis y Pro

@@ -105,12 +105,12 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/analyzr"
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-makina-cyan transition-colors hover:underline focus-visible:rounded-sm"
-                >
-                  Analyzr App
-                </Link>
+                  <Link
+                    href="/analyzr-vinyl"
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-makina-gold transition-colors hover:underline focus-visible:rounded-sm"
+                  >
+                    Analyzr Vinyl
+                  </Link>
               </li>
               <li>
                 <Link

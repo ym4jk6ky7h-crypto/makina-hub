@@ -60,6 +60,11 @@ const nextConfig: NextConfig = {
         destination: "/eventos/:slug",
         permanent: true,
       },
+      {
+        source: "/analyzr",
+        destination: "/analyzr-vinyl",
+        permanent: true,
+      },
     ];
   },
   images: {

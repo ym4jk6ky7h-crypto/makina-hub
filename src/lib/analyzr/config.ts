@@ -1,14 +1,19 @@
 /**
- * Configuración comercial de Analyzr (app iOS de análisis DJ).
- * URLs en Vercel / CLAVES-SUPABASE.env cuando publiques en App Store.
+ * Analyzr Vinyl — producto vinilo en Makina Hub (no confundir con Analyzr).
+ * URLs en Vercel cuando publiques descarga / tienda.
  */
 
-export const ANALYZR_NAME = "Analyzr";
-export const ANALYZR_TAGLINE = "BPM, tonalidad y estructura DJ en tu iPhone";
-export const ANALYZR_DESCRIPTION =
-  "Apunta el micrófono, graba unos segundos y obtén BPM, KEY y estructura en notación de cabina — 100 % offline, pensado para makina y hard dance.";
+export const ANALYZR_VINYL_NAME = "Analyzr Vinyl";
+export const ANALYZR_NAME = ANALYZR_VINYL_NAME; // alias interno legacy
+export const ANALYZR_VINYL_TAGLINE = "Tu escena mákina en vinilo, catalogada";
+export const ANALYZR_TAGLINE = ANALYZR_VINYL_TAGLINE;
+export const ANALYZR_VINYL_DESCRIPTION =
+  "Organiza tu colección de vinilos remember y mákina, descubre lanzamientos del catálogo Makina Hub y lleva tu biblioteca de pista a cualquier sitio.";
+export const ANALYZR_DESCRIPTION = ANALYZR_VINYL_DESCRIPTION;
+export const ANALYZR_COMING_SOON_NOTE =
+  "Analyzr (app principal) llegará más adelante. Esta sección es Analyzr Vinyl.";
 
-export type AnalyzrTier = {
+export type AnalyzrVinylTier = {
   id: "free" | "pro";
   name: string;
   price: string;
@@ -24,97 +29,111 @@ function envUrl(key: string): string | null {
   return v && v.startsWith("http") ? v : null;
 }
 
-export function getAnalyzrTiers(): AnalyzrTier[] {
+export function getAnalyzrVinylTiers(): AnalyzrVinylTier[] {
   const freeUrl =
+    envUrl("NEXT_PUBLIC_ANALYZR_VINYL_FREE_URL") ??
     envUrl("NEXT_PUBLIC_ANALYZR_FREE_URL") ??
     envUrl("NEXT_PUBLIC_ANALYZR_APP_STORE_URL");
-  const proUrl = envUrl("NEXT_PUBLIC_ANALYZR_PRO_URL");
+  const proUrl =
+    envUrl("NEXT_PUBLIC_ANALYZR_VINYL_PRO_URL") ?? envUrl("NEXT_PUBLIC_ANALYZR_PRO_URL");
 
   return [
     {
       id: "free",
       name: "Gratis",
       price: "0 €",
-      priceNote: "Para empezar en cabina",
-      cta: freeUrl ? "Descargar gratis" : "Ver cómo funciona",
-      href: freeUrl ?? "/analyzr#descargar",
+      priceNote: "Para empezar con tu colección",
+      cta: freeUrl ? "Descargar gratis" : "Ver Analyzr Vinyl",
+      href: freeUrl ?? "/analyzr-vinyl#descargar",
       features: [
-        "BPM y tonalidad (KEY) offline",
-        "Preset Makina / Hard (165–195 BPM)",
-        "Medidor de entrada en tiempo real",
-        "Última sesión guardada",
-        "Copiar estructura al portapapeles",
+        "Catálogo personal de vinilos",
+        "Sincronizado con artistas y sellos de Makina Hub",
+        "Búsqueda por DJ, sello o título",
+        "Listado de novedades de la escena",
+        "Modo consulta sin conexión (próximamente)",
       ],
     },
     {
       id: "pro",
       name: "Pro",
-      price: "4,99 €",
-      priceNote: "Pago único · sin suscripción",
-      cta: proUrl ? "Conseguir Pro" : "Lista de espera Pro",
-      href: proUrl ?? "/analyzr#pro",
+      price: "Próximamente",
+      priceNote: "Precio final cuando publiquemos",
+      cta: proUrl ? "Conseguir Pro" : "Avisarme de Pro",
+      href: proUrl ?? "/analyzr-vinyl#pro",
       highlighted: true,
       features: [
         "Todo lo de Gratis",
-        "Estructura DJ completa (frases 32 beats)",
-        "Historial ilimitado de análisis",
-        "Todos los presets: Techno, House, DnB…",
-        "Panel técnico y ajuste fino de BPM",
-        "Prioridad en nuevas funciones",
+        "Colección ilimitada + etiquetas",
+        "Listas para cabina y sesiones",
+        "Historial de adquisiciones",
+        "Exportar colección",
+        "Acceso anticipado a funciones nuevas",
       ],
     },
   ];
 }
 
-export const ANALYZR_FEATURES = [
+export const getAnalyzrTiers = getAnalyzrVinylTiers;
+
+export const ANALYZR_VINYL_FEATURES = [
   {
-    title: "100 % offline",
-    description: "Sin nube, sin cuenta, sin internet. Tu audio no sale del iPhone.",
+    title: "Hecho para la mákina",
+    description: "Artistas, sellos y novedades del catálogo Makina Hub, pensado para DJs de vinilo.",
   },
   {
-    title: "Hecho para mákina",
-    description: "Preset Makina/Hard y rango 165–195 BPM optimizado para la escena.",
+    title: "Tu colección",
+    description: "Guarda qué tienes en estantería y qué te falta — sin hojas de cálculo.",
   },
   {
-    title: "Estructura de cabina",
-    description: "Notación DJ real: 8)4(2)4(2)8)16 — cada número es un compás.",
+    title: "Descubrimiento",
+    description: "Novedades con enlace de compra y referencias de la escena catalana.",
   },
   {
-    title: "Micrófono → resultados",
-    description: "START, deja grabar 8–20 s, STOP. BPM, KEY y estructura al instante.",
+    title: "Gratis y Pro",
+    description: "Empieza sin pagar; la versión Pro ampliará herramientas de cabina.",
   },
 ] as const;
 
-export const ANALYZR_STEPS = [
+export const ANALYZR_FEATURES = ANALYZR_VINYL_FEATURES;
+
+export const ANALYZR_VINYL_STEPS = [
   {
     step: "01",
-    title: "Apunta al altavoz",
-    description: "En la cabina, en la pista o desde otro móvil. El medidor VU te guía.",
+    title: "Explora el catálogo",
+    description: "Artistas, sellos y novedades curadas en Makina Hub.",
   },
   {
     step: "02",
-    title: "Graba y para",
-    description: "Mínimo 8 segundos; 20+ recomendado para estructura fiable.",
+    title: "Añade tus vinilos",
+    description: "Marca lo que tienes, lo que buscas y tus favoritos de pista.",
   },
   {
     step: "03",
-    title: "Analiza en local",
-    description: "BPM, tonalidad y frases DJ procesados en el propio iPhone.",
+    title: "Llévalo a la cabina",
+    description: "Consulta tu colección antes de pinchar o comprar el siguiente disco.",
   },
 ] as const;
 
-export const ANALYZR_REQUIREMENTS = [
-  "iPhone con iOS 17 o superior",
-  "Micrófono (permiso en el primer uso)",
-  "Volumen suficiente cerca del altavoz",
-  "Dispositivo real (no Simulador)",
+export const ANALYZR_STEPS = ANALYZR_VINYL_STEPS;
+
+export const ANALYZR_VINYL_REQUIREMENTS = [
+  "Compatible con web y app (cuando publiquemos)",
+  "Cuenta opcional — muchas funciones sin registro",
+  "Conexión para sincronizar novedades del hub",
 ] as const;
 
-/** Demo visual en mockups (valores de ejemplo makina). */
-export const ANALYZR_DEMO = {
-  bpm: 175,
-  key: "Am",
-  structure: "8)4(2)4(2)8)16",
-  quality: "Buena señal",
-  confidence: 94,
+export const ANALYZR_REQUIREMENTS = ANALYZR_VINYL_REQUIREMENTS;
+
+/** Demo visual en mockups (vinilo de ejemplo). */
+export const ANALYZR_VINYL_DEMO = {
+  artist: "Skudero",
+  title: "Flying Free",
+  label: "Pont Aeri",
+  year: "1995",
+  bpm: "175",
+  genre: "Mákina",
 } as const;
+
+export const ANALYZR_DEMO = ANALYZR_VINYL_DEMO;
+
+export const ANALYZR_VINYL_PATH = "/analyzr-vinyl";

@@ -14,12 +14,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/buscar",
     "/sobre",
     "/favoritos",
-    "/analyzr",
+    "/analyzr-vinyl",
   ].map((path) => ({
     url: `${SITE_URL}${path}`,
     lastModified: new Date(),
     changeFrequency: "weekly" as const,
-    priority: path === "" ? 1 : path === "/analyzr" ? 0.95 : 0.8,
+    priority: path === "" ? 1 : path === "/analyzr-vinyl" ? 0.95 : 0.8,
   }));
 
   try {

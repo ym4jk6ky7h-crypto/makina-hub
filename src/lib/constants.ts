@@ -37,8 +37,8 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/sesiones", label: "Sesiones", icon: Headphones, group: "catalogo", primary: true },
   { href: "/sellos", label: "Sellos", icon: Tag, group: "catalogo", primary: true },
   {
-    href: "/analyzr",
-    label: "Analyzr",
+    href: "/analyzr-vinyl",
+    label: "Analyzr Vinyl",
     icon: AudioWaveform,
     group: "tools",
     primary: true,

@@ -141,10 +141,10 @@ export default async function HomePage() {
                     Sesiones
                   </Link>
                   <Link
-                    href="/analyzr"
-                    className="inline-flex items-center gap-1 font-semibold text-makina-cyan hover:underline"
+                    href="/analyzr-vinyl"
+                    className="inline-flex items-center gap-1 font-semibold text-makina-gold hover:underline"
                   >
-                    Analyzr App
+                    Analyzr Vinyl
                   </Link>
                   <Link
                     href="/ask"
